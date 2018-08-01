@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+import Red#!/usr/bin/env python
 import os
 import sys
 
