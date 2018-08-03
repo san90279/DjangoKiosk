@@ -26,7 +26,7 @@ SECRET_KEY = '8(wnml6cxp-)@@#ze^ev3325nqhcu%br&l8a=8ga@fyac*9rgf'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
+APPEND_SLASH = False
 
 # Application definition
 
@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'polls'
+    'polls',
+    'Auth',
 ]
 
 MIDDLEWARE = [
@@ -48,6 +49,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+MIDDLEWARE_CLASSES = [
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # 確認此行有加
 ]
 
 ROOT_URLCONF = 'DjangoKiosk.urls'
