@@ -22,8 +22,8 @@ def V_CheckAuth(request):
 		auth.login(request, user)
 
 		try:
-			MenuData=M_Menu.objects.all()
-			request.session['Menu']=serializers.serialize('json', MenuData, fields=('id',))
+			MenuData=M_Menu.objects.filter(IsActive=True)
+			request.session['Menu']=serializers.serialize('json', MenuData, fields=('id','MenuName','MenuLink','MenuType','MenuParent','MenuIcon'))
 		except:
 			request.session['Menu']=''
 
