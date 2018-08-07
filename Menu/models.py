@@ -4,7 +4,7 @@ from django.db import models
 class M_Menu(models.Model):
     MenuTypeList=(
         ('MT01','功能選項'),
-        ('MT01','連結選項'),
+        ('MT02','連結選項'),
     )
 
 
