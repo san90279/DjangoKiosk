@@ -7,6 +7,9 @@ def home(request):
 
 def login(request):
 		return  render(request, 'login.html')
-		
+
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
+
+def index_Demo(request):
+	return  render(request, 'index-Demo.html')

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'polls',
     'Auth',
     'Menu',
+    'EmployeeCard',
 ]
 
 MIDDLEWARE = [
@@ -60,7 +61,8 @@ ROOT_URLCONF = 'DjangoKiosk.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/home/pi/DjangoKiosk/template'],
+        #'DIRS': ['/home/pi/DjangoKiosk/template'],
+        'DIRS':[os.path.join(BASE_DIR, "template")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
