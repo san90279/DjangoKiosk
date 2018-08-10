@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}{{sum}}{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block container %}
+<div class="card mb-3">
+  <div class="card-header">
+    <i class="fas fa-table"></i>
+    員工卡號編輯</div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <form method="post" action="/EmployeeCard/Save/">
+        {% csrf_token %}
+        <table class="table table-bordered" id="EmployeeCardTable" width="100%" cellspacing="0">
+          <input type="hidden" name="pk" id="pk" value="{{ id }}">
+          <tr>
+            <th>代碼</th><td><input type="text" class="form-control" value="{{ EmployeeID }}" name="EmployeeID" id="EmployeeID"></td>
+          </tr>
+          <tr>
+            <th>名稱</th><td><input type="text" class="form-control" value="{{ EmployeeName }}" name="EmployeeName" id="EmployeeName"></td>
+          </tr>
+          <tr>
+            <th>卡號</th><td><input type="text" class="form-control" value="{{ CardNo }}" name="CardNo" id="CardNo"></td>
+          </tr>
+          <tr>
+            <th>是否在職</th><td><input type="checkbox" value="True" name="IsWork" id="IsWork" {% if IsWork %} checked {% endif %} class="editor-active"></td>
+          </tr>
+          <tr>
+            <td colspan="2"><input type="submit" value="儲存" class="btn btn-primary"></td>
+          </tr>
+        </table>
+      </form>
+    </div>
+  </div>
+  <div class="card-footer small text-muted">Updated {% now "SHORT_DATETIME_FORMAT" %}</div>
+</div>
+{% endblock %}
+
+{% block foot %}Copyright © Cypress 2018{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+  $(document).ready(function() {
+
+  });
+</script>
+{% endblock %}
