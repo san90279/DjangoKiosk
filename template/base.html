@@ -117,7 +117,36 @@
   <script src="/static/js/sb-admin.min.js"></script>
   <!-- Demo scripts for this page-->
   <!--<script src="/static/js/demo/datatables-demo.js"></script>-->
-  <!--<script src="/static/js/demo/chart-area-demo.js"></script>-->
+  <!--<script src="/static/js/demo/chart-area-demo.js"></script>-->.
+  <script>
+  function load_menu_init(mid){
+    var session={{request.session.Menu|safe}};
+    $.each(session, function(i, item) {
+      var id=item.pk;
+      var nm=item.fields.MenuName;
+      var link=item.fields.MenuLink;
+      var par=item.fields.MenuParent;
+      var icon=item.fields.MenuIcon;
+      var t=item.fields.MenuType;
+      var drop='#sidebar .sidebar.navbar-nav .nav-item.dropdown'+id;
+      var drop2='#sidebar .sidebar.navbar-nav .nav-item.dropdown'+id+' a';
+      var dropsub='#sidebar .sidebar.navbar-nav .nav-item.dropdown'+par+' .dropdown-menu';
+      if(par==mid)
+      {
+        alert(nm);
+        load_menu_init(id);
+      }
+
+    });
+  }
+
+    $(function() {
+          $('#sidebar').append('<ul class="sidebar navbar-nav">');
+          load_menu_init(null);
+
+
+    })
+  </script>
   {% block js %}
   {% endblock %}
 </html>
