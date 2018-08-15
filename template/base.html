@@ -30,6 +30,10 @@
       <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
         <i class="fas fa-bars"></i>
       </button>
+      <a href="#sidebar" data-toggle="collapse">
+        <i class="fa fa-navicon fa-lg"></i>
+      </a>
+      <hr>
 
       <!-- Navbar Search -->
       <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
@@ -43,10 +47,7 @@
             <i class="fas fa-user-circle fa-fw"></i>
           </a>
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-            <a class="dropdown-item" href="#">Settings</a>
-            <a class="dropdown-item" href="#">Activity Log</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+            <a class="dropdown-item" href="/Auth/login/">登出</a>
           </div>
         </li>
       </ul>
@@ -55,27 +56,8 @@
     <div id="wrapper">
 
       <!-- Sidebar -->
-      <ul class="sidebar navbar-nav">
-        {% for m in request.session.Menu %}
-         <li class="nav-item {% if m.MenuType == "MT01" and m.MenuParent != None %}dropdown{% endif %}">
-           <a class="nav-link" href="{{m.MenuLink}}"{% if  m.MenuType == "MT01" and m.MenuParent != None  %}role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"{% endif %}>
-             <i class="{{m.MenuIcon}}"></i>
-             <span>{{m.MenuName}}</span>
-           </a>
-           {% if  m.MenuType == "MT01" and m.MenuParent != None  %}
-             <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-               {% for n in request.session.Menu %}
-                 {% if n.MenuParent == m.ID %}
-                   <a class="dropdown-item" href="{{n.MenuLink}}">{{n.MenuName}}}</a>
-                   {% endif %}
-                 {% endfor %}
-                   <div class="dropdown-divider"></div>
-             </div>
-           {% endif %}
-         </li>
+      <ul id="Menu_Wrapper" class="sidebar navbar-nav">
 
-
-         {% endfor %}
       </ul>
 
       <div id="content-wrapper">
@@ -114,37 +96,19 @@
   <script src="/static/vendor/datatables/jquery.dataTables.js"></script>
   <script src="/static/vendor/datatables/dataTables.bootstrap4.js"></script>
   <!-- Custom scripts for all pages-->
-  <script src="/static/js/sb-admin.min.js"></script>
+  <script src="/static/js/sb-admin.js"></script>
   <!-- Demo scripts for this page-->
   <!--<script src="/static/js/demo/datatables-demo.js"></script>-->
   <!--<script src="/static/js/demo/chart-area-demo.js"></script>-->.
   <script>
-  function load_menu_init(mid){
-    var session={{request.session.Menu|safe}};
-    $.each(session, function(i, item) {
-      var id=item.pk;
-      var nm=item.fields.MenuName;
-      var link=item.fields.MenuLink;
-      var par=item.fields.MenuParent;
-      var icon=item.fields.MenuIcon;
-      var t=item.fields.MenuType;
-      var drop='#sidebar .sidebar.navbar-nav .nav-item.dropdown'+id;
-      var drop2='#sidebar .sidebar.navbar-nav .nav-item.dropdown'+id+' a';
-      var dropsub='#sidebar .sidebar.navbar-nav .nav-item.dropdown'+par+' .dropdown-menu';
-      if(par==mid)
-      {
-        alert(nm);
-        load_menu_init(id);
-      }
 
-    });
-  }
 
     $(function() {
-          $('#sidebar').append('<ul class="sidebar navbar-nav">');
-          load_menu_init(null);
+      var UserSession='{{request.user|safe}}';
+      CheckLogin(UserSession);
 
-
+      //var session=;
+      Load_Menu_Session({{request.session.Menu|safe}});
     })
   </script>
   {% block js %}

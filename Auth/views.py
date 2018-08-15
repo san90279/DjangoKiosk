@@ -26,7 +26,7 @@ def V_CheckAuth(request):
 			#request.session['Menu']=MenuData.values_list()
 			request.session['Menu']=serializers.serialize('json', MenuData, fields=('id','MenuName','MenuLink','MenuType','MenuParent','MenuIcon'))
 		except:
-			request.session['Menu']=''
+			request.session['Menu']=null
 
 		if user.is_superuser:
 			return HttpResponseRedirect('/admin/')

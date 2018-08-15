@@ -3,8 +3,8 @@ from django.db import models
 # Create your models here.
 class M_Menu(models.Model):
     MenuTypeList=(
-        ('MT01','功能選項'),
-        ('MT02','連結選項'),
+        ('MT01','功能選項'),#有子項
+        ('MT02','連結選項'),#沒有子項
     )
 
 
