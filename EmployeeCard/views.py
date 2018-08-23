@@ -6,14 +6,14 @@ import datetime
 
 # Create your views here.
 def V_EmployeeCardIndex(request):
-    return render(request,'EmployeeCard/index.html');
+    return render(request,'EmployeeCard/index.html')
 
 
 def V_GetEmployeeCardData(request):
     try:
         EmployeeCardData=M_EmployeeCard.objects.all()
     except:
-        EmployeeCardData=None
+        EmployeeCardData=''
     EmployeeCardDataJson = serializers.serialize('json', EmployeeCardData)
     return HttpResponse(EmployeeCardDataJson, content_type='application/json')
 
