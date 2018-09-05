@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404
 from django.http import HttpResponse
 from django.core import serializers
 from .forms import TermForm
@@ -17,22 +17,22 @@ def V_GetTermData(request):
     TermDataJson = serializers.serialize('json', TermData)
     return HttpResponse(TermDataJson, content_type='application/json')
 
-def V_TermEdit(request,id):
+def V_TermEdit(request,id=0):
     if(id==0):
-        TermData=None
+        TermData=M_Term()
     else:
         TermData=M_Term.objects.get(pk=id)
-    form =TermForm(instance=TermData)
-    return render(request,'Term/Edit.html',{'form': form});
 
-def V_TremSave(request):
-    form = TermForm(request.POST,instance=M_Term)
-    if form.is_valid():
-        trems=form.save(commit=False)
-        trems.Editor=request.user
-        trems.EditDate=datetime.datetime.now()
-        trems.save()
-    else:
+    if(request.method == 'GET'):
+        form =TermForm(instance=TermData)
         return render(request,'Term/Edit.html',{'form': form});
-
-    return render(request,'Term/index.html')
+    else:
+        form = TermForm(request.POST,instance=TermData)
+        if form.is_valid():
+            trems=form.save(commit=False)
+            trems.Editor=request.user
+            trems.EditDate=datetime.datetime.now()
+            trems.save()
+            return render(request,'Term/index.html')
+        else:
+            return render(request,'Term/Edit.html',{'form': form});

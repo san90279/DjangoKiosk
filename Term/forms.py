@@ -6,8 +6,6 @@ class TermForm(forms.ModelForm):
         model=M_Term
         fields=['TermID','TermName','Remark']
 
-    #def TermForm(self):
-
     def __init__(self,*args, **kwargs):
         super(TermForm, self).__init__(*args, **kwargs)
         self.fields['TermID'].widget=forms.TextInput(attrs={'class':'form-control'})

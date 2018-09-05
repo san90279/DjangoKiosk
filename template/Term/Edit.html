@@ -12,7 +12,7 @@
     條款清單編輯</div>
   <div class="card-body">
     <div class="table-responsive">
-      <form method="post" action="/Term/Save/">
+      <form method="post" action="/Term/Edit/{% firstof form.instance.id %}">
         {% csrf_token %}
         <table class="table table-bordered" width="100%" cellspacing="0">
           {{ form.as_table }}

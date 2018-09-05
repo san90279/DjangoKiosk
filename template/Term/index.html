@@ -8,7 +8,7 @@
 {% block container %}
 <ol class="breadcrumb">
   <li class="breadcrumb-item">
-    <a href="/Term/Edit/0/">新增</a>
+    <a href="/Term/Edit/">新增</a>
   </li>
 </ol>
 
@@ -64,7 +64,7 @@
                 "data": "pk" ,
                 render: function ( data, type, row ) {
                     if ( type === 'display' ) {
-                      var retStr='<input type="button" class="btn btn-secondary" onclick="location.href=\'/Term/Edit/'+data+'/\';" value="編輯" />'
+                      var retStr='<input type="button" class="btn btn-secondary" onclick="location.href=\'/Term/Edit/'+data+'\';" value="編輯" />'
                       return retStr;
                     }
                     return data;

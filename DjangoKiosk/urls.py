@@ -4,7 +4,7 @@ from django.urls import path,include
 from polls.views import home, login
 from Auth.views import V_Login, V_CheckAuth
 from EmployeeCard.views import V_EmployeeCardIndex,V_GetEmployeeCardData,V_EmployeeCardEdit,V_EmployeeCardSave
-from Term.views import V_TermIndex,V_GetTermData,V_TermEdit,V_TremSave
+from Term.views import V_TermIndex,V_GetTermData,V_TermEdit
 
 Auth_urlpatterns = [
     url(r'^login/$', V_Login),
@@ -21,8 +21,8 @@ EmployeeCard_urlpatterns = [
 Term_urlpatterns = [
     path('index/', V_TermIndex),
     path('GetTermData/', V_GetTermData),
-    path('Edit/<int:id>/', V_TermEdit),
-    path('Save/', V_TremSave, name='save'),
+    path('Edit/<int:id>', V_TermEdit),
+    path('Edit/', V_TermEdit),
 ]
 
 urlpatterns = [
