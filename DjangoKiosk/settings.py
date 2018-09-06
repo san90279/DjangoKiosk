@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'polls',
     'Auth',
     'Menu',
+    'Penalty',
     'EmployeeCard',
     'Term',
 ]

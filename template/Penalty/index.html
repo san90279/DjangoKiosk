@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}罰緩{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block container %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="{% url 'PenaltyNew'%}">新增</a>
+  </li>
+</ol>
+
+<div class="card mb-3">
+  <div class="card-header">
+    <i class="fas fa-table"></i>
+    罰緩清單</div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered" id="PenaltyTable" width="100%" cellspacing="0">
+        <thead>
+          <tr>
+            <th>罰緩編號</th>
+            <th>罰緩名稱</th>
+            <th>罰緩說明</th>
+            <th> </th>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <th>罰緩編號</th>
+            <th>罰緩名稱</th>
+            <th>罰緩說明</th>
+            <th> </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer small text-muted">最後更新日期 {% now "SHORT_DATETIME_FORMAT" %}</div>
+</div>
+{% endblock %}
+
+{% block foot %}Copyright © Cypress 2018{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+  $(document).ready(function() {
+      $('#PenaltyTable').dataTable( {
+          "ajax": {
+                 "processing": true,
+                 "url": "/Penalty/GetPenaltyData/",
+                 "dataSrc": ""
+             },
+         "language": {
+                 "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
+             },
+          "columns": [
+              { "data": "fields.PenaltyID" },
+              { "data": "fields.PenaltyName" },
+              { "data": "fields.Remark" },
+              {
+                "data": "pk" ,
+                render: function ( data, type, row ) {
+                    if ( type === 'display' ) {
+                      var retStr='<input type="button" class="btn btn-secondary" onclick="location.href=\'/Penalty/Edit/'+data+'/\';" value="編輯" />'
+                      return retStr;
+                    }
+                    return data;
+                },
+              }
+          ]
+      } );
+  } );
+</script>
+{% endblock %}
