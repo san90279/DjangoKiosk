@@ -4,8 +4,8 @@ from django.http import HttpResponse
 from Penalty.models import M_Penalty
 from django.core import serializers
 from Penalty.forms import PenaltyForm
-
 import datetime
+
 def V_PenaltyIndex(request):
     return render(request,'Penalty/index.html');
 
@@ -17,11 +17,6 @@ def V_GetPenaltyData(request):
         PenaltyData=None
     PenaltyDataJson = serializers.serialize('json', PenaltyData)
     return HttpResponse(PenaltyDataJson, content_type='application/json')
-
-
-def V_PenaltyEdit(request,id):
-    form = AddForm()
-    return render(request,'Penalty/Edit.html',{'form': form});
 
 
 def V_PenaltyEdit(request, id):
