@@ -4,7 +4,7 @@ from django.urls import path,include
 from polls.views import home, login
 from Auth.views import V_Login, V_CheckAuth
 from EmployeeCard.views import V_EmployeeCardIndex,V_GetEmployeeCardData,V_EmployeeCardEdit,V_EmployeeCardSave
-from Term.views import V_TermIndex,V_GetTermData,V_TermEdit,V_TermNew
+from Term.views import V_TermIndex,V_GetTermData,V_TermEdit
 from Penalty.views import V_PenaltyIndex,V_GetPenaltyData,V_PenaltyEdit,V_PenaltyNew
 
 
@@ -23,11 +23,12 @@ EmployeeCard_urlpatterns = [
 ]
 
 Term_urlpatterns = [
-    path('index/', V_TermIndex,name='TermIndex'),
+    path('index/', V_TermIndex),
     path('GetTermData/', V_GetTermData),
-    path('Edit/<int:id>/', V_TermEdit,name='TermEdit'),
-    path('Edit/', V_TermNew,name='TermNew'),
+    path('Edit/<int:id>', V_TermEdit),
+    path('Edit/', V_TermEdit),
 ]
+
 Penalty_urlpatterns = [
     path('index/', V_PenaltyIndex,name='PenaltyIndex'),
     path('GetPenaltyData/', V_GetPenaltyData),
