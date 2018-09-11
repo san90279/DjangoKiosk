@@ -14,8 +14,6 @@ def V_PenaltyIndex(request):
 
 @csrf_protect
 def V_GetPenaltyData(request):
-
-
     searchPenaltyID = request.POST.get('searchPenaltyID')
     searchPenaltyName = request.POST.get('searchPenaltyName')
     pgno = int(request.POST.get('pgno'))
