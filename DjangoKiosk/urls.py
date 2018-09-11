@@ -32,6 +32,7 @@ Term_urlpatterns = [
 Penalty_urlpatterns = [
     path('index/', V_PenaltyIndex,name='PenaltyIndex'),
     path('GetPenaltyData/', V_GetPenaltyData),
+    #path('PenaltySearch/', V_PenaltySearch,name='PenaltySearch'),
     path('Edit/<int:id>/', V_PenaltyEdit,name='PenaltyEdit'),
     path('Edit/', V_PenaltyNew,name='PenaltyNew'),
 ]

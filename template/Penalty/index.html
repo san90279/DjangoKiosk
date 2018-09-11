@@ -6,11 +6,27 @@
 {% endblock %}
 
 {% block container %}
-<ol class="breadcrumb">
-  <li class="breadcrumb-item">
-    <a href="{% url 'PenaltyNew'%}">新增</a>
-  </li>
-</ol>
+
+  <div class="card bg-light mb-3">
+        <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
+            <div class="card-body">
+              <div class="row">
+                  <h6 class="text-right col-sm-1">罰鍰編號：</h6>
+                  <input class="rounded-0 col-sm-3" id="searchPenaltyID" name="searchPenaltyID" value="" type="text">
+                  <h6 class="text-right col-sm-1">罰鍰名稱：</h6>
+                  <input class="rounded-0 col-sm-3" id="searchPenaltyName" name="searchPenaltyName" value="" type="text">
+              </div>
+            </div>
+
+            <div class="card-footer small text-muted">
+                <button onclick="tablerefresh();"  id="search" class="btn btn-primary"> <i class="fas fa-search icon-large"></i>查詢 </button>
+                <button  class="btn btn-warning"  onclick="javascript:location.href='{% url 'PenaltyNew'%}'" ><i class="fas fa-plus"></i>新增</button>
+            </div>
+
+  </div>
+
+
+
 
 <div class="card mb-3">
   <div class="card-header">
@@ -18,8 +34,8 @@
     罰緩清單</div>
   <div class="card-body">
     <div class="table-responsive">
-      <table class="table table-bordered" id="PenaltyTable" width="100%" cellspacing="0">
-        <thead>
+      <table class="table table-bordered table-striped" id="PenaltyTable" width="100%" cellspacing="0">
+        <thead class="thead-light">
           <tr>
             <th>罰緩編號</th>
             <th>罰緩名稱</th>
@@ -27,7 +43,7 @@
             <th> </th>
           </tr>
         </thead>
-        <tfoot>
+        <tfoot class="thead-light">
           <tr>
             <th>罰緩編號</th>
             <th>罰緩名稱</th>
@@ -40,38 +56,61 @@
   </div>
   <div class="card-footer small text-muted">最後更新日期 {% now "SHORT_DATETIME_FORMAT" %}</div>
 </div>
+
+
 {% endblock %}
 
 {% block foot %}Copyright © Cypress 2018{% endblock %}
 
 {% block js %}
 <script type="text/javascript">
+    function tablerefresh(pg){
+        $('#PenaltyTable').DataTable( {
+            "processing": true,
+            "serverSide": true,
+            "searching": false,
+            "ajax": {
+                    "type":"POST",
+                    "url": "/Penalty/GetPenaltyData/",
+                    "data":{
+                      'csrfmiddlewaretoken': '{{ csrf_token }}',
+                      'pgno':pg,
+                      'searchPenaltyID':$("#searchPenaltyID").val(),
+                      'searchPenaltyName':$("#searchPenaltyName").val()
+                    },
+                    "dataSrc": "data",
+            },
+
+           "language": {
+                    "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
+            },
+            "columns": [
+                { "data": "PenaltyID" },
+                { "data": "PenaltyName" },
+                { "data": "Remark" },
+                { "data": "pk" ,
+                  render: function ( data, type, row ) {
+                      if ( type === 'display' ) {
+                        var retStr='<button class="btn btn-secondary " onclick="location.href=\'/Penalty/Edit/'+data+'/\';" ><i class="far fa-edit icon-large"></i>編輯</button>'
+                        return retStr;
+                      }
+                      return data;
+                  },
+                }
+            ],
+          });
+  }
+
   $(document).ready(function() {
-      $('#PenaltyTable').dataTable( {
-          "ajax": {
-                 "processing": true,
-                 "url": "/Penalty/GetPenaltyData/",
-                 "dataSrc": ""
-             },
-         "language": {
-                 "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
-             },
-          "columns": [
-              { "data": "fields.PenaltyID" },
-              { "data": "fields.PenaltyName" },
-              { "data": "fields.Remark" },
-              {
-                "data": "pk" ,
-                render: function ( data, type, row ) {
-                    if ( type === 'display' ) {
-                      var retStr='<input type="button" class="btn btn-secondary" onclick="location.href=\'/Penalty/Edit/'+data+'/\';" value="編輯" />'
-                      return retStr;
-                    }
-                    return data;
-                },
-              }
-          ]
+     tablerefresh(0);
+     $('#PenaltyTable').on( 'page.dt', function () {
+       var table = $('#PenaltyTable').DataTable();
+        var info = table.page.info();
+        tablerefresh(info.page);
+
+        //$('#pageInfo').html( 'Showing page: '+info.page+' of '+info.pages );
       } );
+
   } );
 </script>
 {% endblock %}

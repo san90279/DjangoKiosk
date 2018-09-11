@@ -1,22 +1,65 @@
 from django.shortcuts import render, get_object_or_404,redirect
-from django.shortcuts import render
 from django.http import HttpResponse
-from Penalty.models import M_Penalty
 from django.core import serializers
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models.query_utils import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views.decorators.csrf import csrf_protect
 from Penalty.forms import PenaltyForm
-import datetime
+from Penalty.models import M_Penalty
+import datetime,json
 
 def V_PenaltyIndex(request):
     return render(request,'Penalty/index.html');
 
-
+@csrf_protect
 def V_GetPenaltyData(request):
+
+
+    searchPenaltyID = request.POST.get('searchPenaltyID')
+    searchPenaltyName = request.POST.get('searchPenaltyName')
+    pgno = int(request.POST.get('pgno'))
+    draw = int(request.POST.get('draw'))  # 記錄操作次數
+    start = int(request.POST.get('start'))  # 起始位置
+    length = int(request.POST.get('length'))  # 每頁長度
+    search_key = request.POST.get('search[value]')  # 搜索關鍵字
+    order_column = request.POST.get('order[0][column]')  # 排序字段索引
+    order_column = request.POST.get('order[0][dir]')  #排序規則：ase/desc
     try:
-        PenaltyData=M_Penalty.objects.all()
+        if searchPenaltyID or searchPenaltyName :
+            if order_column=='asc':
+                PenaltyData = M_Penalty.objects.filter(Q(PenaltyID__icontains=searchPenaltyID) ,
+                                              Q(PenaltyName__icontains=searchPenaltyName)).order_by('id')
+            else:
+                PenaltyData = M_Penalty.objects.filter(Q(PenaltyID__icontains=searchPenaltyID) ,
+                                              Q(PenaltyName__icontains=searchPenaltyName)).order_by('-id')
+        else:
+            if order_column=='asc':
+                PenaltyData=M_Penalty.objects.all().order_by('id')
+            else:
+                PenaltyData=M_Penalty.objects.all().order_by('-id')
     except:
         PenaltyData=None
-    PenaltyDataJson = serializers.serialize('json', PenaltyData)
-    return HttpResponse(PenaltyDataJson, content_type='application/json')
+
+    count=int(PenaltyData.count())
+    paginator = Paginator(PenaltyData, length)
+    try:
+        object_list = paginator.page(pgno+1).object_list
+    except EmptyPage:
+        object_list = None
+    data=[{	'PenaltyID': penalty.PenaltyID,
+			'PenaltyName': penalty.PenaltyName,
+			'Remark': penalty.Remark,
+            'pk': penalty.pk} for penalty in object_list]
+    dic = {
+        'draw': draw,
+        'recordsTotal': count,
+        'recordsFiltered': count,
+        'data': data,
+    }
+    return HttpResponse(json.dumps(dic, cls=DjangoJSONEncoder), content_type='application/json')
+
+
 
 
 def V_PenaltyEdit(request, id):
