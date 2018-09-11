@@ -43,6 +43,11 @@ INSTALLED_APPS = [
     'Penalty',
     'EmployeeCard',
     'Term',
+    'Deal',
+    'FeeItem',
+    'Invoice',
+    'Station',
+    'Store',
 ]
 
 MIDDLEWARE = [

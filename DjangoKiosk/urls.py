@@ -37,6 +37,26 @@ Penalty_urlpatterns = [
     path('Edit/', V_PenaltyNew,name='PenaltyNew'),
 ]
 
+FeeItem_urlpatterns = [
+
+]
+
+Invoice_urlpatterns = [
+
+]
+
+Deal_urlpatterns = [
+
+]
+
+Store_urlpatterns = [
+
+]
+
+Station_urlpatterns = [
+
+]
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^home/$',home),
@@ -46,4 +66,9 @@ urlpatterns = [
     path('EmployeeCard/', include(EmployeeCard_urlpatterns)),
     path('Term/', include(Term_urlpatterns)),
     path('Penalty/', include(Penalty_urlpatterns)),
+    path('FeeItem/', include(FeeItem_urlpatterns)),
+    path('Invoice/', include(Invoice_urlpatterns)),
+    path('Deal/', include(Deal_urlpatterns)),
+    path('Store/', include(Store_urlpatterns)),
+    path('Station/', include(Station_urlpatterns)),
 ]
