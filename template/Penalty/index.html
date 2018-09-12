@@ -12,9 +12,9 @@
             <div class="card-body">
               <div class="row">
                   <h6 class="text-right col-sm-1">罰鍰編號：</h6>
-                  <input class="rounded-0 col-sm-3" id="searchPenaltyID" name="searchPenaltyID" value="" type="text">
+                  <input class="rounded-0 col-sm-3" id="PenaltyID" name="searchPenaltyID" value="" type="text">
                   <h6 class="text-right col-sm-1">罰鍰名稱：</h6>
-                  <input class="rounded-0 col-sm-3" id="searchPenaltyName" name="searchPenaltyName" value="" type="text">
+                  <input class="rounded-0 col-sm-3" id="PenaltyName" name="searchPenaltyName" value="" type="text">
               </div>
             </div>
 
@@ -64,52 +64,46 @@
 
 {% block js %}
 <script type="text/javascript">
-    function tablerefresh(pg){
-        $('#PenaltyTable').DataTable( {
-            "processing": true,
-            "serverSide": true,
-            "searching": false,
-            "ajax": {
-                    "type":"POST",
-                    "url": "/Penalty/GetPenaltyData/",
-                    "data":{
-                      'csrfmiddlewaretoken': '{{ csrf_token }}',
-                      'pgno':pg,
-                      'searchPenaltyID':$("#searchPenaltyID").val(),
-                      'searchPenaltyName':$("#searchPenaltyName").val()
-                    },
-                    "dataSrc": "data",
-            },
+    function tablerefresh(){
+        var table = $('#PenaltyTable').DataTable();
+        table.ajax.reload();
+    }
 
-           "language": {
-                    "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
-            },
-            "columns": [
-                { "data": "PenaltyID" },
-                { "data": "PenaltyName" },
-                { "data": "Remark" },
-                { "data": "pk" ,
-                  render: function ( data, type, row ) {
-                      if ( type === 'display' ) {
-                        var retStr='<button class="btn btn-secondary " onclick="location.href=\'/Penalty/Edit/'+data+'/\';" ><i class="far fa-edit icon-large"></i>編輯</button>'
-                        return retStr;
-                      }
-                      return data;
-                  },
-                }
-            ],
-          });
-  }
 
   $(document).ready(function() {
-     tablerefresh(0);
-     $('#PenaltyTable').on( 'page.dt', function () {
-       var table = $('#PenaltyTable').DataTable();
-        var info = table.page.info();
-        tablerefresh(info.page);
+    $('#PenaltyTable').DataTable( {
+        "processing": true,
+        "serverSide": true,
+        "searching": false,
+        "ajax": {
+                "type":"POST",
+                "url": "/Penalty/GetPenaltyData/",
+                "data":function(d){
+                  d.csrfmiddlewaretoken= '{{ csrf_token }}',
+                  d.searchPenaltyID=$("#searchPenaltyID").val(),
+                  d.searchPenaltyName=$("#searchPenaltyName").val()
+                },
+                "dataSrc": "data"
+        },
 
-        //$('#pageInfo').html( 'Showing page: '+info.page+' of '+info.pages );
-      } );
+       "language": {
+                "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
+        },
+        "columns": [
+            { "data": "PenaltyID" },
+            { "data": "PenaltyName" },
+            { "data": "Remark" },
+            { "data": "pk" ,
+              render: function ( data, type, row ) {
+                  if ( type === 'display' ) {
+                    var retStr='<button class="btn btn-secondary " onclick="location.href=\'/Penalty/Edit/'+data+'/\';" ><i class="far fa-edit icon-large"></i>編輯</button>'
+                    return retStr;
+                  }
+                  return data;
+              },
+            }
+        ],
+      });
 
   } );
 </script>
