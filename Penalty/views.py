@@ -16,7 +16,6 @@ def V_PenaltyIndex(request):
 def V_GetPenaltyData(request):
     searchPenaltyID = request.POST.get('searchPenaltyID')
     searchPenaltyName = request.POST.get('searchPenaltyName')
-    pgno = int(request.POST.get('pgno'))
     draw = int(request.POST.get('draw'))  # 記錄操作次數
     start = int(request.POST.get('start'))  # 起始位置
     length = int(request.POST.get('length'))  # 每頁長度
@@ -42,7 +41,7 @@ def V_GetPenaltyData(request):
     count=int(PenaltyData.count())
     paginator = Paginator(PenaltyData, length)
     try:
-        object_list = paginator.page(pgno+1).object_list
+        object_list = paginator.page(start/length+1).object_list
     except EmptyPage:
         object_list = None
     data=[{	'PenaltyID': penalty.PenaltyID,

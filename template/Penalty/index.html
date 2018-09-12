@@ -10,11 +10,11 @@
   <div class="card bg-light mb-3">
         <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
             <div class="card-body">
-              <div class="row">
-                  <h6 class="text-right col-sm-1">罰鍰編號：</h6>
-                  <input class="rounded-0 col-sm-3" id="searchPenaltyID" name="searchPenaltyID" value="" type="text">
-                  <h6 class="text-right col-sm-1">罰鍰名稱：</h6>
-                  <input class="rounded-0 col-sm-3" id="searchPenaltyName" name="searchPenaltyName" value="" type="text">
+              <div class="w3-row">
+                  <B class="col-sm-2">罰鍰編號：</B>
+                  <input class="rounded-0 col-sm-4" id="searchPenaltyID" name="searchPenaltyID" value="" type="text">
+                  <B class="col-sm-2">罰鍰名稱：</B>
+                  <input class="rounded-0 col-sm-4" id="searchPenaltyName" name="searchPenaltyName" value="" type="text">
               </div>
             </div>
 
@@ -64,8 +64,9 @@
 
 {% block js %}
 <script type="text/javascript">
-    function tablerefresh(pg){
+    function tablerefresh(){
         $('#PenaltyTable').DataTable( {
+            destroy:true,
             "processing": true,
             "serverSide": true,
             "searching": false,
@@ -74,7 +75,6 @@
                     "url": "/Penalty/GetPenaltyData/",
                     "data":{
                       'csrfmiddlewaretoken': '{{ csrf_token }}',
-                      'pgno':pg,
                       'searchPenaltyID':$("#searchPenaltyID").val(),
                       'searchPenaltyName':$("#searchPenaltyName").val()
                     },
@@ -102,15 +102,7 @@
   }
 
   $(document).ready(function() {
-     tablerefresh(0);
-     $('#PenaltyTable').on( 'page.dt', function () {
-       var table = $('#PenaltyTable').DataTable();
-        var info = table.page.info();
-        tablerefresh(info.page);
-
-        //$('#pageInfo').html( 'Showing page: '+info.page+' of '+info.pages );
-      } );
-
-  } );
+     tablerefresh();
+    } );
 </script>
 {% endblock %}
