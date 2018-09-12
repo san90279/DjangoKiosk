@@ -14,9 +14,8 @@ def V_PenaltyIndex(request):
 
 @csrf_protect
 def V_GetPenaltyData(request):
-
-    searchPenaltyID = request.POST.get('PenaltyID')
-    searchPenaltyName = request.POST.get('PenaltyName')
+    searchPenaltyID = request.POST.get('searchPenaltyID')
+    searchPenaltyName = request.POST.get('searchPenaltyName')
     draw = int(request.POST.get('draw'))  # 記錄操作次數
     start = int(request.POST.get('start'))  # 起始位置
     length = int(request.POST.get('length'))  # 每頁長度
@@ -42,7 +41,7 @@ def V_GetPenaltyData(request):
     paginator = Paginator(PenaltyData, length)
     count=paginator.count
     try:
-        object_list = paginator.page((start+length)/length).object_list
+        object_list = paginator.page(start/length+1).object_list
     except EmptyPage:
         object_list = None
 
