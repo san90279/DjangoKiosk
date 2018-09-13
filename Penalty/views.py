@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_protect
 from Penalty.forms import PenaltyForm
 from Penalty.models import M_Penalty
 import datetime,json
+from CommonApp.models import GridCS
 
 def V_PenaltyIndex(request):
     return render(request,'Penalty/index.html');
@@ -21,19 +22,25 @@ def V_GetPenaltyData(request):
     length = int(request.POST.get('length'))  # 每頁長度
     order_column = request.POST.get('order[0][column]')  # 排序字段索引
     order_column = request.POST.get('order[0][dir]')  #排序規則：ase/desc
+
+    a=GridCS(request)
+    return HttpResponse(a.columnList[2], content_type='application/json')
+
+
     try:
+        PenaltyData = M_Penalty.objects
         if searchPenaltyID or searchPenaltyName :
-            if order_column=='asc':
-                PenaltyData = M_Penalty.objects.filter(Q(PenaltyID__icontains=searchPenaltyID) ,
-                                              Q(PenaltyName__icontains=searchPenaltyName)).order_by('id')
-            else:
-                PenaltyData = M_Penalty.objects.filter(Q(PenaltyID__icontains=searchPenaltyID) ,
-                                              Q(PenaltyName__icontains=searchPenaltyName)).order_by('-id')
+            PenaltyData = PenaltyData.filter(Q(PenaltyID__icontains=searchPenaltyID) ,
+                                          Q(PenaltyName__icontains=searchPenaltyName)).order_by('id')
         else:
-            if order_column=='asc':
-                PenaltyData=M_Penalty.objects.all().order_by('id')
-            else:
-                PenaltyData=M_Penalty.objects.all().order_by('-id')
+            PenaltyData = PenaltyData.all()
+
+
+        if order_column=='asc':
+            PenaltyData = PenaltyData.order_by('id')
+        else:
+            PenaltyData = PenaltyData.order_by('-id')
+
     except:
         PenaltyData=None
 

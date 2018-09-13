@@ -53,9 +53,6 @@ Store_urlpatterns = [
 
 ]
 
-Station_urlpatterns = [
-
-]
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -70,5 +67,4 @@ urlpatterns = [
     path('Invoice/', include(Invoice_urlpatterns)),
     path('Deal/', include(Deal_urlpatterns)),
     path('Store/', include(Store_urlpatterns)),
-    path('Station/', include(Station_urlpatterns)),
 ]
