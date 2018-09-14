@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load Common_extras %}
 {% block title %}規費科目{% endblock %}
 
 {% block css %}
@@ -18,27 +18,9 @@
                     <B class="col-xl-3 col-sm-6 mb-3">項目描述：</B>
                     <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchRemark" name="searchRemark" value="" type="text">
                     <B class="col-xl-3 col-sm-6 mb-3">規費群組：</B>
-                    <select class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchFeeType" name="searchFeeType">
-                      <option value="">
-                          請選擇
-                      </option>
-                      {% for key,val in type %}
-                         <option value="{{key}}">
-                             {{val}}
-                         </option>
-                      {% endfor %}
-                    </select>
+                    {{type|ParameterListFor:"searchFeeType,----請選擇----"}}
                     <B class="col-xl-3 col-sm-6 mb-3">狀態：</B>
-                    <select class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchStatus" name="searchStatus">
-                      <option value="">
-                          請選擇
-                      </option>
-                      {% for key,val in status %}
-                         <option value="{{key}}">
-                             {{val}}
-                         </option>
-                      {% endfor %}
-                    </select>
+                    {{status|ParameterListFor:"searchFeeType,----請選擇----"}}
                     <B class="col-xl-3 col-sm-6 mb-3"></B>
                     <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" value="" type="hidden">
               </div>
@@ -106,13 +88,13 @@
             "ajax": {
                     "type":"POST",
                     "url": "/FeeItem/GetFeeItemData/",
-                    "data":{
-                      'csrfmiddlewaretoken': '{{ csrf_token }}',
-                      'searchFeeID':$("#searchFeeID").val(),
-                      'searchFeeName':$("#searchFeeName").val(),
-                      'searchRemark':$("#searchRemark").val(),
-                      'searchFeeType':$("#searchFeeType").val(),
-                      'searchStatus':$("#searchStatus").val()
+                    "data":function(d){
+                      d.csrfmiddlewaretoken= '{{ csrf_token }}',
+                      d.FeeID__icontains =$("#searchFeeID").val(),
+                      d.FeeName__icontains =$("#searchFeeName").val(),
+                      d.Remark__icontains =$("#searchRemark").val(),
+                      d.FeeType__icontains =$("#searchFeeType").val(),
+                      d.Status__icontains =$("#searchStatus").val()
                     },
                     "dataSrc": "data",
             },

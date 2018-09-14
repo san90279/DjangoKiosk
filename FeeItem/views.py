@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_protect
 from FeeItem.forms import FeeItemForm
 from FeeItem.models import M_FeeItem
 import datetime,json
+from CommonApp.models import GridCS
 
 def V_FeeItemIndex(request):
     type=M_FeeItem.FeeTypeList
@@ -16,55 +17,20 @@ def V_FeeItemIndex(request):
 
 @csrf_protect
 def V_GetFeeItemData(request):
-    searchFeeID = request.POST.get('searchFeeID')
-    searchFeeName = request.POST.get('searchFeeName')
-    searchRemark = request.POST.get('searchRemark')
-    searchFeeType = request.POST.get('searchFeeType')
-    searchStatus = request.POST.get('searchStatus')
-
     draw = int(request.POST.get('draw'))  # 記錄操作次數
-    start = int(request.POST.get('start'))  # 起始位置
-    length = int(request.POST.get('length'))  # 每頁長度
-    search_key = request.POST.get('search[value]')  # 搜索關鍵字
-    order_column = request.POST.get('order[0][column]')  # 排序字段索引
-    order_column = request.POST.get('order[0][dir]')  #排序規則：ase/desc
-    try:
-        if searchFeeID or searchFeeName or searchRemark or searchFeeType or searchStatus :
-            if order_column=='asc':
-                FeeItemData = M_FeeItem.objects.filter(Q(FeeID__icontains=searchFeeID) ,
-                                                       Q(FeeName__icontains=searchFeeName) ,
-                                                       Q(Remark__icontains=searchRemark) ,
-                                                       Q(FeeType__icontains=searchFeeType) ,
-                                                       Q(Status__icontains=searchStatus)).order_by('id')
-            else:
-                FeeItemData = M_FeeItem.objects.filter(Q(FeeID__icontains=searchFeeID) ,
-                                                       Q(FeeName__icontains=searchFeeName) ,
-                                                       Q(Remark__icontains=searchRemark) ,
-                                                       Q(FeeType__icontains=searchFeeType) ,
-                                                       Q(Status__icontains=searchStatus)).order_by('-id')
-        else:
-            if order_column=='asc':
-                FeeItemData=M_FeeItem.objects.all().order_by('id')
-            else:
-                FeeItemData=M_FeeItem.objects.all().order_by('-id')
-    except:
-        FeeItemData=None
-    try:
-        count=int(FeeItemData.count())
-    except:
-        count=0
-        length=0
-    paginator = Paginator(FeeItemData, length)
-    try:
-        object_list = paginator.page(start/length+1).object_list
-    except :
-        object_list =''
+
+    grid=GridCS(request)
+    FeeItemData=grid.dynamic_query_order(M_FeeItem)
+    object_list = grid.dynamic_query_order_paginator(FeeItemData)
+
+    count=len(FeeItemData)
+
 
     data=[{	'FeeID': FeeItem.FeeID,
             'FeeName': FeeItem.FeeName,
             'Remark': FeeItem.Remark,
             'FeeAmount': FeeItem.FeeAmount,
-    'FeeType':  [val for key,val in M_FeeItem.FeeTypeList if key==FeeItem.FeeType],
+            'FeeType':  [val for key,val in M_FeeItem.FeeTypeList if key==FeeItem.FeeType],
             'Status':  [val for key,val in M_FeeItem.FeeStatusList if key==FeeItem.Status],
             'pk': FeeItem.pk} for FeeItem in object_list]
 
