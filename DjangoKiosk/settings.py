@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'FeeItem',
     'Invoice',
     'Store',
+    'CommonApp'
 ]
 
 MIDDLEWARE = [
