@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'Deal',
     'FeeItem',
     'Invoice',
-    'Station',
     'Store',
 ]
 
