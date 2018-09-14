@@ -12,7 +12,7 @@ class M_DealMaster(models.Model):
     )
 
 
-    StationID=models.ForeignKey('Store.M_Station',on_delete=models.PROTECT)
+    StationID=models.ForeignKey('Station.M_Station',on_delete=models.PROTECT)
     DealDate=models.DateTimeField()
     Status=models.CharField(max_length=10,choices=DealStatusList,null=True)
     Cashier=models.ForeignKey('EmployeeCard.M_EmployeeCard',on_delete=models.PROTECT)
