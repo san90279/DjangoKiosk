@@ -15,42 +15,13 @@ def V_PenaltyIndex(request):
 
 @csrf_protect
 def V_GetPenaltyData(request):
-    searchPenaltyID = request.POST.get('searchPenaltyID')
-    searchPenaltyName = request.POST.get('searchPenaltyName')
     draw = int(request.POST.get('draw'))  # 記錄操作次數
-    start = int(request.POST.get('start'))  # 起始位置
-    length = int(request.POST.get('length'))  # 每頁長度
-    order_column = request.POST.get('order[0][column]')  # 排序字段索引
-    order_column = request.POST.get('order[0][dir]')  #排序規則：ase/desc
 
-    a=GridCS(request)
-    return HttpResponse(a.columnList[2], content_type='application/json')
+    grid=GridCS(request)
+    PenaltyData=grid.dynamic_query_order(M_Penalty)
+    object_list = grid.dynamic_query_order_paginator(PenaltyData)
 
-
-    try:
-        PenaltyData = M_Penalty.objects
-        if searchPenaltyID or searchPenaltyName :
-            PenaltyData = PenaltyData.filter(Q(PenaltyID__icontains=searchPenaltyID) ,
-                                          Q(PenaltyName__icontains=searchPenaltyName)).order_by('id')
-        else:
-            PenaltyData = PenaltyData.all()
-
-
-        if order_column=='asc':
-            PenaltyData = PenaltyData.order_by('id')
-        else:
-            PenaltyData = PenaltyData.order_by('-id')
-
-    except:
-        PenaltyData=None
-
-
-    paginator = Paginator(PenaltyData, length)
-    count=paginator.count
-    try:
-        object_list = paginator.page(start/length+1).object_list
-    except EmptyPage:
-        object_list = None
+    count=len(PenaltyData)
 
     data=[{	'PenaltyID': penalty.PenaltyID,
 			'PenaltyName': penalty.PenaltyName,

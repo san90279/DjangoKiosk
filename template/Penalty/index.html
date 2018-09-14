@@ -80,8 +80,8 @@
                 "url": "/Penalty/GetPenaltyData/",
                 "data":function(d){
                   d.csrfmiddlewaretoken= '{{ csrf_token }}',
-                  d.searchPenaltyID=$("#PenaltyID").val(),
-                  d.searchPenaltyName=$("#PenaltyName").val()
+                  d.PenaltyID__icontains =$("#PenaltyID").val(),
+                  d.PenaltyName__icontains =$("#PenaltyName").val()
                 },
                 "dataSrc": "data"
         },
