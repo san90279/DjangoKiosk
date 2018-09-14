@@ -37,13 +37,17 @@ def V_GetPenaltyData(request):
                 PenaltyData=M_Penalty.objects.all().order_by('-id')
     except:
         PenaltyData=None
+    try:
+        count=int(PenaltyData.count())
+    except:
+        count=0
+        length=0
 
-    count=int(PenaltyData.count())
     paginator = Paginator(PenaltyData, length)
     try:
         object_list = paginator.page(start/length+1).object_list
     except EmptyPage:
-        object_list = None
+        object_list = ''
     data=[{	'PenaltyID': penalty.PenaltyID,
 			'PenaltyName': penalty.PenaltyName,
 			'Remark': penalty.Remark,
