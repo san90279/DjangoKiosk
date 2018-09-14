@@ -11,10 +11,10 @@
         <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
             <div class="card-body">
               <div class="row">
-                  <B class="col-xl-3 col-sm-6 mb-3">罰鍰編號：</B>
-                  <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchPenaltyID" name="searchPenaltyID" value="" type="text">
-                  <B class="col-xl-3 col-sm-6 mb-3">罰鍰名稱：</B>
-                  <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchPenaltyName" name="searchPenaltyName" value="" type="text">
+                  <h6 class="text-right col-sm-1">罰鍰編號：</h6>
+                  <input class="rounded-0 col-sm-3" id="PenaltyID" name="searchPenaltyID" value="" type="text">
+                  <h6 class="text-right col-sm-1">罰鍰名稱：</h6>
+                  <input class="rounded-0 col-sm-3" id="PenaltyName" name="searchPenaltyName" value="" type="text">
               </div>
             </div>
 
@@ -65,44 +65,46 @@
 {% block js %}
 <script type="text/javascript">
     function tablerefresh(){
-        $('#PenaltyTable').DataTable( {
-            destroy:true,
-            "processing": true,
-            "serverSide": true,
-            "searching": false,
-            "ajax": {
-                    "type":"POST",
-                    "url": "/Penalty/GetPenaltyData/",
-                    "data":{
-                      'csrfmiddlewaretoken': '{{ csrf_token }}',
-                      'searchPenaltyID':$("#searchPenaltyID").val(),
-                      'searchPenaltyName':$("#searchPenaltyName").val()
-                    },
-                    "dataSrc": "data",
-            },
+        var table = $('#PenaltyTable').DataTable();
+        table.ajax.reload();
+    }
 
-           "language": {
-                    "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
-            },
-            "columns": [
-                { "data": "PenaltyID" },
-                { "data": "PenaltyName" },
-                { "data": "Remark" },
-                { "data": "pk" ,
-                  render: function ( data, type, row ) {
-                      if ( type === 'display' ) {
-                        var retStr='<button class="btn btn-secondary " onclick="location.href=\'/Penalty/Edit/'+data+'/\';" ><i class="far fa-edit icon-large"></i>編輯</button>'
-                        return retStr;
-                      }
-                      return data;
-                  },
-                }
-            ],
-          });
-  }
 
   $(document).ready(function() {
-     tablerefresh();
-    } );
+    $('#PenaltyTable').DataTable( {
+        "processing": true,
+        "serverSide": true,
+        "searching": false,
+        "ajax": {
+                "type":"POST",
+                "url": "/Penalty/GetPenaltyData/",
+                "data":function(d){
+                  d.csrfmiddlewaretoken= '{{ csrf_token }}',
+                  d.searchPenaltyID=$("#PenaltyID").val(),
+                  d.searchPenaltyName=$("#PenaltyName").val()
+                },
+                "dataSrc": "data"
+        },
+
+       "language": {
+                "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
+        },
+        "columns": [
+            { "data": "PenaltyID" },
+            { "data": "PenaltyName" },
+            { "data": "Remark" },
+            { "data": "pk" ,
+              render: function ( data, type, row ) {
+                  if ( type === 'display' ) {
+                    var retStr='<button class="btn btn-secondary " onclick="location.href=\'/Penalty/Edit/'+data+'/\';" ><i class="far fa-edit icon-large"></i>編輯</button>'
+                    return retStr;
+                  }
+                  return data;
+              },
+            }
+        ],
+      });
+
+  } );
 </script>
 {% endblock %}

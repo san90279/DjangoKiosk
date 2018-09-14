@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_protect
 from Penalty.forms import PenaltyForm
 from Penalty.models import M_Penalty
 import datetime,json
+from CommonApp.models import GridCS
 
 def V_PenaltyIndex(request):
     return render(request,'Penalty/index.html');
@@ -19,22 +20,27 @@ def V_GetPenaltyData(request):
     draw = int(request.POST.get('draw'))  # 記錄操作次數
     start = int(request.POST.get('start'))  # 起始位置
     length = int(request.POST.get('length'))  # 每頁長度
-    search_key = request.POST.get('search[value]')  # 搜索關鍵字
     order_column = request.POST.get('order[0][column]')  # 排序字段索引
     order_column = request.POST.get('order[0][dir]')  #排序規則：ase/desc
+
+    a=GridCS(request)
+    return HttpResponse(a.columnList[2], content_type='application/json')
+
+
     try:
+        PenaltyData = M_Penalty.objects
         if searchPenaltyID or searchPenaltyName :
-            if order_column=='asc':
-                PenaltyData = M_Penalty.objects.filter(Q(PenaltyID__icontains=searchPenaltyID) ,
-                                              Q(PenaltyName__icontains=searchPenaltyName)).order_by('id')
-            else:
-                PenaltyData = M_Penalty.objects.filter(Q(PenaltyID__icontains=searchPenaltyID) ,
-                                              Q(PenaltyName__icontains=searchPenaltyName)).order_by('-id')
+            PenaltyData = PenaltyData.filter(Q(PenaltyID__icontains=searchPenaltyID) ,
+                                          Q(PenaltyName__icontains=searchPenaltyName)).order_by('id')
         else:
-            if order_column=='asc':
-                PenaltyData=M_Penalty.objects.all().order_by('id')
-            else:
-                PenaltyData=M_Penalty.objects.all().order_by('-id')
+            PenaltyData = PenaltyData.all()
+
+
+        if order_column=='asc':
+            PenaltyData = PenaltyData.order_by('id')
+        else:
+            PenaltyData = PenaltyData.order_by('-id')
+
     except:
         PenaltyData=None
     try:
@@ -43,11 +49,14 @@ def V_GetPenaltyData(request):
         count=0
         length=0
 
+
     paginator = Paginator(PenaltyData, length)
+    count=paginator.count
     try:
         object_list = paginator.page(start/length+1).object_list
     except EmptyPage:
-        object_list = ''
+        object_list = None
+
     data=[{	'PenaltyID': penalty.PenaltyID,
 			'PenaltyName': penalty.PenaltyName,
 			'Remark': penalty.Remark,
