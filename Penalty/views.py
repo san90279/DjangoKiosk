@@ -21,40 +21,7 @@ def V_GetPenaltyData(request):
     PenaltyData=grid.dynamic_query_order(M_Penalty)
     object_list = grid.dynamic_query_order_paginator(PenaltyData)
 
-<<<<<<< HEAD
     count=len(PenaltyData)
-=======
-
-    try:
-        PenaltyData = M_Penalty.objects
-        if searchPenaltyID or searchPenaltyName :
-            PenaltyData = PenaltyData.filter(Q(PenaltyID__icontains=searchPenaltyID) ,
-                                          Q(PenaltyName__icontains=searchPenaltyName)).order_by('id')
-        else:
-            PenaltyData = PenaltyData.all()
-
-
-        if order_column=='asc':
-            PenaltyData = PenaltyData.order_by('id')
-        else:
-            PenaltyData = PenaltyData.order_by('-id')
-
-    except:
-        PenaltyData=None
-    try:
-        count=int(PenaltyData.count())
-    except:
-        count=0
-        length=0
-
-
-    paginator = Paginator(PenaltyData, length)
-    count=paginator.count
-    try:
-        object_list = paginator.page(start/length+1).object_list
-    except EmptyPage:
-        object_list = None
->>>>>>> b8156358224cc32d49e39396b1c9fd8662d04d16
 
     data=[{	'PenaltyID': penalty.PenaltyID,
 			'PenaltyName': penalty.PenaltyName,
