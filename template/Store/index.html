@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load Common_extras %}
+{% block title %}規費科目{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block container %}
+
+  <div class="card bg-light mb-3">
+        <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
+            <div class="card-body">
+              <div class="row">
+                    <B class="col-xl-3 col-sm-6 mb-3">戶所代碼：</B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchStationID" name="searchStationID" value="" type="text">
+                    <B class="col-xl-3 col-sm-6 mb-3">戶所名稱：</B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchStationName" name="searchStationName" value="" type="text">
+                    <B class="col-xl-3 col-sm-6 mb-3">站點代碼：</B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchStoreID" name="searchStoreID" value="" type="text">
+                    <B class="col-xl-3 col-sm-6 mb-3">站點名稱：</B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchStoreName" name="searchStoreName" value="" type="text">
+
+                    <B class="col-xl-3 col-sm-6 mb-3"></B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" value="" type="hidden">
+              </div>
+
+            </div>
+
+            <div class="card-footer small text-muted">
+                <button onclick="tablerefresh();"  id="search" class="btn btn-primary"> <i class="fas fa-search icon-large"></i>查詢 </button>
+                <button  class="btn btn-warning"  onclick="javascript:location.href='{% url 'StoreNew'%}'" ><i class="fas fa-plus"></i>新增戶所</button>
+                <button  class="btn btn-warning"  onclick="javascript:location.href='{% url 'StationNew'%}'" ><i class="fas fa-plus"></i>新增站點</button>
+            </div>
+
+  </div>
+
+
+
+
+<div class="card mb-3">
+  <div class="card-header">
+    <i class="fas fa-table"></i>
+    規費科目清單</div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped" id="StationTable" width="100%" cellspacing="0">
+        <thead class="thead-light">
+          <tr>
+            <th>戶所代碼</th>
+            <th>戶所名稱</th>
+            <th>站點代碼</th>
+            <th>站點名稱</th>
+            <th> </th>
+          </tr>
+        </thead>
+        <tfoot class="thead-light">
+          <tr>
+            <th>戶所代碼</th>
+            <th>戶所名稱</th>
+            <th>站點代碼</th>
+            <th>站點名稱</th>
+            <th> </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer small text-muted">最後更新日期 {% now "SHORT_DATETIME_FORMAT" %}</div>
+</div>
+
+
+{% endblock %}
+
+{% block foot %}Copyright © Cypress 2018{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    function tablerefresh(){
+        $('#StationTable').DataTable( {
+            destroy:true,
+            "processing": true,
+            "serverSide": true,
+            "searching": false,
+            "ajax": {
+                    "type":"POST",
+                    "url": "/Store/GetStationData/",
+                    "data":function(d){
+                      d.csrfmiddlewaretoken= '{{ csrf_token }}',
+                      d.StationID__icontains =$("#searchStationID").val(),
+                      d.StationName__icontains =$("#searchStationName").val(),
+                      d.StoreID__icontains =$("#searchStoreID").val(),
+                      d.StoreName__icontains =$("#searchStoreName").val()
+                    },
+                    "dataSrc": "data",
+            },
+
+           "language": {
+                    "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
+            },
+            "columns": [
+                { "data": "StationID" },
+                { "data": "StationName" },
+                { "data": "StoreID" },
+                { "data": "StoreName" },
+                { "data": "pk" ,
+                  render: function ( data, type, row ) {
+                      if ( type === 'display' ) {
+                        var retStr='<button class="btn btn-secondary " onclick="location.href=\'/Store/StationEdit/'+data+'/\';" ><i class="far fa-edit icon-large"></i>編輯</button>'
+                        return retStr;
+                      }
+                      return data;
+                  },
+                }
+            ],
+          });
+  }
+
+  $(document).ready(function() {
+     tablerefresh();
+    } );
+</script>
+{% endblock %}

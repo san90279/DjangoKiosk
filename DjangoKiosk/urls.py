@@ -7,9 +7,9 @@ from EmployeeCard.views import V_EmployeeCardIndex,V_GetEmployeeCardData,V_Emplo
 from Term.views import V_TermIndex,V_GetTermData,V_TermEdit
 from Penalty.views import V_PenaltyIndex,V_GetPenaltyData,V_PenaltyEdit,V_PenaltyNew
 from FeeItem.views import V_FeeItemIndex,V_GetFeeItemData,V_FeeItemEdit,V_FeeItemNew
+from Store.views import V_StationIndex,V_GetStationData,V_StationEdit,V_StationNew,V_StoreNew
 from Deal.views import V_DealIndex,V_GetDealMasterData,V_GetDealDetailData
 from Invoice.views import V_InvoiceIndex,V_GetInvoiceData
-
 
 Auth_urlpatterns = [
     url(r'^login/$', V_Login),
@@ -58,7 +58,12 @@ Deal_urlpatterns = [
 ]
 
 Store_urlpatterns = [
-
+    path('index/', V_StationIndex,name='StationIndex'),
+    path('GetStationData/', V_GetStationData),
+    #path('PenaltySearch/', V_PenaltySearch,name='PenaltySearch'),
+    path('StationEdit/<int:id>/', V_StationEdit,name='StationEdit'),
+    path('StationEdit/', V_StationNew,name='StationNew'),
+    path('StoreEdit/', V_StoreNew,name='StoreNew'),
 ]
 
 
