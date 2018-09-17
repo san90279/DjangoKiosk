@@ -66,8 +66,8 @@ function Load_Menu_Session(session)
       iElement.setAttribute('class',icon);
       spanElement.innerText=nm;
 
-      iElement.appendChild(spanElement);
       aElement.appendChild(iElement);
+      aElement.appendChild(spanElement);
       liElement.appendChild(aElement);
 
       if(t=='MT01'){

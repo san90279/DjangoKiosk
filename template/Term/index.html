@@ -6,11 +6,19 @@
 {% endblock %}
 
 {% block container %}
-<ol class="breadcrumb">
-  <li class="breadcrumb-item">
-    <a href="/Term/Edit/">新增</a>
-  </li>
-</ol>
+<div class="card bg-light mb-3">
+      <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
+          <div class="card-body">
+            <div class="row">
+
+            </div>
+          </div>
+
+          <div class="card-footer small text-muted">
+              <button  class="btn btn-warning"  onclick="javascript:location.href='{% url 'PenaltyNew'%}'" ><i class="fas fa-plus"></i>新增</button>
+          </div>
+
+</div>
 
 <div class="card mb-3">
   <div class="card-header">
@@ -48,23 +56,29 @@
 <script type="text/javascript">
   $(document).ready(function() {
       $('#TermTable').dataTable( {
+          "processing": true,
+          "serverSide": true,
+          "searching": false,
           "ajax": {
-                 "processing": true,
+                 "type":"POST",
                  "url": "/Term/GetTermData/",
-                 "dataSrc": ""
+                 "data":function(d){
+                   d.csrfmiddlewaretoken= '{{ csrf_token }}'
+                 },
+                 "dataSrc": "data"
              },
          "language": {
                  "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
              },
           "columns": [
-              { "data": "fields.TermID" },
-              { "data": "fields.TermName" },
-              { "data": "fields.Remark" },
+              { "data": "TermID" },
+              { "data": "TermName" },
+              { "data": "Remark" },
               {
                 "data": "pk" ,
                 render: function ( data, type, row ) {
                     if ( type === 'display' ) {
-                      var retStr='<input type="button" class="btn btn-secondary" onclick="location.href=\'/Term/Edit/'+data+'\';" value="編輯" />'
+                      var retStr='<button class="btn btn-secondary "onclick="location.href=\'/Term/Edit/'+data+'\';" ><i class="far fa-edit icon-large"></i>編輯</button>'
                       return retStr;
                     }
                     return data;

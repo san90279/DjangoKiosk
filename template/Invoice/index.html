@@ -77,7 +77,7 @@
         "searching": false,
         "ajax": {
                 "type":"POST",
-                "url": "/Penalty/GetPenaltyData/",
+                "url": "/Invoice/GetInvoiceData/",
                 "data":function(d){
                   d.csrfmiddlewaretoken= '{{ csrf_token }}',
                   d.PenaltyID__icontains =$("#PenaltyID").val(),

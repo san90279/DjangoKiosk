@@ -3,19 +3,36 @@ from django.http import HttpResponse
 from django.core import serializers
 from .forms import TermForm
 from .models import M_Term
-import datetime
+import datetime,json
+from django.views.decorators.csrf import csrf_protect
+from CommonApp.models import GridCS
+from django.core.serializers.json import DjangoJSONEncoder
 
 # Create your views here.
 def V_TermIndex(request):
     return render(request,'Term/index.html')
 
+@csrf_protect
 def V_GetTermData(request):
-    try:
-        TermData=M_Term.objects.all()
-    except:
-        TermData=''
-    TermDataJson = serializers.serialize('json', TermData)
-    return HttpResponse(TermDataJson, content_type='application/json')
+    draw = int(request.POST.get('draw'))  # 記錄操作次數
+
+    grid=GridCS(request)
+    TermData=grid.dynamic_query_order(M_Term)
+    object_list = grid.dynamic_query_order_paginator(TermData)
+
+    count=len(TermData)
+
+    data=[{	'TermID': term.TermID,
+			'TermName': term.TermName,
+			'Remark': term.Remark,
+            'pk': term.pk} for term in object_list]
+    dic = {
+        'draw': draw,
+        'recordsTotal': count,
+        'recordsFiltered': count,
+        'data': data,
+    }
+    return HttpResponse(json.dumps(dic, cls=DjangoJSONEncoder), content_type='application/json')
 
 def V_TermEdit(request,id=0):
     if(id==0):

@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load Common_extras %}
+{% block title %}規費科目{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block container %}
+
+  <div class="card bg-light mb-3">
+        <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
+            <div class="card-body">
+              <div class="row">
+                    <B class="col-xl-3 col-sm-6 mb-3">規費項目代碼：</B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchFeeID" name="searchFeeID" value="" type="text">
+                    <B class="col-xl-3 col-sm-6 mb-3">規費項目名稱：</B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchFeeName" name="searchFeeName" value="" type="text">
+                    <B class="col-xl-3 col-sm-6 mb-3">項目描述：</B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchRemark" name="searchRemark" value="" type="text">
+                    <B class="col-xl-3 col-sm-6 mb-3">規費群組：</B>
+                    {% ParameterListFor  list=type html_id="searchFeeType" pleaseselect="----請選擇----" %}
+                    <B class="col-xl-3 col-sm-6 mb-3">狀態：</B>
+                    {% ParameterListFor  list=type html_id="searchFeeType" pleaseselect="----請選擇----" %}
+
+                    <B class="col-xl-3 col-sm-6 mb-3"></B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" value="" type="hidden">
+              </div>
+
+            </div>
+
+            <div class="card-footer small text-muted">
+                <button onclick="tablerefresh();"  id="search" class="btn btn-primary"> <i class="fas fa-search icon-large"></i>查詢 </button>
+            </div>
+
+  </div>
+
+
+
+
+<div class="card mb-3">
+  <div class="card-header">
+    <i class="fas fa-table"></i>
+    規費科目清單</div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table>
+        <tr>
+          <td style="width:70%;">
+            <table class="table table-bordered table-striped" id="MasterTable" width="100%" cellspacing="0">
+              <thead class="thead-light">
+                <tr>
+                  <th>機台</th>
+                  <th>交易時間</th>
+                  <th>收銀人員</th>
+                  <th>單據號碼</th>
+                  <th>合計金額</th>
+                  <th>付款類別</th>
+                  <th>狀態</th>
+                </tr>
+              </thead>
+              <tfoot class="thead-light">
+                <tr>
+                  <th>機台</th>
+                  <th>交易時間</th>
+                  <th>收銀人員</th>
+                  <th>單據號碼</th>
+                  <th>合計金額</th>
+                  <th>付款類別</th>
+                  <th>狀態</th>
+                </tr>
+              </tfoot>
+            </table>
+          </td>
+          <td  style="width:30%;">
+            <table class="table table-bordered table-striped" id="DetailTable" width="100%" cellspacing="0">
+              <thead class="thead-light">
+                <tr>
+                  <th>規費</th>
+                  <th>原價</th>
+                  <th>數量</th>
+                  <th>小計</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tfoot class="thead-light">
+                <tr>
+                  <th>規費</th>
+                  <th>原價</th>
+                  <th>數量</th>
+                  <th>小計</th>
+                  <th>備註</th>
+                </tr>
+              </tfoot>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+    </div>
+  </div>
+  <div class="card-footer small text-muted">最後更新日期 {% now "SHORT_DATETIME_FORMAT" %}</div>
+</div>
+
+
+{% endblock %}
+
+{% block foot %}Copyright © Cypress 2018{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    function tablerefresh(){
+      var table = $('#FeeItemTable').DataTable();
+      table.ajax.reload();
+    }
+
+  $(document).ready(function() {
+    $('#MasterTable').DataTable( {
+        "processing": true,
+        "serverSide": true,
+        "searching": false,
+        "ajax": {
+                "type":"POST",
+                "url": "/Deal/GetDealMasterData/",
+                "data":function(d){
+                  d.csrfmiddlewaretoken= '{{ csrf_token }}',
+                  d.FeeID__icontains =$("#searchFeeID").val(),
+                  d.FeeName__icontains =$("#searchFeeName").val(),
+                  d.Remark__icontains =$("#searchRemark").val(),
+                  d.FeeType__icontains =$("#searchFeeType").val(),
+                  d.Status__icontains =$("#searchStatus").val()
+                },
+                "dataSrc": "data",
+        },
+
+       "language": {
+                "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
+        },
+        "columns": [
+            { "data": "StationID" },
+            { "data": "DealDate" },
+            { "data": "Cashier" },
+            { "data": "InvoiceNo" },
+            { "data": "Amount" },
+            { "data": "PayType" },
+            { "data": "Status" },
+        ],
+      });
+
+      $('#DetailTable').DataTable( {
+          "processing": true,
+          "serverSide": true,
+          "searching": false,
+          "paging": false,
+          "info": false,
+          "ajax": {
+                  "type":"POST",
+                  "url": "/Deal/GetDealDetailData/",
+                  "data":function(d){
+                    d.csrfmiddlewaretoken= '{{ csrf_token }}',
+                    d.FeeID__icontains =$("#searchFeeID").val(),
+                    d.FeeName__icontains =$("#searchFeeName").val(),
+                    d.Remark__icontains =$("#searchRemark").val(),
+                    d.FeeType__icontains =$("#searchFeeType").val(),
+                    d.Status__icontains =$("#searchStatus").val()
+                  },
+                  "dataSrc": "data",
+          },
+
+         "language": {
+                  "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
+          },
+          "columns": [
+              { "data": "FeeID" },
+              { "data": "Amount" },
+              { "data": "Qty" },
+              { "data": "TotalAmount" },
+              { "data": "Remark" },
+          ],
+        });
+    } );
+</script>
+{% endblock %}
