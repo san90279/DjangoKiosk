@@ -9,7 +9,10 @@ from Penalty.views import V_PenaltyIndex,V_GetPenaltyData,V_PenaltyEdit,V_Penalt
 from FeeItem.views import V_FeeItemIndex,V_GetFeeItemData,V_FeeItemEdit,V_FeeItemNew
 from Store.views import V_StationIndex,V_GetStationData,V_StationEdit,V_StationNew,V_StoreNew
 from Deal.views import V_DealIndex,V_GetDealMasterData,V_GetDealDetailData
+#from Invoice.views import V_InvoiceIndex,V_GetInvoiceData
+from Checkout.views import V_GetCheckoutData,V_CheckoutIndex,V_CheckoutNew
 from Invoice.views import V_InvoiceIndex,V_GetInvoiceData,V_AddInvoiceData
+
 
 Auth_urlpatterns = [
     url(r'^login/$', V_Login),
@@ -67,6 +70,11 @@ Store_urlpatterns = [
     path('StoreEdit/', V_StoreNew,name='StoreNew'),
 ]
 
+Checkout_urlpatterns = [
+    path('index/', V_CheckoutIndex,name='CheckoutIndex'),
+    path('GetCheckoutData/', V_GetCheckoutData),
+    path('CheckoutNew/', V_CheckoutNew,name='CheckoutNew'),
+]
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -81,4 +89,5 @@ urlpatterns = [
     path('Invoice/', include(Invoice_urlpatterns)),
     path('Deal/', include(Deal_urlpatterns)),
     path('Store/', include(Store_urlpatterns)),
+    path('Checkout/', include(Checkout_urlpatterns)),
 ]
