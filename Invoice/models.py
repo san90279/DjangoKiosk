@@ -13,6 +13,8 @@ class M_Invoice(models.Model):
     InvoiceNo=models.CharField(max_length=20,unique=True)
     Status=models.CharField(max_length=10,choices=InvoiceStatusList)
     Amount=models.IntegerField(null=True)
+    StationID=models.ForeignKey('Store.M_Station',on_delete=models.PROTECT)
+    LotNo=models.IntegerField()
     Creator=models.ForeignKey('auth.user',on_delete=models.PROTECT,related_name='Creator')
     CreateDate=models.DateTimeField(auto_now=True)
     Editor=models.ForeignKey('auth.user',on_delete=models.PROTECT,null=True,related_name='Editor')
@@ -20,8 +22,16 @@ class M_Invoice(models.Model):
 
 
 class M_V_Invoice(models.Model):
-    InvoiceNo=models.CharField(max_length=20)
-
+    MaxInvoice=models.CharField(max_length=20)
+    MinInvoice=models.CharField(max_length=20)
+    TotalInvoice=models.IntegerField()
+    TotalAmount=models.IntegerField()
+    Status=models.CharField(max_length=10,choices=M_Invoice.InvoiceStatusList)
+    StationID=models.CharField(max_length=10)
+    StationName=models.CharField(max_length=50)
+    FeeID=models.CharField(max_length=10)
+    FeeName=models.CharField(max_length=50)
+    LotNo=models.IntegerField()
     class Meta:
         managed = False
         db_table = "Invoice_M_V_Invoice"

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}罰緩{% endblock %}
+{% block title %}憑證庫存{% endblock %}
 
 {% block css %}
 {% endblock %}
@@ -11,16 +11,18 @@
         <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
             <div class="card-body">
               <div class="row">
-                <B class="col-xl-3 col-sm-6 mb-3">罰鍰編號：</B>
-                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="PenaltyID" name="PenaltyID" value="" type="text">
-                <B class="col-xl-3 col-sm-6 mb-3">罰鍰名稱：</B>
-                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="PenaltyName" name="PenaltyName" value="" type="text">
+                <B class="col-xl-3 col-sm-6 mb-3">站名：</B>
+                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="StationID" name="StationID" value="" type="text">
+                <B class="col-xl-3 col-sm-6 mb-3">規費：</B>
+                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="FeeID" name="FeeID" value="" type="text">
+                <B class="col-xl-3 col-sm-6 mb-3">狀態：</B>
+                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Status" name="Status" value="" type="text">
               </div>
             </div>
 
             <div class="card-footer small text-muted">
                 <button onclick="tablerefresh();"  id="search" class="btn btn-primary"> <i class="fas fa-search icon-large"></i>查詢 </button>
-                <button  class="btn btn-warning"  onclick="javascript:location.href='{% url 'PenaltyNew'%}'" ><i class="fas fa-plus"></i>新增</button>
+                <button  class="btn btn-warning"  onclick="javascript:location.href='/Invoice/AddInvoice/'" ><i class="fas fa-plus"></i>新增</button>
             </div>
 
   </div>
@@ -31,24 +33,32 @@
 <div class="card mb-3">
   <div class="card-header">
     <i class="fas fa-table"></i>
-    罰緩清單</div>
+    憑證庫存</div>
   <div class="card-body">
     <div class="table-responsive">
       <table class="table table-bordered table-striped" id="PenaltyTable" width="100%" cellspacing="0">
         <thead class="thead-light">
           <tr>
-            <th>罰緩編號</th>
-            <th>罰緩名稱</th>
-            <th>罰緩說明</th>
-            <th> </th>
+            <th>站名</th>
+            <th>規費代碼</th>
+            <th>規費名稱</th>
+            <th>起始號碼</th>
+            <th>結束號碼</th>
+            <th>張數</th>
+            <th>總金額</th>
+            <th>狀態</th>
           </tr>
         </thead>
         <tfoot class="thead-light">
           <tr>
-            <th>罰緩編號</th>
-            <th>罰緩名稱</th>
-            <th>罰緩說明</th>
-            <th> </th>
+            <th>站名</th>
+            <th>規費代碼</th>
+            <th>規費名稱</th>
+            <th>起始號碼</th>
+            <th>結束號碼</th>
+            <th>張數</th>
+            <th>總金額</th>
+            <th>狀態</th>
           </tr>
         </tfoot>
       </table>
@@ -80,8 +90,9 @@
                 "url": "/Invoice/GetInvoiceData/",
                 "data":function(d){
                   d.csrfmiddlewaretoken= '{{ csrf_token }}',
-                  d.PenaltyID__icontains =$("#PenaltyID").val(),
-                  d.PenaltyName__icontains =$("#PenaltyName").val()
+                  d.StationID__icontains =$("#StationID").val(),
+                  d.FeeID__icontains =$("#FeeID").val(),
+                  d.Status__icontains =$("#Status").val()
                 },
                 "dataSrc": "data"
         },
@@ -90,18 +101,14 @@
                 "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
         },
         "columns": [
-            { "data": "PenaltyID" },
-            { "data": "PenaltyName" },
-            { "data": "Remark" },
-            { "data": "pk" ,
-              render: function ( data, type, row ) {
-                  if ( type === 'display' ) {
-                    var retStr='<button class="btn btn-secondary " onclick="location.href=\'/Penalty/Edit/'+data+'/\';" ><i class="far fa-edit icon-large"></i>編輯</button>'
-                    return retStr;
-                  }
-                  return data;
-              },
-            }
+            { "data": "StationName" },
+            { "data": "FeeID" },
+            { "data": "FeeName" },
+            { "data": "MinInvoice" },
+            { "data": "MaxInvoice" },
+            { "data": "TotalInvoice" },
+            { "data": "TotalAmount" },
+            { "data": "Status" }
         ],
       });
 

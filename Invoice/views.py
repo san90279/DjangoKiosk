@@ -3,9 +3,13 @@ from django.http import HttpResponse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_protect
 from Invoice.models import M_Invoice,M_V_Invoice
+from FeeItem.models import M_FeeItem
+from Store.models import M_Station
 import datetime,json
 from CommonApp.models import GridCS
 from django.core.serializers.json import DjangoJSONEncoder
+from Invoice.forms import AddInvoiceForm
+from django.db.models import Max
 # Create your views here.
 def V_InvoiceIndex(request):
     return render(request,'Invoice/index.html')
@@ -21,12 +25,16 @@ def V_GetInvoiceData(request):
 
     count=len(InvoiceData)
 
-    data=[{	'InvoiceNo': Invoice.InvoiceNo,
-            #'InvoiceNo': Invoice.InvoiceNo,
-            #'Amount': Invoice.Amount,
-            #'StationID': Invoice.StationID.StationName,
-            #'Status':  [val for key,val in M_Invoice.InvoiceStatusList if key==M_Invoice.Status],
-            'pk': Invoice.pk} for Invoice in object_list]
+    data=[{	'MaxInvoice': Invoice.MaxInvoice,
+            'MinInvoice': Invoice.MinInvoice,
+            'TotalInvoice': Invoice.TotalInvoice,
+            'TotalAmount': Invoice.TotalAmount,
+            'StationID': Invoice.StationID,
+            'StationName': Invoice.StationName,
+            'FeeID': Invoice.FeeID,
+            'FeeName': Invoice.FeeName,
+            'Status':  [val for key,val in M_Invoice.InvoiceStatusList if key==Invoice.Status]
+            } for Invoice in object_list]
 
     dic = {
         'draw': draw,
@@ -35,3 +43,34 @@ def V_GetInvoiceData(request):
         'data': data,
     }
     return HttpResponse(json.dumps(dic, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+def V_AddInvoiceData(request):
+    if request.method == 'GET':
+        form = AddInvoiceForm()
+        return render(request, 'Invoice/AddInvoice.html', {'form':form})
+
+    form=AddInvoiceForm(request.POST)
+    if form.is_valid():
+        i=1
+        StartKey=form.cleaned_data['StartInvoiceNo'][:1]
+        AddKey=int(form.cleaned_data['StartInvoiceNo'][1:])
+        FeeItemObject=M_FeeItem.objects.get(pk=form.cleaned_data['FeeID'])
+        StationObject=M_Station.objects.get(pk=form.cleaned_data['StationID'])
+        LastLotNo=M_Invoice.objects.all().aggregate(Max('LotNo'))
+        BulkCreateList=[]
+        while i<=form.cleaned_data['AddCount']:
+            data=M_Invoice()
+            data.FeeID=FeeItemObject
+            data.InvoiceNo=StartKey+str(AddKey)
+            data.Status='2'
+            data.Amount=FeeItemObject.FeeAmount
+            data.StationID=StationObject
+            data.LotNo=LastLotNo['LotNo__max']+1
+            data.Creator=request.user
+            data.CreateDate=datetime.datetime.now()
+            BulkCreateList.append(data)
+            i=i+1
+            AddKey=AddKey+1
+        M_Invoice.objects.bulk_create(BulkCreateList,form.cleaned_data['AddCount'])
+        return render(request,'Invoice/index.html')
