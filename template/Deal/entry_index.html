@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load Common_extras %}
+{% block title %}規費科目{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block container %}
+
+  <div class="card bg-light mb-3">
+        <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
+            <div class="card-body">
+              <div class="row">
+                    <B class="col-xl-3 col-sm-6 mb-3">指定日期：</B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchDate" name="searchFeeID" value="" type="date">
+                    <B class="col-xl-3 col-sm-6 mb-3">收銀人員：</B>
+                    {% ParameterListFor  list=employee html_id="searchUserName" pleaseselect="----請選擇----" %}
+                    <B class="col-xl-3 col-sm-6 mb-3">指定機台：</B>
+                    {% ParameterListFor  list=station html_id="searchStation" pleaseselect="----請選擇----" %}
+                    <B class="col-xl-3 col-sm-6 mb-3">規費代碼：</B>
+                    {% ParameterListFor  list=fee html_id="searchFeeID" pleaseselect="----請選擇----" %}
+                    <B class="col-xl-3 col-sm-6 mb-3">收款類別：</B>
+                    {% ParameterListFor  list=paytype html_id="searchPayType" pleaseselect="全部" %}
+
+                    <B class="col-xl-3 col-sm-6 mb-3"></B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" value="" type="hidden">
+              </div>
+
+            </div>
+
+            <div class="card-footer small text-muted">
+                <button onclick="tablerefresh();"  id="search" class="btn btn-primary"> <i class="fas fa-search icon-large"></i>查詢 </button>
+                <button  class="btn btn-warning"  onclick="javascript:location.href='{% url 'EntryNew'%}'" ><i class="far fa-calendar-alt"></i>交易補登</button>
+            </div>
+
+  </div>
+
+
+  {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      {{ message }}
+    </div>
+  {% endfor %}
+
+
+<div class="card mb-3">
+  <div class="card-header">
+    <i class="fas fa-table"></i>
+    補登記錄清單</div>
+  <div class="card-body">
+    <div class="table-responsive">
+            <table class="table table-bordered table-striped" id="EntryTable" width="100%" cellspacing="0">
+              <thead class="thead-light">
+                <tr>
+                  <th>補登日期</th>
+                  <th>機台代碼</th>
+                  <th>收銀人員</th>
+                  <th>規費代碼</th>
+                  <th>規費名稱</th>
+                  <th>起始號碼</th>
+                  <th>收款別</th>
+                  <th>單價</th>
+                  <th>張數</th>
+                  <th>總金額</th>
+                  <th>狀態</th>
+                  <th>是否過帳</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tfoot class="thead-light">
+                <tr>
+                  <th>補登日期</th>
+                  <th>機台代碼</th>
+                  <th>收銀人員</th>
+                  <th>規費代碼</th>
+                  <th>規費名稱</th>
+                  <th>起始號碼</th>
+                  <th>收款別</th>
+                  <th>單價</th>
+                  <th>張數</th>
+                  <th>總金額</th>
+                  <th>狀態</th>
+                  <th>是否過帳</th>
+                  <th></th>
+                </tr>
+              </tfoot>
+            </table>
+
+    </div>
+  </div>
+  <div class="card-footer small text-muted">最後更新日期 {% now "SHORT_DATETIME_FORMAT" %}</div>
+</div>
+
+
+{% endblock %}
+
+{% block foot %}Copyright © Cypress 2018{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    function tablerefresh(){
+      var table = $('#EntryTable').DataTable();
+      table.ajax.reload();
+    }
+
+  $(document).ready(function() {
+    $('#EntryTable').DataTable( {
+        "processing": true,
+        "serverSide": true,
+        "searching": false,
+        "order":[[0,"desc"]],
+        "ajax": {
+                "type":"POST",
+                "url": "/Deal/GetEntryData/",
+                "data":function(d){
+                  d.csrfmiddlewaretoken= '{{ csrf_token }}',
+                  d.DealDate__icontains =$("#searchDate").val(),
+                  d.EmployeeID__icontains =$("#searchUserName").val(),
+                  d.StationID__icontains =$("#searchStation").val(),
+                  d.FeeID__icontains =$("#searchFeeID").val(),
+                  d.PayType__icontains =$("#searchPayType").val()
+                },
+                "dataSrc": "data",
+        },
+
+       "language": {
+                "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
+        },
+        "columns": [
+            { "data": "DealDate" },
+            { "data": "EmployeeID" },
+            { "data": "StationID" },
+            { "data": "FeeID" },
+            { "data": "FeeName" },
+            { "data": "beginno" },
+            { "data": "PayType" },
+            { "data": "Amount" },
+            { "data": "Qty" },
+            { "data": "TotalAmount" },
+            { "data": "Status" },
+            { "data": "IsCheckout" },
+            { "data": "LotNo" ,
+             render: function ( data, type, row ) {
+                 if ( type === 'display' && row['IsCheckout']==false) {
+                   var retStr='<button  class="btn btn-danger " onclick="location.href=\'/Deal/entrydelete/'+row['DealDate']+'/'+data+'/\';" ><i class="fas fa-minus-circle"></i>刪除</button>'
+                   return retStr;
+                   return data;
+                 }
+                 else{
+                   return '';
+                 }
+             },
+           }
+        ],
+      });
+
+
+    } );
+</script>
+{% endblock %}

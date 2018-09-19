@@ -16,6 +16,35 @@ class Migration(migrations.Migration):
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('EmployeeCard', '0001_initial'),
     ]
+    sql = """
+        CREATE VIEW "Deal_M_V_entry" AS
+         SELECT
+          row_number() OVER (ORDER BY dm.id) AS id,
+          dm."DealDate",
+          e."EmployeeID",
+          s1."StationID",
+          f."FeeID",
+          f."FeeName",
+          min(i."InvoiceNo") as beginno,
+          dm."PayType",
+          dd."Amount",
+          dd."Qty",
+          dd."TotalAmount",
+          dm."Status",
+          dm."IsCheckout"
+        FROM
+          "Deal_m_dealmaster" as dm
+          JOIN  "Deal_m_dealdetail" as dd ON dm.id = dd."MasterID_id"
+          JOIN  "Invoice_m_invoice" as i ON dm."InvoiceNo_id"=i.id
+          JOIN  "FeeItem_m_feeitem" as f ON dd."FeeID_id"=f.id
+          JOIN  "EmployeeCard_m_employeecard" as e ON dm."Cashier_id" = e.id
+          JOIN  "Store_m_station" as s1 ON dm."StationID_id" = s1.id
+          JOIN  "Store_m_store"as s2 ON s1."StoreID_id" = s2.id
+         WHERE  dm."IsOutside"=True
+         GROUP BY dm.id,dm."DealDate",e."EmployeeID",s1."StationID",f."FeeID",f."FeeName",dm."PayType",dd."TotalAmount",dd."Qty",dd."Amount"
+    """
+
+
 
     operations = [
         migrations.CreateModel(
@@ -57,4 +86,28 @@ class Migration(migrations.Migration):
             name='MasterID',
             field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='Deal.M_DealMaster'),
         ),
+        migrations.RunSQL("""drop view if exists "Deal_M_V_entry";"""),
+        migrations.RunSQL(sql),
+        migrations.CreateModel(
+            name='M_V_entry',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('DealDate', models.DateTimeField()),
+                ('EmployeeID', models.CharField(max_length=10, unique=True)),
+                ('FeeID', models.CharField(max_length=10, unique=True)),
+                ('FeeName', models.CharField(max_length=50)),
+                ('beginno', models.CharField(max_length=20, unique=True)),
+                ('PayType', models.CharField(choices=[('PT01', '現金'), ('PT02', '悠遊卡')], max_length=10)),
+                ('Amount', models.IntegerField(default=0)),
+                ('Qty', models.IntegerField(default=0)),
+                ('TotalAmount', models.IntegerField(default=0)),
+                ('Status', models.CharField(choices=[('0', '作廢')], max_length=10, null=True)),
+                ('IsCheckout', models.BooleanField()),
+            ],
+            options={
+                'db_table': 'Deal_M_V_entry',
+                'managed': False,
+            },
+        ),
+
     ]

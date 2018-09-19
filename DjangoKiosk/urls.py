@@ -8,8 +8,7 @@ from Term.views import V_TermIndex,V_GetTermData,V_TermEdit
 from Penalty.views import V_PenaltyIndex,V_GetPenaltyData,V_PenaltyEdit,V_PenaltyNew
 from FeeItem.views import V_FeeItemIndex,V_GetFeeItemData,V_FeeItemEdit,V_FeeItemNew
 from Store.views import V_StationIndex,V_GetStationData,V_StationEdit,V_StationNew,V_StoreNew
-from Deal.views import V_DealIndex,V_GetDealMasterData,V_GetDealDetailData
-#from Invoice.views import V_InvoiceIndex,V_GetInvoiceData
+from Deal.views import V_DealIndex,V_GetDealMasterData,V_GetDealDetailData,V_GetEntryData,V_EntryIndex,V_EntryNew,V_EntryDelete
 from Checkout.views import V_GetCheckoutData,V_CheckoutIndex,V_CheckoutNew
 from Invoice.views import V_InvoiceIndex,V_GetInvoiceData,V_AddInvoiceData
 
@@ -59,6 +58,10 @@ Deal_urlpatterns = [
     path('index/', V_DealIndex),
     path('GetDealMasterData/', V_GetDealMasterData),
     path('GetDealDetailData/', V_GetDealDetailData),
+    path('entryindex/', V_EntryIndex,name='EntryIndex'),
+    path('GetEntryData/', V_GetEntryData,name='GetEntryData'),
+    path('entryedit/', V_EntryNew,name='EntryNew'),
+    path('entrydelete/<str:DealDate>/<str:LotNo>/', V_EntryDelete,name='EntryDelete'),
 ]
 
 Store_urlpatterns = [
