@@ -76,6 +76,10 @@ Checkout_urlpatterns = [
     path('CheckoutNew/', V_CheckoutNew,name='CheckoutNew'),
 ]
 
+ExportExcel_urlpatterns = [
+    
+]
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^home/$',home),
@@ -90,4 +94,5 @@ urlpatterns = [
     path('Deal/', include(Deal_urlpatterns)),
     path('Store/', include(Store_urlpatterns)),
     path('Checkout/', include(Checkout_urlpatterns)),
+    path('ExportExcel/', include(ExportExcel_urlpatterns)),
 ]

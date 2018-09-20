@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'Invoice',
     'Store',
     'Checkout',
-    'CommonApp'
+    'CommonApp',
+    'ExportExcel'
 ]
 
 MIDDLEWARE = [
