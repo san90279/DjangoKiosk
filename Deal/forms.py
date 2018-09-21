@@ -11,9 +11,9 @@ class EntryForm(forms.Form):
     PayType=forms.CharField(max_length=10,label='收款別')
     StationID=forms.CharField(label='站點')
     FeeID=forms.CharField(label='規費')
-    EmployeeCardID=forms.CharField(label='規費')
+    EmployeeCardID=forms.CharField(label='收銀人員')
     Qty=forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}),label='張數')
-    
+
 
     def __init__(self, *args, **kwargs):
         super(EntryForm, self).__init__(*args, **kwargs)

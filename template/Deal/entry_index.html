@@ -1,8 +1,13 @@
 {% extends 'base.html' %}
 {% load Common_extras %}
-{% block title %}規費科目{% endblock %}
+{% block title %}交易補登{% endblock %}
 
 {% block css %}
+<style type="text/css">
+/**绿色勾*/
+.myicon-tick-checked{ display: inline-block; width: 10px;height:5px; background: #2ac845;line-height: 0;font-size:0;vertical-align: middle;-webkit-transform: rotate(45deg);}
+.myicon-tick-checked:after{content:'/';display:block;width: 20px;height:5px; background: #2ac845;-webkit-transform: rotate(-90deg) translateY(-50%) translateX(50%);}
+</style>
 {% endblock %}
 
 {% block container %}
@@ -141,7 +146,18 @@
             { "data": "Qty" },
             { "data": "TotalAmount" },
             { "data": "Status" },
-            { "data": "IsCheckout" },
+            { "data": "IsCheckout" ,
+               render: function ( data, type, row ) {
+                   if ( type === 'display' && data==true) {
+                     var retStr='<span class="myicon-tick-checked"></span>'
+                     return retStr;
+                     return data;
+                   }
+                   else{
+                     return '';
+                   }
+              },
+            },
             { "data": "LotNo" ,
              render: function ( data, type, row ) {
                  if ( type === 'display' && row['IsCheckout']==false) {

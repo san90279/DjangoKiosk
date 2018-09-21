@@ -6,11 +6,12 @@
 {% endblock %}
 
 {% block container %}
-<ol class="breadcrumb">
-  <li class="breadcrumb-item">
-    <a href="/EmployeeCard/Edit/0/">新增</a>
-  </li>
-</ol>
+<div class="card bg-light mb-3">
+            <div class="card-footer small text-muted">
+                <button class="btn btn-warning" onclick="javascript:location.href='/EmployeeCard/Edit/0/'"><i class="fas fa-plus"></i>新增員工卡</button>
+            </div>
+</div>
+
 
 <div class="card mb-3">
   <div class="card-header">
@@ -80,7 +81,7 @@
                 "data": "pk" ,
                 render: function ( data, type, row ) {
                     if ( type === 'display' ) {
-                      var retStr='<input type="button" class="btn btn-secondary" onclick="location.href=\'/EmployeeCard/Edit/'+data+'/\';" value="編輯" />'
+                      var retStr='<button class="btn btn-secondary " onclick="location.href=\'/EmployeeCard/Edit/'+data+'/\';" ><i class="far fa-edit icon-large"></i>編輯</button>'
                       return retStr;
                     }
                     return data;
