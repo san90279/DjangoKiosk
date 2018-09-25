@@ -15,7 +15,11 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib import messages
 # Create your views here.
 def V_DealIndex(request):
-    return render(request,'Deal/index.html')
+    Status=M_DealMaster.DealStatusList
+    Cashier=M_EmployeeCard.objects.all().values_list('pk', 'EmployeeName')
+    PayType=M_DealMaster.PayTypeList
+    FeeID=M_FeeItem.objects.all().values_list('pk', 'FeeName')
+    return render(request,'Deal/index.html',{'Cashier':Cashier,'Status':Status,'PayType':PayType,'FeeID':FeeID})
 
 @csrf_protect
 def V_GetDealMasterData(request):

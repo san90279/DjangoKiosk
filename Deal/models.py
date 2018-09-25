@@ -5,6 +5,7 @@ class M_DealMaster(models.Model):
 
     DealStatusList=(
         ('0','作廢'),
+        ('1','正常'),
     )
     PayTypeList=(
         ('PT01','現金'),
@@ -35,6 +36,8 @@ class M_DealDetail(models.Model):
     Qty=models.IntegerField(default=0)
     TotalAmount=models.IntegerField(default=0)
     Remark=models.CharField(max_length=100,null=True)
+    PenaltyID=models.ForeignKey('Penalty.M_Penalty',on_delete=models.PROTECT,null=True)
+    TermID=models.ForeignKey('Term.M_Term',on_delete=models.PROTECT,null=True)
     Creator=models.ForeignKey('auth.user',on_delete=models.PROTECT,related_name='CreatorDetail')
     CreateDate=models.DateTimeField(auto_now=True)
     Editor=models.ForeignKey('auth.user',on_delete=models.PROTECT,null=True,related_name='EditorDetail')
