@@ -48,9 +48,34 @@ class Migration(migrations.Migration):
             GROUP BY EXTRACT(MONTH FROM M."DealDate"),EXTRACT(YEAR FROM M."DealDate"),M."Status",M."PayType",D."FeeID_id",F."FeeID",F."FeeName"
     """
 
+    sqlFeeItemReport = """
+        CREATE VIEW "ExportExcel_M_V_FeeItemReport" AS
+            select row_number() OVER (ORDER BY a."id") AS id, c."StationID",b."DealDate",e."InvoiceNo",b."PayType",b."Status",d."FeeID",d."FeeName",a."Amount",a."Qty",a."Remark"
+            from public."Deal_m_dealdetail" a
+            left join public."Deal_m_dealmaster" b on a."MasterID_id"=b."id"
+            left join public."Store_m_station" c on b."StationID_id"=c."id"
+            left join public."FeeItem_m_feeitem" d on a."FeeID_id"=d."id"
+            left join public."Invoice_m_invoice" e on b."InvoiceNo_id"=e."id"
+    """
+
+    sqlPenaltyReport = """
+        CREATE VIEW "ExportExcel_M_V_PenaltyReport" AS
+            select b."DealDate",row_number() OVER (ORDER BY d."PenaltyID") AS id,d."PenaltyID",d."PenaltyName",c."TermID",c."TermName",sum(a."Qty") as Qty,Sum(a."TotalAmount") as TotalAmount,a."Remark"
+            from public."Deal_m_dealdetail" a
+            left join public."Deal_m_dealmaster" b on a."MasterID_id"=b."id"
+            left join public."Term_m_term" c on a."TermID_id"=c."id"
+            left join public."Penalty_m_penalty" d on a."PenaltyID_id"=d."id"
+	        left join public."FeeItem_m_feeitem" e on a."FeeID_id"=e."id"
+	        where e."FeeType"='FY06'
+	        group by  d."PenaltyID",d."PenaltyName",c."TermID",c."TermName",a."Remark", b."DealDate"
+    """
     operations = [
         migrations.RunSQL("""drop view if exists "ExportExcel_M_V_DayReport";"""),
         migrations.RunSQL(sqlDayReport),
         migrations.RunSQL("""drop view if exists "ExportExcel_M_V_MonthReport";"""),
         migrations.RunSQL(sqlMonthReport),
+        migrations.RunSQL("""drop view if exists "ExportExcel_M_V_FeeItemReport";"""),
+        migrations.RunSQL(sqlFeeItemReport),
+        migrations.RunSQL("""drop view if exists "ExportExcel_M_V_PenaltyReport";"""),
+        migrations.RunSQL(sqlPenaltyReport),
     ]

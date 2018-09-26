@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load Common_extras %}
+{% block title %}規費交易查詢{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block container %}
+
+  <div class="card bg-light mb-3">
+        <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
+            <div class="card-body">
+              <div class="row">
+                    <B class="col-xl-3 col-sm-6 mb-3">起始日期：</B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Startdate" name="Startdate" value="" type="date">
+                    <B class="col-xl-3 col-sm-6 mb-3">結束日期：</B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Enddadte" name="Enddadte" value="" type="date">
+                    <B class="col-xl-3 col-sm-6 mb-3">指定名稱：</B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Feename" name="Feename" value="" type="text">
+                    <B class="col-xl-3 col-sm-6 mb-3">顯示類別：</B>
+                    {% ParameterListFor  list=Status html_id="DealType" pleaseselect="所有交易" %}
+                    <B class="col-xl-3 col-sm-6 mb-3">收款類別：</B>
+                    {% ParameterListFor  list=PayType html_id="PayType" pleaseselect="全部" %}
+
+                    <B class="col-xl-3 col-sm-6 mb-3"></B>
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" value="" type="hidden">
+              </div>
+
+            </div>
+
+            <div class="card-footer small text-muted">
+                <button onclick="tablerefresh();"  id="search" class="btn btn-primary"> <i class="fas fa-search icon-large"></i>查詢 </button>
+                <button  class="btn btn-warning"  onclick="javascript:location.href='{% url 'FeeItemNew'%}'" ><i class="fas fa-newspaper"></i>報表</button>
+            </div>
+
+  </div>
+
+
+
+
+<div class="card mb-3">
+  <div class="card-header">
+    <i class="fas fa-table"></i>
+    規費交易清單</div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped" id="FeeItemTable" width="100%" cellspacing="0">
+        <thead class="thead-light">
+          <tr>
+            <th>站號</th>
+            <th>交易日期</th>
+            <th>時間</th>
+            <th>交易序號</th>
+            <th>狀態</th>
+            <th>規費代碼</th>
+            <th>項目名稱</th>
+            <th>原價</th>
+            <th>單價</th>
+            <th>數量</th>
+          </tr>
+        </thead>
+        <tfoot class="thead-light">
+          <tr>
+            <th>站號</th>
+            <th>交易日期</th>
+            <th>時間</th>
+            <th>交易序號</th>
+            <th>狀態</th>
+            <th>規費代碼</th>
+            <th>項目名稱</th>
+            <th>原價</th>
+            <th>單價</th>
+            <th>數量</th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer small text-muted">最後更新日期 {% now "SHORT_DATETIME_FORMAT" %}</div>
+</div>
+
+
+{% endblock %}
+
+{% block foot %}Copyright © Cypress 2018{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    function tablerefresh(){
+        $('#FeeItemTable').DataTable( {
+            destroy:true,
+            "processing": true,
+            "serverSide": true,
+            "searching": false,
+            "ajax": {
+                    "type":"POST",
+                    "url": "/ExportExcel/GetFeeItemReport/",
+                    "data":function(d){
+                      d.csrfmiddlewaretoken= '{{ csrf_token }}',
+                      d.DealDate__lt=$("#Startdate").val(),
+                      d.DealDate__gt=$("#Enddate").val(),
+                      d.FeeName__icontains=$("#Feename").val(),
+                      d.Status__icontains=$("#DealType").val()
+                    },
+                    "dataSrc": "data",
+            },
+
+           "language": {
+                    "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
+            },
+            "columns": [
+                { "data": "StationID" },
+                { "data": "DealDate" },
+                { "data": "DealTime" },
+                { "data": "InvoiceNo" },
+                { "data": "Status" },
+                { "data": "FeeID" },
+                { "data": "FeeName" },
+                { "data": "Amount" },
+                { "data": "cAmount" },
+                { "data": "Qty" },
+            ],
+          });
+  }
+
+  $(document).ready(function() {
+     tablerefresh();
+    } );
+</script>
+{% endblock %}

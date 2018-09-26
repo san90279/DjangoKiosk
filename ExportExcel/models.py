@@ -28,3 +28,32 @@ class M_V_MonthReport(models.Model):
     class Meta:
         managed = False
         db_table = "ExportExcel_M_V_MonthReport"
+
+class M_V_PenaltyReport(models.Model):
+
+    DealDate=models.DateTimeField()
+    PenaltyID=models.CharField(max_length=10)
+    PenaltyName=models.CharField(max_length=50)
+    TermID=models.CharField(max_length=10)
+    TermName=models.CharField(max_length=50)
+    qty=models.IntegerField()
+    totalamount=models.IntegerField()
+    Remark=models.CharField(max_length=100)
+    class Meta:
+        managed = False
+        db_table = "ExportExcel_M_V_PenaltyReport"
+
+class M_V_FeeItemReport(models.Model):
+    DealDate=models.DateTimeField()
+    StationID=models.CharField(max_length=10)
+    InvoiceNo=models.CharField(max_length=20)
+    PayType=models.CharField(max_length=10,choices=M_DealMaster.PayTypeList)
+    Status=models.CharField(max_length=10,choices=M_DealMaster.DealStatusList)
+    FeeID=models.CharField(max_length=10)
+    FeeName=models.CharField(max_length=50)
+    Qty=models.IntegerField()
+    Amount=models.IntegerField()
+    Remark=models.CharField(max_length=100)
+    class Meta:
+        managed = False
+        db_table = "ExportExcel_M_V_FeeItemReport"

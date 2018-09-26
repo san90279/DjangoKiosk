@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}罰緩統計報表{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block container %}
+
+  <div class="card bg-light mb-3">
+        <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
+            <div class="card-body">
+              <div class="row">
+                <B class="col-xl-3 col-sm-6 mb-3">起始日期：</B>
+                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Begindate" name="Begindate" value="" type="date">
+                <B class="col-xl-3 col-sm-6 mb-3">結束日期：</B>
+                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Enddate" name="Enddate" value="" type="date">
+              </div>
+            </div>
+
+            <div class="card-footer small text-muted">
+                <button onclick="tablerefresh();"  id="search" class="btn btn-primary"> <i class="fas fa-search icon-large"></i>查詢 </button>
+                <button  class="btn btn-warning"  onclick="javascript:location.href=''" ><i class="fas fa-newspaper"></i>報表</button>
+            </div>
+
+  </div>
+
+
+
+
+<div class="card mb-3">
+  <div class="card-header">
+    <i class="fas fa-table"></i>
+    罰緩統計清單</div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped" id="PenaltyTable" width="100%" cellspacing="0">
+        <thead class="thead-light">
+          <tr>
+            <th>罰緩編號</th>
+            <th>罰緩名稱</th>
+            <th>條款編號</th>
+            <th>適用條款</th>
+            <th>數量</th>
+            <th>金額小計</th>
+            <th>備註</th>
+          </tr>
+        </thead>
+        <tfoot class="thead-light">
+          <tr>
+            <th>罰緩編號</th>
+            <th>罰緩名稱</th>
+            <th>條款編號</th>
+            <th>適用條款</th>
+            <th>數量</th>
+            <th>金額小計</th>
+            <th>備註</th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer small text-muted">最後更新日期 {% now "SHORT_DATETIME_FORMAT" %}</div>
+</div>
+
+
+{% endblock %}
+
+{% block foot %}Copyright © Cypress 2018{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    function tablerefresh(){
+        var table = $('#PenaltyTable').DataTable();
+        table.ajax.reload();
+    }
+
+
+  $(document).ready(function() {
+    $('#PenaltyTable').DataTable( {
+        "processing": true,
+        "serverSide": true,
+        "searching": false,
+        "ajax": {
+                "type":"POST",
+                "url": "/ExportExcel/GetPenaltyReport/",
+                "data":function(d){
+                  d.csrfmiddlewaretoken= '{{ csrf_token }}',
+                  d.CreateDate__le =$("#Begindate").val(),
+                  d.CreateDate__ge =$("#Enddate").val()
+                },
+                "dataSrc": "data"
+        },
+
+       "language": {
+                "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
+        },
+        "columns": [
+            { "data": "PenaltyID" },
+            { "data": "PenaltyName" },
+            { "data": "TermID" },
+            { "data": "TermName" },
+            { "data": "Qty" },
+            { "data": "TotalAmount" },
+            { "data": "Remark" },
+
+        ],
+      });
+
+  } );
+</script>
+{% endblock %}
