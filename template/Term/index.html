@@ -10,11 +10,15 @@
       <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
           <div class="card-body">
             <div class="row">
-
+              <B class="col-xl-3 col-sm-6 mb-3">條款編號：</B>
+              <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchTermID" name="searchTermID" value="" type="text">
+              <B class="col-xl-3 col-sm-6 mb-3">條款名稱：</B>
+              <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchTermName" name="searchTermName" value="" type="text">
             </div>
           </div>
 
           <div class="card-footer small text-muted">
+              <button id="search" class="btn btn-primary"> <i class="fas fa-search icon-large"></i>查詢 </button>
               <button  class="btn btn-warning"  onclick="javascript:location.href='/Term/Edit/'" ><i class="fas fa-plus"></i>新增</button>
           </div>
 
@@ -26,8 +30,8 @@
     條款清單</div>
   <div class="card-body">
     <div class="table-responsive">
-      <table class="table table-bordered" id="TermTable" width="100%" cellspacing="0">
-        <thead>
+      <table class="table table-bordered table-striped" id="TermTable" width="100%" cellspacing="0">
+        <thead class="thead-light">
           <tr>
             <th>條款編號</th>
             <th>條款名稱</th>
@@ -35,7 +39,7 @@
             <th> </th>
           </tr>
         </thead>
-        <tfoot>
+        <tfoot class="thead-light">
           <tr>
             <th>條款編號</th>
             <th>條款名稱</th>
@@ -54,6 +58,10 @@
 
 {% block js %}
 <script type="text/javascript">
+  function tablerefresh(){
+    var table = $('#TermTable').DataTable();
+    table.ajax.reload();
+  }
   $(document).ready(function() {
       $('#TermTable').dataTable( {
           "processing": true,
@@ -63,7 +71,9 @@
                  "type":"POST",
                  "url": "/Term/GetTermData/",
                  "data":function(d){
-                   d.csrfmiddlewaretoken= '{{ csrf_token }}'
+                   d.csrfmiddlewaretoken= '{{ csrf_token }}',
+                   d.TermID__contains =$("#searchTermID").val();
+                   d.TermName__contains =$("#searchTermName").val();
                  },
                  "dataSrc": "data"
              },
@@ -86,6 +96,11 @@
               }
           ]
       } );
+      $('#search').click(function(){
+        var table = $('#TermTable').DataTable();
+        table.ajax.reload();
+        tablerefresh();
+      });
   } );
 </script>
 {% endblock %}

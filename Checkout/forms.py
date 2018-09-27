@@ -8,4 +8,4 @@ class CheckoutForm(forms.ModelForm):
     def __init__(self,*args, **kwargs):
         super(CheckoutForm, self).__init__(*args, **kwargs)
         self.fields['CloseDate'].widget=forms.TextInput(attrs={'type':'date'})
-        self.fields['CloseDate'].label='過帳日期'
+        self.fields['CloseDate'].label='結帳日期'

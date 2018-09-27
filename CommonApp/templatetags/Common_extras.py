@@ -3,13 +3,14 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 register = template.Library()
 
+#DropDownHelper
 @register.simple_tag
 def ParameterListFor(*args, **kwargs):
-    list = defaultnull(kwargs,'list')
-    html_id =  defaultnull(kwargs,'html_id')
-    pleaseselect=  defaultnull(kwargs,'pleaseselect')
-    selectitem=  defaultnull(kwargs,'selectitem')
-    HtmlClass=defaultnull(kwargs,'HtmlClass')
+    list = defaultnull(kwargs,'list')                       #資料列表
+    html_id =  defaultnull(kwargs,'html_id')                #該控制項的ID
+    pleaseselect=  defaultnull(kwargs,'pleaseselect')       #預設的字串
+    selectitem=  defaultnull(kwargs,'selectitem')           #預選項目
+    HtmlClass=defaultnull(kwargs,'HtmlClass')               #該控制項的CLASS
     if HtmlClass=='':
         HtmlClass="form-control rounded-0 col-xl-3 col-sm-6 mb-3"
 
@@ -23,6 +24,8 @@ def ParameterListFor(*args, **kwargs):
         else:
             selecthelper='%s<option value=%s>%s</option>' % (selecthelper,key,val)
     return mark_safe(selecthelper+'</select>')
+
+#如果值為None則帶入空值
 def defaultnull(kwargs,key):
     try:
         return kwargs[key]
