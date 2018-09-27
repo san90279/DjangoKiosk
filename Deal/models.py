@@ -43,7 +43,7 @@ class M_DealDetail(models.Model):
     CreateDate=models.DateTimeField(auto_now=True)
     Editor=models.ForeignKey('auth.user',on_delete=models.PROTECT,null=True,related_name='EditorDetail')
     EditDate=models.DateTimeField(auto_now=True,null=True)
-
+#交易補登DB VIEW MODEL
 class M_V_entry(models.Model):
     id = models.BigIntegerField(primary_key=True)
     DealDate=models.DateTimeField()

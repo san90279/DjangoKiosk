@@ -83,6 +83,7 @@ def V_GetDealDetailData(request):
 
 
 #-------------------------交易補登------------------------------#
+#交易補登主頁
 def V_EntryIndex(request):
     #收銀人員項DropDown使用
     EmployeeList= M_EmployeeCard.objects.all().values_list('EmployeeID', 'EmployeeName')
@@ -91,9 +92,10 @@ def V_EntryIndex(request):
     #規費項DropDown使用
     FeeList= M_FeeItem.objects.all().values_list('FeeID', 'FeeName')
     #付款別項DropDown使用
-    PayTypeList=M_V_entry.PayTypeList
+    PayTypeList=M_DealMaster.PayTypeList
     return render(request,'Deal/entry_index.html',{'employee':EmployeeList,'station':StationList,'fee':FeeList,'paytype':PayTypeList})
 
+#交易補登刪除
 def V_EntryDelete(request, DealDate,LotNo):
     Mobject=M_DealMaster.objects.filter(Q(DealDate=DealDate,LotNo=LotNo))
     for master in Mobject:
@@ -106,6 +108,7 @@ def V_EntryDelete(request, DealDate,LotNo):
     #跳轉至首頁
     return redirect('EntryIndex')
 
+#交易補登新增
 def V_EntryNew(request):
     #指定模板路徑
     template = 'Deal/entry_Edit.html'
@@ -127,9 +130,10 @@ def V_EntryNew(request):
                 PayType=form.cleaned_data['PayType']
                 EmployeeObject=M_EmployeeCard.objects.get(pk=form.cleaned_data['EmployeeCardID'])
                 FeeItemObject=M_FeeItem.objects.get(pk=form.cleaned_data['FeeID'])
+                #群組篩選LotNo欄位
                 LastLotNo=M_DealMaster.objects.filter(Q(DealDate=DealDate)).aggregate(Max('LotNo'))
-                BulkCreateList_m=[]
-                BulkCreateList_d=[]
+                BulkCreateList_m=[] #Bulk insert 交易主檔array
+                BulkCreateList_d=[] #Bulk insert 交易子檔array
                 if LastLotNo['LotNo__max'] is None:
                     lotno=1
                 else:
@@ -141,6 +145,7 @@ def V_EntryNew(request):
                     data_m.Cashier=EmployeeObject
                     data_m.Amount=FeeItemObject.FeeAmount
                     data_m.PayType=PayType
+                    data_m.Status='1'
                     data_m.LotNo=lotno
                     data_m.InvoiceNo=M_Invoice.objects.get(InvoiceNo=i)
                     data_m.IsOutside=True
@@ -176,15 +181,19 @@ def V_EntryNew(request):
         form = EntryForm()
     return render(request, template, {'form': form})
 
+#交易補登JQGRID資料取得
 @csrf_protect
 def V_GetEntryData(request):
     draw = int(request.POST.get('draw'))  # 記錄操作次數
-
+    #將前端request物件傳入GridCS內做處理
     grid=GridCS(request)
+    #將Model M_V_entry傳入作查詢
     EntryData=grid.dynamic_query_order(M_V_entry)
-
-
+    #將EntryData傳入作後端分頁
+    object_list = grid.dynamic_query_order_paginator(EntryData)
+    #資料總筆數
     count=len(EntryData)
+    #拼出teplate JQGRID 欄位JSON資料流
     data=[{	'DealDate': Enrty.DealDate.strftime('%Y-%m-%d'),
             'EmployeeID': Enrty.EmployeeID,
             'StationID': Enrty.StationID,
@@ -197,8 +206,8 @@ def V_GetEntryData(request):
             'TotalAmount': Enrty.TotalAmount,
             'Status': Enrty.Status,
             'IsCheckout': Enrty.IsCheckout,
-            'LotNo': Enrty.LotNo} for Enrty in EntryData]
-
+            'LotNo': Enrty.LotNo} for Enrty in object_list]
+    #JQGRID API
     dic = {
         'draw': draw,
         'recordsTotal': count,

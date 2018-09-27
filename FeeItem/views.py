@@ -9,23 +9,24 @@ from FeeItem.forms import FeeItemForm
 from FeeItem.models import M_FeeItem
 import datetime,json
 from CommonApp.models import GridCS
-
+#規費主頁
 def V_FeeItemIndex(request):
     type=M_FeeItem.FeeTypeList
     status=M_FeeItem.FeeStatusList
     return render(request,'FeeItem/index.html',{'type':type,'status':status});
-
+#JQGRID取得規費資料
 @csrf_protect
 def V_GetFeeItemData(request):
     draw = int(request.POST.get('draw'))  # 記錄操作次數
-
+    #將前端request物件傳入GridCS內做處理
     grid=GridCS(request)
+    #將Model M_FeeItem傳入作查詢
     FeeItemData=grid.dynamic_query_order(M_FeeItem)
+    #將FeeItemData傳入作後端分頁
     object_list = grid.dynamic_query_order_paginator(FeeItemData)
-
+    #資料總筆數
     count=len(FeeItemData)
-
-
+    #拼出teplate JQGRID 欄位JSON資料流
     data=[{	'FeeID': FeeItem.FeeID,
             'FeeName': FeeItem.FeeName,
             'Remark': FeeItem.Remark,
@@ -33,7 +34,7 @@ def V_GetFeeItemData(request):
             'FeeType':  [val for key,val in M_FeeItem.FeeTypeList if key==FeeItem.FeeType],
             'Status':  [val for key,val in M_FeeItem.FeeStatusList if key==FeeItem.Status],
             'pk': FeeItem.pk} for FeeItem in object_list]
-
+    #JQGRID API
     dic = {
         'draw': draw,
         'recordsTotal': count,
@@ -46,7 +47,7 @@ def V_GetFeeItemData(request):
 
 
 
-
+#規費編輯
 def V_FeeItemEdit(request, id):
     FeeItemData = get_object_or_404(M_FeeItem, pk=id)
     template = 'FeeItem/Edit.html'
@@ -64,7 +65,7 @@ def V_FeeItemEdit(request, id):
         FeeItem.EditDate = datetime.datetime.now()
         FeeItem.save()
         return redirect('FeeItemIndex')
-
+#規費新增
 def V_FeeItemNew(request):
     template = 'FeeItem/Edit.html'
     if request.method == "POST":

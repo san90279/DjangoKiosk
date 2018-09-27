@@ -27,26 +27,29 @@ def V_DayReportIndex(request):
 def V_MonthReportIndex(request):
     return render(request,'ExportExcel/MonthReportIndex.html');
 
-
+#罰緩報表主頁
 def V_PenaltyReportIndex(request):
     return render(request,'ExportExcel/PenaltyReportIndex.html');
 
-
+#規費報表主頁
 def V_FeeItemReportIndex(request):
     Status=M_DealMaster.DealStatusList
     PayType=M_DealMaster.PayTypeList
     return render(request,'ExportExcel/FeeItemReportIndex.html',{'Status':Status,'PayType':PayType});
 
-
+#JQGRID取得罰緩報表資料
 @csrf_protect
 def V_GetPenaltyReport(request):
     draw = int(request.POST.get('draw'))  # 記錄操作次數
-
+    #將前端request物件傳入GridCS內做處理
     grid=GridCS(request)
+    #將Model M_V_PenaltyReport傳入作查詢
     PenaltyData=grid.dynamic_query_order(M_V_PenaltyReport)
-
-
+    #將FeeItemData傳入作分頁
+    object_list = grid.dynamic_query_order_paginator(PenaltyData)
+    #資料總筆數
     count=len(PenaltyData)
+    #拼出teplate JQGRID 欄位JSON資料流
     data=[{	'DealDate': Penalty.DealDate.strftime('%Y-%m-%d'),
             'PenaltyID':Penalty.PenaltyID  ,
             'PenaltyName': Penalty.PenaltyName,
@@ -54,8 +57,8 @@ def V_GetPenaltyReport(request):
             'TermName': Penalty.TermName ,
             'Qty': Penalty.qty,
             'TotalAmount': Penalty.totalamount,
-            'Remark': Penalty.Remark} for Penalty in PenaltyData]
-
+            'Remark': Penalty.Remark} for Penalty in object_list]
+    #JQGRID API
     dic = {
         'draw': draw,
         'recordsTotal': count,
@@ -64,19 +67,22 @@ def V_GetPenaltyReport(request):
     }
     return HttpResponse(json.dumps(dic, cls=DjangoJSONEncoder), content_type='application/json')
 
-
+#JQGRID取得規費報表資料
 @csrf_protect
 def V_GetFeeItemReport(request):
     draw = int(request.POST.get('draw'))  # 記錄操作次數
-
+    #將前端request物件傳入GridCS內做處理
     grid=GridCS(request)
+    #將Model M_V_FeeItemReport傳入作查詢
     FeeItemData=grid.dynamic_query_order(M_V_FeeItemReport)
+    #將FeeItemData傳入作分頁
     object_list = grid.dynamic_query_order_paginator(FeeItemData)
-
+    #資料總筆數
     count=len(FeeItemData)
+    #拼出teplate JQGRID 欄位JSON資料流
     data=[{	'StationID': FeeItem.StationID,
             'DealDate': FeeItem.DealDate.strftime('%Y-%m-%d'),
-            'DealTime': FeeItem.DealDate.strftime('%H:%M:%S'),
+            'DealTime': FeeItem.DealDate.strftime('%H:%M'),
             'InvoiceNo':FeeItem.InvoiceNo ,
             'Status': FeeItem.Status,
             'FeeID': FeeItem.FeeID,
@@ -84,7 +90,7 @@ def V_GetFeeItemReport(request):
             'Amount': FeeItem.Amount,
             'cAmount': FeeItem.Amount,
             'Qty': FeeItem.Qty} for FeeItem in object_list]
-
+    #JQGRID API
     dic = {
         'draw': draw,
         'recordsTotal': count,

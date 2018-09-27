@@ -18,18 +18,20 @@ def V_CheckoutIndex(request):
 @csrf_protect
 def V_GetCheckoutData(request):
     draw = int(request.POST.get('draw'))  # 記錄操作次數
-
+    #將前端request物件傳入GridCS內做處理
     grid=GridCS(request)
+    #將Model M_Checkout傳入作查詢
     CheckoutData=grid.dynamic_query_order(M_Checkout)
+    #將CheckoutData資料作後端分頁
     object_list = grid.dynamic_query_order_paginator(CheckoutData)
-
+    #資料總筆數
     count=len(CheckoutData)
-
+    #拼出teplate JQGRID 欄位JSON資料流
     data=[{	'CloseDate': Checkout.CloseDate,
             'Editor':Checkout.Editor.username,
             'RecordTime':Checkout.RecordTime.strftime('%Y-%m-%d %H:%M:%S'),
             'pk': Checkout.pk} for Checkout in object_list]
-
+    #JQGRID API
     dic = {
         'draw': draw,
         'recordsTotal': count,
@@ -42,8 +44,10 @@ def V_CheckoutNew(request):
     template = 'Checkout/Checkout.html'
     if request.method == "POST":
         form = CheckoutForm(request.POST)
+        #檢查form表單內是否有非法輸入
         if form.is_valid():
             Checkout = form.save(commit=False)
+            #更新過帳旗標欄位
             M_DealMaster.objects.filter(Q(DealDate__lte=Checkout.CloseDate)).update(IsCheckout=True)
             Checkout.Editor = request.user
             Checkout.RecordTime = datetime.datetime.now()
