@@ -15,26 +15,6 @@
   </div>
 {% endfor %}
 <div class="card mb-3">
-  {% if form.instance.id %}
-  <div class="card-header">
-    <i class="far fa-calendar-alt"></i>
-    補登作業</div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <form method="post" action="{% url 'EntryEdit' id=form.instance.id %}">
-          <!--<input type="hidden" name="pk" id="pk" value="{{ id }}">-->
-          {% csrf_token %}
-          <table class="table table-bordered" width="100%" cellspacing="0">
-            {{ form.as_table }}
-            <tr>
-              <td colspan="2"><button type="submit" id="search" class="btn btn-primary"> <i class="far fa-save icon-large"></i>儲存 </button></td>
-            </tr>
-          </table>
-        </form>
-      </div>
-    </div>
-    <div class="card-footer small text-muted">Updated {% now "SHORT_DATETIME_FORMAT" %}</div>
-  {% else %}
   <div class="card-header">
     <i class="far fa-calendar-alt"></i>
     補登作業</div>
@@ -53,8 +33,6 @@
       </div>
     </div>
     <div class="card-footer small text-muted">Updated {% now "SHORT_DATETIME_FORMAT" %}</div>
-  {% endif %}
-
 </div>
 {% endblock %}
 

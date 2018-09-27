@@ -15,15 +15,10 @@
                     <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchFeeID" name="searchFeeID" value="" type="text">
                     <B class="col-xl-3 col-sm-6 mb-3">規費項目名稱：</B>
                     <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchFeeName" name="searchFeeName" value="" type="text">
-                    <B class="col-xl-3 col-sm-6 mb-3">項目描述：</B>
-                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchRemark" name="searchRemark" value="" type="text">
                     <B class="col-xl-3 col-sm-6 mb-3">規費群組：</B>
                     {% ParameterListFor  list=type html_id="searchFeeType" pleaseselect="----請選擇----" %}
                     <B class="col-xl-3 col-sm-6 mb-3">狀態：</B>
-                    {% ParameterListFor  list=type html_id="searchFeeType" pleaseselect="----請選擇----" %}
-                    
-                    <B class="col-xl-3 col-sm-6 mb-3"></B>
-                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" value="" type="hidden">
+                    {% ParameterListFor  list=status html_id="searchFeeType" pleaseselect="----請選擇----" %}
               </div>
 
             </div>
@@ -93,7 +88,6 @@
                       d.csrfmiddlewaretoken= '{{ csrf_token }}',
                       d.FeeID__icontains =$("#searchFeeID").val(),
                       d.FeeName__icontains =$("#searchFeeName").val(),
-                      d.Remark__icontains =$("#searchRemark").val(),
                       d.FeeType__icontains =$("#searchFeeType").val(),
                       d.Status__icontains =$("#searchStatus").val()
                     },
