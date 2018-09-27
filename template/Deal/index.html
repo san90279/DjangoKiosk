@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load Common_extras %}
-{% block title %}規費科目{% endblock %}
+{% block title %}交易查詢{% endblock %}
 
 {% block css %}
 {% endblock %}
@@ -13,11 +13,11 @@
               <div class="row">
                     <input type="hidden" id="MasterID" value="0">
                     <B class="col-xl-2 col-sm-12 col-mb-6">開始日期：</B>
-                    <input class="form-control rounded-0 col-xl-2 col-sm-6 col-mb-3" id="StartDate" name="StartDate" value="" type="date">
-                    <input class="form-control rounded-0 col-xl-2 col-sm-6 col-mb-3" id="StartTime" name="StartTime" value="" type="time">
+                    <input class="form-control rounded-0 col-xl-2 col-sm-6 col-mb-3" id="StartDate" name="StartDate" type="date">
+                    <input class="form-control rounded-0 col-xl-2 col-sm-6 col-mb-3" id="StartTime" name="StartTime">
                     <B class="col-xl-2 col-sm-12 col-mb-6">結束日期：</B>
-                    <input class="form-control rounded-0 col-xl-2 col-sm-6 col-mb-3" id="EndDate" name="EndDate" value="" type="date">
-                    <input class="form-control rounded-0 col-xl-2 col-sm-6 col-mb-3" id="EndTime" name="EndTime" value="" type="time">
+                    <input class="form-control rounded-0 col-xl-2 col-sm-6 col-mb-3" id="EndDate" name="EndDate" type="date">
+                    <input class="form-control rounded-0 col-xl-2 col-sm-6 col-mb-3" id="EndTime" name="EndTime">
                     <B class="col-xl-2 col-sm-12 col-mb-6">單據號碼：</B>
                     <input class="form-control rounded-0 col-xl-4 col-sm-12 col-mb-6" id="InvoiceNo" name="InvoiceNo" value="" type="text">
                     <B class="col-xl-2 col-sm-12 col-mb-6">規費代號：</B>
@@ -46,7 +46,7 @@
     <div class="table-responsive">
       <table>
         <tr>
-          <td style="width:70%;">
+          <td style="width:60%;">
             <table class="table table-bordered table-striped" id="MasterTable" width="100%" cellspacing="0">
               <thead class="thead-light">
                 <tr>
@@ -72,7 +72,7 @@
               </tfoot>
             </table>
           </td>
-          <td  style="width:30%;">
+          <td valign="top" style="width:40%;padding-top: 37px;">
             <table class="table table-bordered table-striped" id="DetailTable" width="100%" cellspacing="0">
               <thead class="thead-light">
                 <tr>
@@ -117,6 +117,10 @@
     }
 
   $(document).ready(function() {
+
+    $('#StartTime').timepicker({ 'timeFormat': 'H:i' });
+    $('#EndTime').timepicker({ 'timeFormat': 'H:i' });
+
     $('#MasterTable').DataTable( {
         "processing": true,
         "serverSide": true,
