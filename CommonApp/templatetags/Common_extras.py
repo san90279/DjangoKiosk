@@ -9,8 +9,11 @@ def ParameterListFor(*args, **kwargs):
     html_id =  defaultnull(kwargs,'html_id')
     pleaseselect=  defaultnull(kwargs,'pleaseselect')
     selectitem=  defaultnull(kwargs,'selectitem')
+    HtmlClass=defaultnull(kwargs,'HtmlClass')
+    if HtmlClass=='':
+        HtmlClass="form-control rounded-0 col-xl-3 col-sm-6 mb-3"
 
-    selecthelper='<select class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="%s" name="%s">' % (html_id,html_id)
+    selecthelper='<select class="%s" id="%s" name="%s">' % (HtmlClass,html_id,html_id)
     if pleaseselect != '':
         selecthelper='%s<option value="">%s</option>' % (selecthelper,pleaseselect)
 

@@ -7,7 +7,7 @@ from EmployeeCard.models import M_EmployeeCard
 from Store.models import M_Station
 from FeeItem.models import M_FeeItem
 from Invoice.models import M_Invoice
-from Deal.models import M_DealMaster,M_DealDetail,M_V_entry
+from Deal.models import M_DealMaster,M_DealDetail,M_V_entry,M_V_DealDetail
 import datetime,json
 from Deal.forms import EntryForm
 from CommonApp.models import GridCS
@@ -27,12 +27,18 @@ def V_GetDealMasterData(request):
 
     grid=GridCS(request)
     MasterData=grid.dynamic_query_order(M_DealMaster)
-    object_list = grid.dynamic_query_order_paginator(MasterData)
 
+
+    if(request.POST.get('FeeID', '')!=''):
+        filterFee=request.POST.get('FeeID', '')
+        FeeDetailData=M_DealDetail.objects.filter(FeeID=filterFee).values_list('MasterID')
+        MasterData=MasterData.filter(id__in=FeeDetailData)
+
+    object_list = grid.dynamic_query_order_paginator(MasterData)
     count=len(MasterData)
 
     data=[{	'StationID': Master.StationID.StationName,
-            'DealDate': Master.DealDate,
+            'DealDate': Master.DealDate.strftime("%Y-%m-%d %H:%M"),
             'Cashier': Master.Cashier.EmployeeName,
             'InvoiceNo': Master.InvoiceNo.InvoiceNo,
             'Amount': Master.Amount,
@@ -56,16 +62,15 @@ def V_GetDealDetailData(request):
 
     grid=GridCS(request)
     DetailData=grid.dynamic_query_order(M_DealDetail)
-
-
     count=len(DetailData)
 
-    data=[{	'FeeID': Detail.FeeID.FeeName,
+    data=[{	'FeeID': Detail.FeeID.FeeID,
+            'FeeName': Detail.FeeID.FeeName,
             'Amount': Detail.Amount,
             'Qty': Detail.Qty,
-            'TotalAmount': Detail.TotalAmount,
+            'TotalAmount':Detail.TotalAmount,
             'Remark': Detail.Remark,
-            'pk': Detail.pk} for Detail in DetailData]
+            'MasterID': Detail.MasterID.pk} for Detail in DetailData]
 
     dic = {
         'draw': draw,

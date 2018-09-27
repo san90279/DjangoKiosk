@@ -1,4 +1,5 @@
 from django.db import models
+from FeeItem.models import M_FeeItem
 
 # Create your models here.
 class M_DealMaster(models.Model):
@@ -44,13 +45,6 @@ class M_DealDetail(models.Model):
     EditDate=models.DateTimeField(auto_now=True,null=True)
 
 class M_V_entry(models.Model):
-    DealStatusList=(
-        ('0','作廢'),
-    )
-    PayTypeList=(
-        ('PT01','現金'),
-        ('PT02','悠遊卡'),
-    )
     id = models.BigIntegerField(primary_key=True)
     DealDate=models.DateTimeField()
     EmployeeID=models.CharField(max_length=10,unique=True)
@@ -58,13 +52,35 @@ class M_V_entry(models.Model):
     FeeID=models.CharField(max_length=10,unique=True)
     FeeName=models.CharField(max_length=50)
     beginno=models.CharField(max_length=20,unique=True)
-    PayType=models.CharField(max_length=10,choices=PayTypeList)
+    PayType=models.CharField(max_length=10,choices=M_DealMaster.PayTypeList)
     Amount=models.IntegerField(default=0)
     Qty=models.IntegerField(default=0)
     TotalAmount=models.IntegerField(default=0)
-    Status=models.CharField(max_length=10,choices=DealStatusList,null=True)
+    Status=models.CharField(max_length=10,choices=M_DealMaster.DealStatusList,null=True)
     IsCheckout=models.BooleanField()
     LotNo=models.IntegerField(default=1)
     class Meta:
         managed = False
         db_table = "Deal_M_V_entry"
+
+class M_V_DealDetail(models.Model):
+    DealDate=models.DateTimeField()
+    Status=models.CharField(max_length=10,choices=M_DealMaster.DealStatusList,null=True)
+    Amount=models.IntegerField(null=True)
+    PayType=models.CharField(max_length=10,choices=M_DealMaster.PayTypeList,null=True)
+    IsCheckout=models.BooleanField()
+    IsOutside=models.BooleanField()
+    DetailAmount=models.IntegerField(null=True)
+    Qty=models.IntegerField(null=True)
+    DetailTotalAmount=models.IntegerField(null=True)
+    DetailRemark=models.CharField(max_length=100,null=True)
+    MasterID_id=models.IntegerField(null=True)
+    FeeID=models.CharField(max_length=10,null=True)
+    FeeName=models.CharField(max_length=50,null=True)
+    FeeAmount=models.IntegerField(null=True)
+    FeeRemark=models.CharField(max_length=100,null=True)
+    FeeType=models.CharField(max_length=10,choices=M_FeeItem.FeeTypeList,null=True)
+    InvoiceNo=models.CharField(max_length=20,null=True)
+    class Mete:
+        managed = False
+        db_table = "Deal_M_V_DealDetail"

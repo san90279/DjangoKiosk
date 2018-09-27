@@ -11,26 +11,27 @@
         <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
             <div class="card-body">
               <div class="row">
-                    <B class="col-xl-3 col-sm-6 mb-3">開始日期：</B>
-                    <input class="form-control rounded-0 col-xl-3 col-sm-3 mb-3" id="StartDate" name="StartDate" value="" type="date">
-                    <input class="form-control rounded-0 col-xl-3 col-sm-3 mb-3" id="StartTime" name="StartTime" value="" type="time">
-                    <B class="col-xl-3 col-sm-6 mb-3">結束日期：</B>
-                    <input class="form-control rounded-0 col-xl-3 col-sm-3 mb-3" id="EndDate" name="EndDate" value="" type="date">
-                    <input class="form-control rounded-0 col-xl-3 col-sm-3 mb-3" id="EndTime" name="EndTime" value="" type="time">
-                    <B class="col-xl-3 col-sm-6 mb-3">單據號碼：</B>
-                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="InvoiceNo" name="InvoiceNo" value="" type="text">
-                    <B class="col-xl-3 col-sm-6 mb-3">規費代號：</B>
-                    {% ParameterListFor  list=FeeID html_id="FeeID" pleaseselect="----請選擇----" %}
-                    <B class="col-xl-3 col-sm-6 mb-3">收款類別：</B>
-                    {% ParameterListFor  list=PayType html_id="PayType" pleaseselect="----請選擇----" %}
-                    <B class="col-xl-3 col-sm-6 mb-3">收款人員：</B>
-                    {% ParameterListFor  list=Cashier html_id="Cashier" pleaseselect="----請選擇----" %}
-                    <B class="col-xl-3 col-sm-6 mb-3">狀態：</B>
-                    {% ParameterListFor  list=Status html_id="Status" pleaseselect="----請選擇----" %}
+                    <input type="hidden" id="MasterID" value="0">
+                    <B class="col-xl-2 col-sm-12 col-mb-6">開始日期：</B>
+                    <input class="form-control rounded-0 col-xl-2 col-sm-6 col-mb-3" id="StartDate" name="StartDate" value="" type="date">
+                    <input class="form-control rounded-0 col-xl-2 col-sm-6 col-mb-3" id="StartTime" name="StartTime" value="" type="time">
+                    <B class="col-xl-2 col-sm-12 col-mb-6">結束日期：</B>
+                    <input class="form-control rounded-0 col-xl-2 col-sm-6 col-mb-3" id="EndDate" name="EndDate" value="" type="date">
+                    <input class="form-control rounded-0 col-xl-2 col-sm-6 col-mb-3" id="EndTime" name="EndTime" value="" type="time">
+                    <B class="col-xl-2 col-sm-12 col-mb-6">單據號碼：</B>
+                    <input class="form-control rounded-0 col-xl-4 col-sm-12 col-mb-6" id="InvoiceNo" name="InvoiceNo" value="" type="text">
+                    <B class="col-xl-2 col-sm-12 col-mb-6">規費代號：</B>
+                    {% ParameterListFor  list=FeeID html_id="FeeID" pleaseselect="----請選擇----" HtmlClass="form-control rounded-0 col-xl-4 col-sm-12 col-mb-6" %}
+                    <B class="col-xl-2 col-sm-12 col-mb-6">收款類別：</B>
+                    {% ParameterListFor  list=PayType html_id="PayType" pleaseselect="----請選擇----" HtmlClass="form-control rounded-0 col-xl-4 col-sm-12 col-mb-6" %}
+                    <B class="col-xl-2 col-sm-12 col-mb-6">收款人員：</B>
+                    {% ParameterListFor  list=Cashier html_id="Cashier" pleaseselect="----請選擇----" HtmlClass="form-control rounded-0 col-xl-4 col-sm-12 col-mb-6" %}
+                    <B class="col-xl-2 col-sm-12 col-mb-6">狀態：</B>
+                    {% ParameterListFor  list=Status html_id="Status" pleaseselect="----請選擇----" HtmlClass="form-control rounded-0 col-xl-4 col-sm-12 col-mb-6" %}
               </div>
             </div>
             <div class="card-footer small text-muted">
-                <button onclick="tablerefresh();"  id="search" class="btn btn-primary"> <i class="fas fa-search icon-large"></i>查詢 </button>
+                <button id="search" class="btn btn-primary"> <i class="fas fa-search icon-large"></i>查詢 </button>
             </div>
   </div>
 
@@ -75,7 +76,8 @@
             <table class="table table-bordered table-striped" id="DetailTable" width="100%" cellspacing="0">
               <thead class="thead-light">
                 <tr>
-                  <th>規費</th>
+                  <th>規費代碼</th>
+                  <th>規費名稱</th>
                   <th>原價</th>
                   <th>數量</th>
                   <th>小計</th>
@@ -84,7 +86,8 @@
               </thead>
               <tfoot class="thead-light">
                 <tr>
-                  <th>規費</th>
+                  <th>規費代碼</th>
+                  <th>規費名稱</th>
                   <th>原價</th>
                   <th>數量</th>
                   <th>小計</th>
@@ -109,7 +112,7 @@
 {% block js %}
 <script type="text/javascript">
     function tablerefresh(){
-      var table = $('#FeeItemTable').DataTable();
+      var table = $('#DetailTable').DataTable();
       table.ajax.reload();
     }
 
@@ -122,16 +125,17 @@
                 "type":"POST",
                 "url": "/Deal/GetDealMasterData/",
                 "data":function(d){
-                  d.csrfmiddlewaretoken= '{{ csrf_token }}',
-                  d.FeeID__icontains =$("#searchFeeID").val(),
-                  d.FeeName__icontains =$("#searchFeeName").val(),
-                  d.Remark__icontains =$("#searchRemark").val(),
-                  d.FeeType__icontains =$("#searchFeeType").val(),
-                  d.Status__icontains =$("#searchStatus").val()
+                  d.csrfmiddlewaretoken= '{{ csrf_token }}';
+                  d.DealDate__gte =($("#StartDate").val()!=""?($("#StartDate").val()+' '):"")+$("#StartTime").val();
+                  d.DealDate__lte =($("#EndDate").val()!=""?($("#EndDate").val()+' '):"")+$("#EndTime").val();
+                  d.InvoiceNo_id__InvoiceNo__exact =$("#InvoiceNo").val();
+                  d.FeeID =$("#FeeID").val();
+                  d.PayType__exact =$("#PayType").val();
+                  d.Cashier__exact =$("#Cashier").val();
+                  d.Status__exact =$("#Status").val();
                 },
                 "dataSrc": "data",
         },
-
        "language": {
                 "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
         },
@@ -143,6 +147,7 @@
             { "data": "Amount" },
             { "data": "PayType" },
             { "data": "Status" },
+            { "data": "pk","visible": false },
         ],
       });
 
@@ -157,26 +162,39 @@
                   "url": "/Deal/GetDealDetailData/",
                   "data":function(d){
                     d.csrfmiddlewaretoken= '{{ csrf_token }}',
-                    d.FeeID__icontains =$("#searchFeeID").val(),
-                    d.FeeName__icontains =$("#searchFeeName").val(),
-                    d.Remark__icontains =$("#searchRemark").val(),
-                    d.FeeType__icontains =$("#searchFeeType").val(),
-                    d.Status__icontains =$("#searchStatus").val()
+                    d.MasterID__exact =$("#MasterID").val()
                   },
                   "dataSrc": "data",
           },
-
          "language": {
                   "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
           },
           "columns": [
               { "data": "FeeID" },
+              { "data": "FeeName" },
               { "data": "Amount" },
               { "data": "Qty" },
               { "data": "TotalAmount" },
               { "data": "Remark" },
+              { "data": "MasterID","visible": false },
           ],
         });
+
+        var table = $('#example').DataTable();
+
+      $('#MasterTable tbody').on( 'click', 'tr', function () {
+          var table = $('#MasterTable').DataTable();
+          var data=table.row( this ).data()
+          $('#MasterID').val(data.pk);
+          tablerefresh();
+      });
+
+      $('#search').click(function(){
+        var table = $('#MasterTable').DataTable();
+        table.ajax.reload();
+        $('#MasterID').val(0);
+        tablerefresh();
+      });
     } );
 </script>
 {% endblock %}
