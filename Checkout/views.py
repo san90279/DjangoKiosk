@@ -48,7 +48,7 @@ def V_CheckoutNew(request):
         if form.is_valid():
             Checkout = form.save(commit=False)
             #更新過帳旗標欄位
-            M_DealMaster.objects.filter(Q(DealDate__lte=Checkout.CloseDate)).update(IsCheckout=True)
+            M_DealMaster.objects.filter(Q(DealDate=Checkout.CloseDate)).update(IsCheckout=True)
             Checkout.Editor = request.user
             Checkout.RecordTime = datetime.datetime.now()
             Checkout.save()

@@ -14,7 +14,7 @@
                     <B class="col-xl-3 col-sm-6 mb-3">起始日期：</B>
                     <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Startdate" name="Startdate" value="" type="date">
                     <B class="col-xl-3 col-sm-6 mb-3">結束日期：</B>
-                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Enddadte" name="Enddadte" value="" type="date">
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Enddate" name="Enddate" value="" type="date">
                     <B class="col-xl-3 col-sm-6 mb-3">指定名稱：</B>
                     <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Feename" name="Feename" value="" type="text">
                     <B class="col-xl-3 col-sm-6 mb-3">顯示類別：</B>
@@ -97,10 +97,11 @@
                     "url": "/ExportExcel/GetFeeItemReport/",
                     "data":function(d){
                       d.csrfmiddlewaretoken= '{{ csrf_token }}',
-                      d.DealDate__lt=$("#Startdate").val(),
-                      d.DealDate__gt=$("#Enddate").val(),
+                      d.DealDate__gte=$("#Startdate").val(),
+                      d.DealDate__lte=$("#Enddate").val(),
                       d.FeeName__icontains=$("#Feename").val(),
-                      d.Status__icontains=$("#DealType").val()
+                      d.Status__icontains=$("#DealType").val(),
+                      d.PayType__icontains=$("#PayType").val()
                     },
                     "dataSrc": "data",
             },
