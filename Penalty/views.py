@@ -59,9 +59,10 @@ def V_PenaltyEdit(request, id):
         Penalty.Editor = request.user
         Penalty.EditDate = datetime.datetime.now()
         Penalty.save()
+        messages.success(request, '編輯成功!', extra_tags='alert')
         return redirect('PenaltyIndex')
 
-        
+
 #罰緩新增
 def V_PenaltyNew(request):
     template = 'Penalty/Edit.html'
@@ -72,6 +73,7 @@ def V_PenaltyNew(request):
             Penalty.Editor = request.user
             Penalty.EditDate = datetime.datetime.now()
             Penalty.save()
+            messages.success(request, '新增成功!', extra_tags='alert')
             return redirect('PenaltyIndex')
     else:
         form = PenaltyForm()
