@@ -204,7 +204,7 @@ def V_GetEntryData(request):
             'Amount': Enrty.Amount,
             'Qty': Enrty.Qty,
             'TotalAmount': Enrty.TotalAmount,
-            'Status': Enrty.Status,
+            'Status': [val for key,val in M_DealMaster.DealStatusList if key==Enrty.Status],
             'IsCheckout': Enrty.IsCheckout,
             'LotNo': Enrty.LotNo} for Enrty in object_list]
     #JQGRID API

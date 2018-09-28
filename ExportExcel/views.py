@@ -8,6 +8,7 @@ import datetime,json
 from django.http import HttpResponse
 from ExportExcel.models import M_V_PenaltyReport,M_V_FeeItemReport
 from Deal.models import M_DealMaster
+from FeeItem.models import M_FeeItem
 from CommonApp.models import GridCS
 from django.core.serializers.json import DjangoJSONEncoder
 # Create your views here.
@@ -35,7 +36,8 @@ def V_PenaltyReportIndex(request):
 def V_FeeItemReportIndex(request):
     Status=M_DealMaster.DealStatusList
     PayType=M_DealMaster.PayTypeList
-    return render(request,'ExportExcel/FeeItemReportIndex.html',{'Status':Status,'PayType':PayType});
+    Fee=M_FeeItem.objects.all().values_list('FeeID', 'FeeName')
+    return render(request,'ExportExcel/FeeItemReportIndex.html',{'Status':Status,'PayType':PayType,'Fee':Fee});
 
 #JQGRID取得罰緩報表資料
 @csrf_protect
@@ -84,7 +86,8 @@ def V_GetFeeItemReport(request):
             'DealDate': FeeItem.DealDate.strftime('%Y-%m-%d'),
             'DealTime': FeeItem.DealDate.strftime('%H:%M'),
             'InvoiceNo':FeeItem.InvoiceNo ,
-            'Status': FeeItem.Status,
+            'Status': [val for key,val in M_DealMaster.DealStatusList if key==FeeItem.Status],
+            'PayType':[val for key,val in M_DealMaster.PayTypeList if key==FeeItem.PayType],
             'FeeID': FeeItem.FeeID,
             'FeeName': FeeItem.FeeName,
             'Amount': FeeItem.Amount,

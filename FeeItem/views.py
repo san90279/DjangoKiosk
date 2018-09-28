@@ -9,10 +9,12 @@ from FeeItem.forms import FeeItemForm
 from FeeItem.models import M_FeeItem
 import datetime,json
 from CommonApp.models import GridCS
+from django.contrib import messages
 #規費主頁
 def V_FeeItemIndex(request):
     type=M_FeeItem.FeeTypeList
     status=M_FeeItem.FeeStatusList
+
     return render(request,'FeeItem/index.html',{'type':type,'status':status});
 #JQGRID取得規費資料
 @csrf_protect
@@ -64,6 +66,7 @@ def V_FeeItemEdit(request, id):
         FeeItem.Editor = request.user
         FeeItem.EditDate = datetime.datetime.now()
         FeeItem.save()
+        messages.success(request, '規費項目編輯成功!', extra_tags='alert')
         return redirect('FeeItemIndex')
 #規費新增
 def V_FeeItemNew(request):
@@ -75,6 +78,7 @@ def V_FeeItemNew(request):
             FeeItem.Editor = request.user
             FeeItem.EditDate = datetime.datetime.now()
             FeeItem.save()
+            messages.success(request, '規費項目新增成功!', extra_tags='alert')
             return redirect('FeeItemIndex')
     else:
         form = FeeItemForm()

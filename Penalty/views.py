@@ -9,6 +9,7 @@ from Penalty.forms import PenaltyForm
 from Penalty.models import M_Penalty
 import datetime,json
 from CommonApp.models import GridCS
+from django.contrib import messages
 
 #罰緩主頁
 def V_PenaltyIndex(request):
@@ -59,9 +60,10 @@ def V_PenaltyEdit(request, id):
         Penalty.Editor = request.user
         Penalty.EditDate = datetime.datetime.now()
         Penalty.save()
+        messages.success(request, '罰緩項目編輯成功!', extra_tags='alert')
         return redirect('PenaltyIndex')
 
-        
+
 #罰緩新增
 def V_PenaltyNew(request):
     template = 'Penalty/Edit.html'
@@ -72,6 +74,7 @@ def V_PenaltyNew(request):
             Penalty.Editor = request.user
             Penalty.EditDate = datetime.datetime.now()
             Penalty.save()
+            messages.success(request, '罰緩項目新增成功!', extra_tags='alert')
             return redirect('PenaltyIndex')
     else:
         form = PenaltyForm()

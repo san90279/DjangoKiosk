@@ -18,7 +18,7 @@
                     <B class="col-xl-3 col-sm-6 mb-3">規費群組：</B>
                     {% ParameterListFor  list=type html_id="searchFeeType" pleaseselect="----請選擇----" %}
                     <B class="col-xl-3 col-sm-6 mb-3">狀態：</B>
-                    {% ParameterListFor  list=status html_id="searchFeeType" pleaseselect="----請選擇----" %}
+                    {% ParameterListFor  list=status html_id="Status" pleaseselect="----請選擇----" %}
               </div>
 
             </div>
@@ -30,7 +30,14 @@
 
   </div>
 
-
+  {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      {{ message }}
+    </div>
+  {% endfor %}
 
 
 <div class="card mb-3">

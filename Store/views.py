@@ -9,6 +9,7 @@ from Store.forms import StoreForm,StationForm
 from Store.models import M_Store,M_Station,M_V_Station
 import datetime,json
 from CommonApp.models import GridCS
+from django.contrib import messages
 
 #站點主頁
 def V_StationIndex(request):
@@ -62,6 +63,7 @@ def V_StationEdit(request, id):
         Station.Editor = request.user
         Station.EditDate = datetime.datetime.now()
         Station.save()
+        messages.success(request, '站點編輯成功!', extra_tags='alert')
         return redirect('StationIndex')
 
 #戶所新增
@@ -74,6 +76,7 @@ def V_StoreNew(request):
             Store.Editor = request.user
             Store.EditDate = datetime.datetime.now()
             Store.save()
+            messages.success(request, '戶所新增成功!', extra_tags='alert')
             return redirect('StationIndex')
     else:
         form = StoreForm()
@@ -89,6 +92,7 @@ def V_StationNew(request):
             Station.Editor = request.user
             Station.EditDate = datetime.datetime.now()
             Station.save()
+            messages.success(request, '站點新增成功!', extra_tags='alert')
             return redirect('StationIndex')
     else:
         form = StationForm()

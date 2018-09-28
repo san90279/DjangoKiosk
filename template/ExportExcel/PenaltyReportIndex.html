@@ -37,6 +37,7 @@
       <table class="table table-bordered table-striped" id="PenaltyTable" width="100%" cellspacing="0">
         <thead class="thead-light">
           <tr>
+            <th>交易日期</th>
             <th>罰緩編號</th>
             <th>罰緩名稱</th>
             <th>條款編號</th>
@@ -48,6 +49,7 @@
         </thead>
         <tfoot class="thead-light">
           <tr>
+            <th>交易日期</th>
             <th>罰緩編號</th>
             <th>罰緩名稱</th>
             <th>條款編號</th>
@@ -86,8 +88,8 @@
                 "url": "/ExportExcel/GetPenaltyReport/",
                 "data":function(d){
                   d.csrfmiddlewaretoken= '{{ csrf_token }}',
-                  d.CreateDate__le =$("#Begindate").val(),
-                  d.CreateDate__ge =$("#Enddate").val()
+                  d.DealDate__gte =$("#Begindate").val(),
+                  d.DealDate__lte =$("#Enddate").val()
                 },
                 "dataSrc": "data"
         },
@@ -96,6 +98,7 @@
                 "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
         },
         "columns": [
+            { "data": "DealDate" },
             { "data": "PenaltyID" },
             { "data": "PenaltyName" },
             { "data": "TermID" },

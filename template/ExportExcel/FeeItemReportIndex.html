@@ -14,9 +14,9 @@
                     <B class="col-xl-3 col-sm-6 mb-3">起始日期：</B>
                     <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Startdate" name="Startdate" value="" type="date">
                     <B class="col-xl-3 col-sm-6 mb-3">結束日期：</B>
-                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Enddadte" name="Enddadte" value="" type="date">
-                    <B class="col-xl-3 col-sm-6 mb-3">指定名稱：</B>
-                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Feename" name="Feename" value="" type="text">
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Enddate" name="Enddate" value="" type="date">
+                    <B class="col-xl-3 col-sm-6 mb-3">規費：</B>
+                    {% ParameterListFor  list=Fee html_id="FeeID" pleaseselect="---請選擇---" %}
                     <B class="col-xl-3 col-sm-6 mb-3">顯示類別：</B>
                     {% ParameterListFor  list=Status html_id="DealType" pleaseselect="所有交易" %}
                     <B class="col-xl-3 col-sm-6 mb-3">收款類別：</B>
@@ -52,6 +52,7 @@
             <th>時間</th>
             <th>交易序號</th>
             <th>狀態</th>
+            <th>收款類別</th>
             <th>規費代碼</th>
             <th>項目名稱</th>
             <th>原價</th>
@@ -66,6 +67,7 @@
             <th>時間</th>
             <th>交易序號</th>
             <th>狀態</th>
+            <th>收款類別</th>
             <th>規費代碼</th>
             <th>項目名稱</th>
             <th>原價</th>
@@ -97,10 +99,11 @@
                     "url": "/ExportExcel/GetFeeItemReport/",
                     "data":function(d){
                       d.csrfmiddlewaretoken= '{{ csrf_token }}',
-                      d.DealDate__lt=$("#Startdate").val(),
-                      d.DealDate__gt=$("#Enddate").val(),
-                      d.FeeName__icontains=$("#Feename").val(),
-                      d.Status__icontains=$("#DealType").val()
+                      d.DealDate__gte=$("#Startdate").val(),
+                      d.DealDate__lte=$("#Enddate").val(),
+                      d.FeeID__icontains=$("#FeeID").val(),
+                      d.Status__icontains=$("#DealType").val(),
+                      d.PayType__icontains=$("#PayType").val()
                     },
                     "dataSrc": "data",
             },
@@ -114,6 +117,7 @@
                 { "data": "DealTime" },
                 { "data": "InvoiceNo" },
                 { "data": "Status" },
+                { "data": "PayType" },
                 { "data": "FeeID" },
                 { "data": "FeeName" },
                 { "data": "Amount" },
