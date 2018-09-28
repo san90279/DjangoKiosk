@@ -130,8 +130,30 @@
                 "url": "/Deal/GetDealMasterData/",
                 "data":function(d){
                   d.csrfmiddlewaretoken= '{{ csrf_token }}';
-                  d.DealDate__gte =($("#StartDate").val()!=""?($("#StartDate").val()+' '):"")+$("#StartTime").val();
-                  d.DealDate__lte =($("#EndDate").val()!=""?($("#EndDate").val()+' '):"")+$("#EndTime").val();
+                  var startDate=$("#StartDate").val();
+                  var startTime=$("#StartTime").val();
+                  var StartDateTime='';
+                  if(startDate!=''){
+                    StartDateTime=startDate+' ';
+                    if(startTime==''){
+                      StartDateTime=StartDateTime+"00:00:00";
+                    }else{
+                      StartDateTime=StartDateTime+startTime;
+                    }
+                  }
+                  d.DealDate__gte =StartDateTime;
+                  var endDate=$("#EndDate").val();
+                  var endTime=$("#EndTime").val();
+                  var EndDateTime='';
+                  if(endDate!=''){
+                    EndDateTime=endDate+' ';
+                    if(startTime==''){
+                      EndDateTime=endTime+"00:00:00";
+                    }else{
+                      EndDateTime=EndDateTime+endTime;
+                    }
+                  }
+                  d.DealDate__lte =EndDateTime;
                   d.InvoiceNo_id__InvoiceNo__exact =$("#InvoiceNo").val();
                   d.FeeID =$("#FeeID").val();
                   d.PayType__exact =$("#PayType").val();

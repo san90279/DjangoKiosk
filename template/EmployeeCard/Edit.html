@@ -8,8 +8,14 @@
 {% block container %}
 <div class="card mb-3">
   <div class="card-header">
-    <i class="fas fa-table"></i>
-    員工卡號編輯</div>
+    {% if id %}
+    <i class="far fa-edit"></i>
+    員工卡號編輯
+    {% else %}
+    <i class="fas fa-plus-circle"></i>
+    員工卡號新增
+    {% endif %}
+  </div>
   <div class="card-body">
     <div class="table-responsive">
       <form method="post" action="/EmployeeCard/Save/">

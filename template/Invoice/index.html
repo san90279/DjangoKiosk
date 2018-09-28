@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load Common_extras %}
 {% block title %}憑證庫存{% endblock %}
 
 {% block css %}
@@ -12,11 +12,11 @@
             <div class="card-body">
               <div class="row">
                 <B class="col-xl-3 col-sm-6 mb-3">站名：</B>
-                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="StationID" name="StationID" value="" type="text">
+                {% ParameterListFor  list=Station html_id="StationID" pleaseselect="----請選擇----" %}
                 <B class="col-xl-3 col-sm-6 mb-3">規費：</B>
-                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="FeeID" name="FeeID" value="" type="text">
+                {% ParameterListFor  list=FeeID html_id="FeeID" pleaseselect="----請選擇----" %}
                 <B class="col-xl-3 col-sm-6 mb-3">狀態：</B>
-                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Status" name="Status" value="" type="text">
+                {% ParameterListFor  list=Status html_id="Status" pleaseselect="----請選擇----" %}
               </div>
             </div>
 
@@ -90,9 +90,9 @@
                 "url": "/Invoice/GetInvoiceData/",
                 "data":function(d){
                   d.csrfmiddlewaretoken= '{{ csrf_token }}',
-                  d.StationID__icontains =$("#StationID").val(),
-                  d.FeeID__icontains =$("#FeeID").val(),
-                  d.Status__icontains =$("#Status").val()
+                  d.StationID__exact =$("#StationID").val(),
+                  d.FeeID__exact =$("#FeeID").val(),
+                  d.Status__exact =$("#Status").val()
                 },
                 "dataSrc": "data"
         },
@@ -108,7 +108,8 @@
             { "data": "MaxInvoice" },
             { "data": "TotalInvoice" },
             { "data": "TotalAmount" },
-            { "data": "Status" }
+            { "data": "Status" },
+            { "data": "StationID","visible": false  },
         ],
       });
 
