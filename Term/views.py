@@ -7,6 +7,7 @@ import datetime,json
 from django.views.decorators.csrf import csrf_protect
 from CommonApp.models import GridCS
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib import messages
 
 # Create your views here.
 #條款主頁
