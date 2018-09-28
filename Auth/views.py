@@ -35,3 +35,14 @@ def V_CheckAuth(request):
 
 	else:
 		return render(request, 'index.html')
+
+
+def V_ClearSession(request):
+	del request.session['Menu']
+	try:
+		MenuData=M_Menu.objects.filter(IsActive=True)
+		#request.session['Menu']=MenuData.values_list()
+		request.session['Menu']=serializers.serialize('json', MenuData, fields=('id','MenuName','MenuLink','MenuType','MenuParent','MenuIcon'))
+	except:
+		request.session['Menu']=null
+	return redirect('/home/')

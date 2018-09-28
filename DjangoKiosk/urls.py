@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.conf.urls import url
 from django.urls import path,include
 from polls.views import home, login
-from Auth.views import V_Login, V_CheckAuth
+from Auth.views import V_Login, V_CheckAuth,V_ClearSession
 from EmployeeCard.views import V_EmployeeCardIndex,V_GetEmployeeCardData,V_EmployeeCardEdit,V_EmployeeCardSave
 from Term.views import V_TermIndex,V_GetTermData,V_TermEdit
 from Penalty.views import V_PenaltyIndex,V_GetPenaltyData,V_PenaltyEdit,V_PenaltyNew
@@ -17,6 +17,7 @@ from ExportExcel.views import V_DayReportIndex,V_MonthReportIndex,V_PenaltyRepor
 Auth_urlpatterns = [
     url(r'^login/$', V_Login),
     url(r'^home/$', V_CheckAuth),
+    url(r'^clearsession/$', V_ClearSession),
 ]
 
 EmployeeCard_urlpatterns = [
