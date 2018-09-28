@@ -56,6 +56,7 @@ def V_TermEdit(request,id=0):
             trems.Editor=request.user
             trems.EditDate=datetime.datetime.now()
             trems.save()
+            messages.success(request, '儲存成功!', extra_tags='alert')
             return render(request,'Term/index.html')
         else:
             return render(request,'Term/Edit.html',{'form': form});

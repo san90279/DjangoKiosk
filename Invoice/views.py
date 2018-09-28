@@ -76,4 +76,5 @@ def V_AddInvoiceData(request):
             i=i+1
             AddKey=AddKey+1
         M_Invoice.objects.bulk_create(BulkCreateList,form.cleaned_data['AddCount'])
+        messages.success(request, '新增成功!', extra_tags='alert')
         return render(request,'Invoice/index.html')

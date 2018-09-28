@@ -44,4 +44,6 @@ def V_EmployeeCardSave(request):
     EmployeeCardData.Editor=request.user
     EmployeeCardData.EditDate=datetime.datetime.now()
     EmployeeCardData.save()
+
+    messages.success(request, '儲存成功!', extra_tags='alert')
     return render(request,'EmployeeCard/index.html')

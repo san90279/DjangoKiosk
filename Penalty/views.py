@@ -60,7 +60,10 @@ def V_PenaltyEdit(request, id):
         Penalty.Editor = request.user
         Penalty.EditDate = datetime.datetime.now()
         Penalty.save()
+
         messages.success(request, '罰緩項目編輯成功!', extra_tags='alert')
+
+
         return redirect('PenaltyIndex')
 
 
