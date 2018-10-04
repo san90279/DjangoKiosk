@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_protect
 import os
 import datetime,json
 from django.http import HttpResponse
-from ExportExcel.models import M_V_PenaltyReport,M_V_FeeItemReport
+from ExportExcel.models import M_V_PenaltyReport,M_V_FeeItemReport,SetDayReportExcel
 from Deal.models import M_DealMaster
 from FeeItem.models import M_FeeItem
 from CommonApp.models import GridCS
@@ -18,8 +18,10 @@ def V_DayReportIndex(request):
     module_dir = os.path.dirname(__file__)
     path=open(os.path.join(module_dir+'/ExcelTemplate/', '日報表.xlsx'),'rb')
     wb = load_workbook(filename = path)
-    wb.template=True
     ws = wb.active
+
+    SetDayReportExcel(request.POST.get('ExportDate', ''),ws)
+
     response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
     response['Content-Disposition'] = 'attachment;filename={0}.xlsx'.format('Export')
     return response

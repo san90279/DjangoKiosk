@@ -1,0 +1,4 @@
+/home/pi/.local/lib/python3.5/site-packages/openpyxl/writer/etree_worksheet.py
+
+/home/pi/.local/lib/python3.5/site-packages/openpyxl/worksheet/cell_range.py
+/home/pi/.local/lib/python3.5/site-packages/openpyxl/worksheet/worksheet.py
