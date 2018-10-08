@@ -6,11 +6,13 @@ from django.views.decorators.csrf import csrf_protect
 import os
 import datetime,json
 from django.http import HttpResponse
-from ExportExcel.models import M_V_PenaltyReport,M_V_FeeItemReport,SetDayReportExcel
+from ExportExcel.models import M_V_PenaltyReport,M_V_FeeItemReport,SetDayReportExcel,SetMonthReportExcel
 from Deal.models import M_DealMaster
 from FeeItem.models import M_FeeItem
 from CommonApp.models import GridCS
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib import messages
+
 # Create your views here.
 def V_DayReportIndex(request):
     if(request.method=='GET'):
@@ -20,15 +22,45 @@ def V_DayReportIndex(request):
     wb = load_workbook(filename = path)
     ws = wb.active
 
-    SetDayReportExcel(request.POST.get('ExportDate', ''),ws)
-
-    response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
-    response['Content-Disposition'] = 'attachment;filename={0}.xlsx'.format('Export')
-    return response
+    ws=SetDayReportExcel(request.POST.get('ExportDate', ''),ws)
+    if(ws):
+        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment;filename={0}.xlsx'.format('Export')
+        return response
+    else:
+        messages.success(request, '查無資料!', extra_tags='alert')
+        return render(request,'ExportExcel/DayReportIndex.html');
 
 
 def V_MonthReportIndex(request):
-    return render(request,'ExportExcel/MonthReportIndex.html');
+    MonthList=()
+    YearList=()
+    i=1
+    m=1
+    y=datetime.datetime.today().year
+    while m<=12:
+        MonthList=MonthList+((str(m),m),)
+        m+=1
+    while i<=5:
+        YearList=YearList+((str(y),y),)
+        y-=1
+        i+=1
+    if(request.method=='GET'):
+        return render(request,'ExportExcel/MonthReportIndex.html',{"MonthList":MonthList,"YearList":YearList});
+    module_dir = os.path.dirname(__file__)
+    path=open(os.path.join(module_dir+'/ExcelTemplate/', '月報表.xlsx'),'rb')
+    wb = load_workbook(filename = path)
+    ws = wb.active
+
+    ws=SetMonthReportExcel(request.POST.get('SelectYear', ''),request.POST.get('SelectMonth', ''),ws)
+    if(ws):
+        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment;filename={0}.xlsx'.format('Export')
+        return response
+    else:
+        messages.success(request, '查無資料!', extra_tags='alert')
+        return render(request,'ExportExcel/MonthReportIndex.html',{"MonthList":MonthList,"YearList":YearList});
+
 
 #罰緩報表主頁
 def V_PenaltyReportIndex(request):

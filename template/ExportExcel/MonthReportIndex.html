@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-
-{% block title %}日報表{% endblock %}
+{% load Common_extras %}
+{% block title %}月報表{% endblock %}
 
 {% block css %}
 {% endblock %}
@@ -17,18 +17,19 @@
 <div class="card mb-3">
   <div class="card-header">
     <i class="fas fa-plus-circle"></i>
-    日報表</div>
+    月報表</div>
     <div class="card-body">
       <div class="table-responsive">
-        <form method="post" id="SubmitForm" action="/ExportExcel/DayReportIndex/">
+        <form method="post" id="SubmitForm" action="/ExportExcel/MonthReportIndex/">
           {% csrf_token %}
           <table class="table table-bordered" width="100%" cellspacing="0">
             <tr>
               <th>
-                <label>報表日期</label>
+                <label>報表年月</label>
               </th>
               <td>
-                <input type="date" id="ExportDate" name="ExportDate" class="form-control" />
+                {% ParameterListFor list=YearList html_id="SelectYear" pleaseselect="---請選擇---" HtmlStyle="float:left;" %}
+                {% ParameterListFor list=MonthList html_id="SelectMonth" pleaseselect="---請選擇---" %}
               </td>
             </tr>
             <tr>
@@ -49,9 +50,9 @@
 <script type="text/javascript">
   $(document).ready(function() {
     $('#ExportBT').click(function(){
-      if($('#ExportDate').val()=='')      {
+      if($('#SelectYear').val()=='' || $('#SelectMonth').val()=='')      {
         alert("請選擇日期!!!");
-        $('#ExportDate').focus();
+        $('#SelectYear').focus();
         return false;
       }else{
         $( ".alert-dismissible" ).remove();

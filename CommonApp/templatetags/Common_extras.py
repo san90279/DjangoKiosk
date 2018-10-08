@@ -11,10 +11,13 @@ def ParameterListFor(*args, **kwargs):
     pleaseselect=  defaultnull(kwargs,'pleaseselect')       #預設的字串
     selectitem=  defaultnull(kwargs,'selectitem')           #預選項目
     HtmlClass=defaultnull(kwargs,'HtmlClass')               #該控制項的CLASS
+    HtmlStyle=defaultnull(kwargs,'HtmlStyle')
     if HtmlClass=='':
         HtmlClass="form-control rounded-0 col-xl-3 col-sm-6 mb-3"
+    if HtmlStyle!='':
+        HtmlStyle="style='"+HtmlStyle+"'"
 
-    selecthelper='<select class="%s" id="%s" name="%s">' % (HtmlClass,html_id,html_id)
+    selecthelper='<select class="%s" id="%s" name="%s" %s>' % (HtmlClass,html_id,html_id,HtmlStyle)
     if pleaseselect != '':
         selecthelper='%s<option value="">%s</option>' % (selecthelper,pleaseselect)
 
