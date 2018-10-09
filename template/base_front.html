@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+  <!-- Title  -->
+  <title>戶政繳費系統-{% block title %}{% endblock %}</title>
+
+  <!-- Style CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/jquery.numpad.css">
+  {% block css %}
+
+  {% endblock %}
+</head>
+
+<body>
+  <!-- Preloader Start -->
+  <div id="preloader">
+    <div class="preload-content">
+      <div id="world-load"></div>
+    </div>
+  </div>
+  <!-- Preloader End -->
+
+  <!-- ***** Header Area Start ***** -->
+  <header class="header-area">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <nav class="navbar navbar-expand-lg">
+            <!-- Logo -->
+            <a class="navbar-brand" href="index.html">
+              <H1 style="color:white;">信義戶政繳費系統</H1>
+            </a>
+            <!-- Navbar -->
+            <div class="collapse navbar-collapse" id="worldNav">
+            </div>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- ***** Header Area End ***** -->
+
+  <!-- ********** Hero Area Start ********** -->
+  <div class="hero-area">
+
+
+
+
+
+
+    {% block container %}
+    {% endblock %}
+
+
+    <!-- Hero Post Slide -->
+    <div class="hero-post-area">
+      <div class="hero-post-slide">
+        <div class="container">
+          <div class="row">
+            <!-- Single Slide -->
+            <div class='center one col-md-3 col-sm-6 col-xs-12'>
+              <div class="single-slide d-flex ">
+                <div class="post-number">
+                  <p>1</p>
+                </div>
+                <div class="post-title">
+                  <a href="/KioskUi/index/">點擊繳退費按鈕</a>
+                </div>
+              </div>
+            </div>
+            <!-- Single Slide -->
+            <div class='two col-md-3 col-sm-6 col-xs-12'>
+              <div class="single-slide d-flex">
+                <div class="post-number">
+                  <p>2</p>
+                </div>
+                <div class="post-title">
+                  <a href="/KioskUi/index/">刷入員工識別卡</a>
+                </div>
+              </div>
+            </div>
+            <!-- Single Slide -->
+            <div class='three col-md-3 col-sm-6 col-xs-12'>
+              <div class="single-slide d-flex">
+                <div class="post-number">
+                  <p>3</p>
+                </div>
+                <div class="post-title">
+                  <a href="/KioskUi/pick/">選取欲繳之規費、罰緩款項，並且點擊右下角確認按鈕</a>
+                </div>
+              </div>
+            </div>
+            <!-- Single Slide -->
+            <div class='four col-md-3 col-sm-6 col-xs-12'>
+              <div class="single-slide d-flex">
+                <div class="post-number">
+                  <p>4</p>
+                </div>
+                <div class="post-title">
+                  <a href="#">投入相對應之現金，取得付款收據</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+  <div id="pad"></div>
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLongTitle" >
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">請刷入員工識別卡</h5>
+
+        </div>
+        <div class="modal-body">
+          ...
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="javascript:location.href='/KioskUi/pick/'">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery (Necessary for All JavaScript Plugins) -->
+  <script src="/static/vendor/jquery/jquery.js"></script>
+  <!-- Popper js -->
+  <script src="/static/js/popper.min.js"></script>
+  <!-- Bootstrap js -->
+  <script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- Active js -->
+  <script src="/static/js/active.js"></script>
+  <!-- Numpad js -->
+  <script type="text/javascript" src="/static/js/jquery.numpad.js"></script>
+  {% block js %}
+  {% endblock %}
+</body>
+
+</html>

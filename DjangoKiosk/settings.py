@@ -57,7 +57,8 @@ INSTALLED_APPS = [
     'Store',
     'Checkout',
     'CommonApp',
-    'ExportExcel'
+    'ExportExcel',
+    'KioskUi'
 ]
 
 MIDDLEWARE = [
