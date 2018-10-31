@@ -47,7 +47,7 @@
   <div class="col-4 " style="top:100px;padding-left:100px;">
     <div class="list-group">
       {% for fee in Feelist %}
-      <a href="#" id="{{fee.FeeID}}" class="list-group-item list-group-item-action">{{fee.FeeName}}<input type="hidden" value="{{fee.FeeAmount}}"></a>
+      <a href="#" id="{{fee.FeeID}}" class="list-group-item list-group-item-action" onclick="ClickFeeItem(this)">{{fee.FeeName}}<input type="hidden" value="{{fee.FeeAmount}}"/></a>
       {% endfor %}
     </div>
   </div>
@@ -64,15 +64,112 @@
   </div>
 </div>
 
-
-
 {% endblock %}
-
+{% block Process%}
+<!-- Single Slide -->
+<div class='center one col-md-3 col-sm-6 col-xs-12'>
+  <div class="single-slide d-flex ">
+    <div class="post-number">
+      <p>1</p>
+    </div>
+    <div class="post-title">
+      <a href="/KioskUi/index/">點擊繳退費按鈕</a>
+    </div>
+  </div>
+</div>
+<!-- Single Slide -->
+<div class='two col-md-3 col-sm-6 col-xs-12'>
+  <div class="single-slide d-flex">
+    <div class="post-number">
+      <p>2</p>
+    </div>
+    <div class="post-title">
+      <a href="/KioskUi/index/">刷入員工識別卡</a>
+    </div>
+  </div>
+</div>
+<!-- Single Slide -->
+<div class='three col-md-3 col-sm-6 col-xs-12'>
+  <div class="single-slide d-flex">
+    <div class="post-number">
+      <p>3</p>
+    </div>
+    <div class="post-title">
+      <a href="/KioskUi/pick/">選取欲繳之規費、罰緩款項，並且點擊右下角確認按鈕</a>
+    </div>
+  </div>
+</div>
+<!-- Single Slide -->
+<div class='four col-md-3 col-sm-6 col-xs-12'>
+  <div class="single-slide d-flex">
+    <div class="post-number">
+      <p>4</p>
+    </div>
+    <div class="post-title">
+      <a href="#">投入相對應之現金，取得付款收據</a>
+    </div>
+  </div>
+</div>
+{% endblock%}
+{% block model %}
+<!-- Modal -->
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLongTitle" >
+  <input type="hidden" id="h_name" />
+  <input type="hidden" id="h_id" />
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <ul class="nav nav-tabs">
+          <li class="active"><a data-toggle="tab" href="#PenaltyList"><h2>&nbsp&nbsp罰鍰&nbsp&nbsp</h2></a></li>
+          <li><a data-toggle="tab" href="#TermList"><h2>&nbsp&nbsp條款&nbsp&nbsp</h2></a></li>
+        </ul>
+        <div class="tab-content">
+          <div id="PenaltyList" class="tab-pane fade in active">
+            <ul class="list-group">
+              <input type="hidden" id="h_PenaltyID"/>
+            {% for penalty in PenaltyList %}
+              <li class="list-group-item" onclick="GoTermList('{{penalty.id}}')" id='{{penalty.id}}'>{{penalty.PenaltyName}}</li>
+            {% endfor %}
+            </ul>
+          </div>
+          <div id="TermList" class="tab-pane fade">
+            <input type="hidden" id="h_TermID"/>
+            {% for term in TermList %}
+            <li class="list-group-item" onclick="CheckTermDate('{{term.id}}')" id='{{term.id}}'>{{term.TermName}}</li>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">確定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="StepModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLongTitle" >
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>請執行以下動作</h5>
+      </div>
+      <div class="modal-body">
+        <h3 id="step1">1.請投入金額</h3>
+        <h3 id="step2">2.列印收據</h3>
+        <h3 id="step3">3.打印編號</h3>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">確定</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
 {% block js %}
 <script>
-  $(".hero-post-area > .hero-post-slide > .container > .row > div").removeClass("center")
-  $(".hero-post-area > .hero-post-slide > .container > .row >.three").addClass("center")
   $(function() {
+    $(".hero-post-area > .hero-post-slide > .container > .row > div").removeClass("center");
+    $(".hero-post-area > .hero-post-slide > .container > .row >.three").addClass("center");
+
     // Set NumPad defaults for jQuery mobile.
     // These defaults will be applied to all NumPads within this document!
     $.fn.numpad.defaults.gridTpl = '<table class="table modal-content"></table>';
@@ -91,33 +188,83 @@
       textClear: '清除',
       textCancel: '取消'
     });
+    $('#Checkout').click(function () {
+      $('#StepModal').modal('show');
+      $("#step1").css("color", "red");
+    });
   });
-  $(".list-group > .list-group-item").click(function() {
-    var price = $(this).children().val()
-    var name = $(this).text()
-    var id = $(this).attr("id")
+  //按下罰鍰後記錄罰鍰編號>然後選擇條款
+  function GoTermList(PenaltyID)
+  {
+    $('#h_PenaltyID').val(PenaltyID);
+    $('.nav-tabs a[href="#TermList"]').tab('show');
+  }
+  //按下條款後記錄條款編號>開啟小算盤>設定確認小算盤後需要組到右邊的資料
+  function CheckTermDate(TermID)
+  {
+    $('#h_TermID').val(TermID);
+    $('#exampleModalLong').modal('toggle');
+    $("#pad").numpad('open');
+    $('.done').on("click", function() {
+      var price=$('.nmpd-display').val();
+      var id= $('#h_id').val();
+      var name= $('#h_name').val();
+      var PenaltyID=$('#h_PenaltyID').val();
+      PenaltyName=$('#'+PenaltyID+'').text();
+      TermName=$('#'+TermID+'').text();
+      name=name+'('+PenaltyName+')('+TermName+')';
 
-    if (price == 0) {
-      $("#pad").numpad('open')
-      $('.done').on("click", function() {
-        $(".right > .list-group").append("<li class='list-group-item d-flex justify-content-between align-items-center'>" + name + "<span class='badge badge-primary badge-pill' data-numpad='nmpd1'>NT$" + $('.nmpd-display').val() +
-          "</span><input type='number' id='" + id +
-          "' min='1' max='100' value='1'/><i onclick='removeitem(this,"+$('.nmpd-display').val()+")' class='fas fa-times fa-1x'></i></li>")
-          var total=convert()
-          total=total+ parseInt($('.nmpd-display').val());
-          document.getElementById("totalaccount").innerHTML = 'NT$'+total;
-      });
+      SetAppendFee(price,name,id);
+    });
+  }
+  //點擊左邊選項後要做的事>罰鍰:就開啟罰緩視窗>金額為0:開啟小算盤>其他:組出左邊的資料
+  function ClickFeeItem(elem)
+  {
+    var price = $(elem).children().val()
+    var name = $(elem).text()
+    var id = $(elem).attr("id")
 
-    } else {
-      $(this).attr('hidden', true)
-      $(".right > .list-group").append("<li class='list-group-item d-flex justify-content-between align-items-center'>" + name + "<span class='badge badge-primary badge-pill'>NT$" + price + "</span><input type='number' id='" + id +
-        "' min='1' max='100' value='1'/><i onclick='removeitem(this,"+price+")' class='fas fa-times fa-1x'></i></li>")
-        var total=convert()
-        total=total+ parseInt(price);
-        var i= document.getElementById("totalaccount").innerHTML
-        document.getElementById("totalaccount").innerHTML = 'NT$'+total;
+    if(id=='91'){
+      $('#h_name').val(name);
+      $('#h_id').val(id);
+      $('#exampleModalLong').modal('show');
+      $('.nav-tabs a[href="#PenaltyList"]').tab('show');
+    }else{
+      $(elem).attr('hidden', true)
+      if (price == 0) {
+        $("#pad").numpad('open');
+        $('.done').on("click", function() {
+          price=$('.nmpd-display').val();
+          SetAppendFee(price,name,id);
+        });
+      } else {
+        SetAppendFee(price,name,id);
+      }
     }
-  });
+
+  }
+  //組出左邊的資料>在計算總金額
+  function SetAppendFee(price,name,id,Term,Penalty){
+    $(".right > .list-group").append(
+      "<li class='list-group-item d-flex justify-content-between align-items-center'>" + name +
+        "<span class='badge badge-primary badge-pill'>NT$" + price + "</span>"+
+        "<input type='number' class='FeeItem' onchange='ChangeFeeCount()' id='" + id +"' min='1' max='100' price='"+price+"' Term='"+Term+"' Penalty='"+Penalty+"' value='1'/>"+
+        "<i onclick='removeitem(this,"+price+")' class='fas fa-times fa-1x'></i>"+
+      "</li>");
+      var total=convert()
+      total=total+ parseInt(price);
+      document.getElementById("totalaccount").innerHTML = 'NT$'+total;
+  }
+  //設定數量後重新計算總金額
+  function ChangeFeeCount(){
+    var total=0;
+    $(".FeeItem").each(function() {
+      var Price=$(this).attr('price');
+      var FeeCount=$(this).val();
+      total=total+parseInt(Price)*parseInt(FeeCount)
+    });
+    document.getElementById("totalaccount").innerHTML = 'NT$'+total;
+  }
   function convert(){
     return parseInt(document.getElementById("totalaccount").innerHTML.substring(3, document.getElementById("totalaccount").innerHTML.length))
   }

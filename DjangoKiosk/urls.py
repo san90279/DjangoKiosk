@@ -12,7 +12,7 @@ from Deal.views import V_DealIndex,V_GetDealMasterData,V_GetDealDetailData,V_Get
 from Checkout.views import V_GetCheckoutData,V_CheckoutIndex,V_CheckoutNew
 from Invoice.views import V_InvoiceIndex,V_GetInvoiceData,V_AddInvoiceData
 from ExportExcel.views import V_DayReportIndex,V_MonthReportIndex,V_PenaltyReportIndex,V_FeeItemReportIndex,V_GetPenaltyReport,V_GetFeeItemReport
-from KioskUi.views import V_KioskIndex,V_KioskPick
+from KioskUi.views import V_KioskIndex,V_KioskPick,V_Refund,V_GetEmployeeData,V_GetDealList,V_GetDealData
 
 Auth_urlpatterns = [
     url(r'^login/$', V_Login),
@@ -92,7 +92,11 @@ ExportExcel_urlpatterns = [
 ]
 KioskUi_urlpatterns=[
     path('index/', V_KioskIndex),
-    path('pick/', V_KioskPick),
+    path('pick/<int:id>/', V_KioskPick),
+    path('Refund/<int:id>/', V_Refund),
+    path('GetEmployee/', V_GetEmployeeData),
+    path('GetDealList/<str:InvoiceNo>/', V_GetDealList),
+    path('GetDealData/<str:MasterID>/', V_GetDealData),
 ]
 
 urlpatterns = [

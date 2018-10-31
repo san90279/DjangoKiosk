@@ -7,6 +7,7 @@
 
 
 {% block container %}
+<input type="hidden" id="NextPageUrl" value="" />
 <div class="row">
   <div class="col-12">
     <div class="load-more-btn mt-50 text-center">
@@ -15,17 +16,85 @@
     </div>
   </div>
 </div>
-
-
 {% endblock %}
 
+{% block Process%}
+<!-- Single Slide -->
+<div class='center one col-md-3 col-sm-6 col-xs-12'>
+  <div class="single-slide d-flex ">
+    <div class="post-number">
+      <p>1</p>
+    </div>
+    <div class="post-title">
+      <a href="/KioskUi/index/">點擊繳退費按鈕</a>
+    </div>
+  </div>
+</div>
+<!-- Single Slide -->
+<div class='two col-md-3 col-sm-6 col-xs-12'>
+  <div class="single-slide d-flex">
+    <div class="post-number">
+      <p>2</p>
+    </div>
+    <div class="post-title">
+      <a href="#">刷入員工識別卡</a>
+    </div>
+  </div>
+</div>
+
+{% endblock%}
+{% block model %}
+<!-- Modal -->
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLongTitle" >
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">請刷入員工識別卡</h5>
+
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" onclick="GoPage()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
 {% block js %}
 <script>
-  $("#Payment,#Refund").click(function() {
-    //alert( "Handler for .click() called." );
-    $('#exampleModalLong').modal('show')
-    $( ".hero-post-area > .hero-post-slide > .container > .row > div" ).removeClass( "center" )
-    $(".hero-post-area > .hero-post-slide > .container > .row >.two").addClass( "center" )
+$(function() {
+  $("#Payment").click(function() {
+    ChangePage('/KioskUi/pick/');
   });
+  $("#Refund").click(function() {
+    ChangePage('/KioskUi/Refund/');
+  });
+});
+function ChangePage(url){
+  $('#exampleModalLong').modal('show')
+  $( ".hero-post-area > .hero-post-slide > .container > .row > div" ).removeClass( "center" );
+  $(".hero-post-area > .hero-post-slide > .container > .row >.two").addClass( "center" );
+  $('#NextPageUrl').val(url);
+}
+function GoPage(){
+  var UserID='';
+  $.ajax({
+    url: '/KioskUi/GetEmployee/',
+    type: 'post',
+    data: {
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+    },
+    cache: false,
+    async: false,
+    success: function (data) {
+      UserID=data;
+    }
+  });
+
+  var url=$('#NextPageUrl').val();
+  location.href=url+UserID+"/";
+}
 </script>
 {% endblock %}

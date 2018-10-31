@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CoinSlot</name>
+    </assembly>
+    <members>
+        <member name="F:CoinSystem.CoinSlot.TmpCoinCount">
+            <summary>
+            投入硬幣數量，當偵測到數量大於零時，即可將此數量更新至退幣機，並將資料歸零。
+            </summary>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.Connect(System.String)">
+            <summary>
+            連線
+            </summary>
+            <param name="Comport">連接埠</param>
+            <returns>連線成功回傳true，否則回傳false</returns>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.Recount">
+            <summary>
+            重新計算投入數量
+            </summary>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.GetMoney">
+            <summary>
+            取得目前投入硬幣金額
+            </summary>
+            <returns>此次交易已投入硬幣金額</returns>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.GetCoinCount">
+            <summary>
+            取得目前投入各種幣值之數量
+            </summary>
+            <returns>此次交易投入各種幣值之數量。依序為1, 5, 10, 50元之數量</returns>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.Detect(System.Int32)">
+            <summary>
+            持續分析投入之幣值
+            </summary>
+            <param name="Timeout_ms">持續時間</param>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.DetectOn">
+            <summary>
+            分析投入之幣值功能開啟
+            </summary>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.DetectOff">
+            <summary>
+            分析投入之幣值關閉
+            </summary>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.Detect">
+            <summary>
+            分析投入之幣值
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.GetInfo">
+            <summary>
+            取得Manufacture, Model Number, Serial Number
+            </summary>
+            <returns>無法取得資訊時，回傳空字串。正常取得資訊時，回傳JSON資料，格式：{"Manufacture": "ICT000", "Model Number": "UCA001", "Serial Number": "000000000000001"}</returns>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.GetVersion">
+            <summary>
+            取得版本
+            </summary>
+            <returns>版本</returns>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.DisableUCA">
+            <summary>
+            禁止投入硬幣
+            </summary>
+            <returns>ACK回傳true，其餘狀態回傳false</returns>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.EnableUCA">
+            <summary>
+            允許投入硬幣
+            </summary>
+            <returns>ACK回傳true，其餘狀態回傳false</returns>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.GetUCA_Status">
+            <summary>
+            Request UCA status
+            </summary>
+            <returns>機台狀態</returns>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:CoinSystem.CoinSlot.components">
+            <summary>
+            設計工具所需的變數。
+            </summary>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.Dispose(System.Boolean)">
+            <summary>
+            清除任何使用中的資源。
+            </summary>
+            <param name="disposing">如果應該處置受控資源則為 true，否則為 false。</param>
+        </member>
+        <member name="M:CoinSystem.CoinSlot.InitializeComponent">
+            <summary>
+            此為設計工具支援所需的方法 - 請勿使用程式碼編輯器修改
+            這個方法的內容。
+            </summary>
+        </member>
+        <member name="M:CoinSystem.Program.Main">
+            <summary>
+            應用程式的主要進入點。
+            </summary>
+        </member>
+        <member name="T:CoinSystem.Properties.Resources">
+            <summary>
+              用於查詢當地語系化字串等的強類型資源類別
+            </summary>
+        </member>
+        <member name="P:CoinSystem.Properties.Resources.ResourceManager">
+            <summary>
+              傳回這個類別使用的快取的 ResourceManager 執行個體。
+            </summary>
+        </member>
+        <member name="P:CoinSystem.Properties.Resources.Culture">
+            <summary>
+              覆寫目前執行緒的 CurrentUICulture 屬性，對象是所有
+              使用這個強類型資源類別的資源查閱。
+            </summary>
+        </member>
+    </members>
+</doc>

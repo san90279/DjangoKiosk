@@ -65,50 +65,8 @@
       <div class="hero-post-slide">
         <div class="container">
           <div class="row">
-            <!-- Single Slide -->
-            <div class='center one col-md-3 col-sm-6 col-xs-12'>
-              <div class="single-slide d-flex ">
-                <div class="post-number">
-                  <p>1</p>
-                </div>
-                <div class="post-title">
-                  <a href="/KioskUi/index/">點擊繳退費按鈕</a>
-                </div>
-              </div>
-            </div>
-            <!-- Single Slide -->
-            <div class='two col-md-3 col-sm-6 col-xs-12'>
-              <div class="single-slide d-flex">
-                <div class="post-number">
-                  <p>2</p>
-                </div>
-                <div class="post-title">
-                  <a href="/KioskUi/index/">刷入員工識別卡</a>
-                </div>
-              </div>
-            </div>
-            <!-- Single Slide -->
-            <div class='three col-md-3 col-sm-6 col-xs-12'>
-              <div class="single-slide d-flex">
-                <div class="post-number">
-                  <p>3</p>
-                </div>
-                <div class="post-title">
-                  <a href="/KioskUi/pick/">選取欲繳之規費、罰緩款項，並且點擊右下角確認按鈕</a>
-                </div>
-              </div>
-            </div>
-            <!-- Single Slide -->
-            <div class='four col-md-3 col-sm-6 col-xs-12'>
-              <div class="single-slide d-flex">
-                <div class="post-number">
-                  <p>4</p>
-                </div>
-                <div class="post-title">
-                  <a href="#">投入相對應之現金，取得付款收據</a>
-                </div>
-              </div>
-            </div>
+            {% block Process%}
+            {% endblock%}
           </div>
         </div>
       </div>
@@ -117,23 +75,8 @@
   </div>
   </div>
   <div id="pad"></div>
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLongTitle" >
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLongTitle">請刷入員工識別卡</h5>
-
-        </div>
-        <div class="modal-body">
-          ...
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="javascript:location.href='/KioskUi/pick/'">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  {% block model %}
+  {% endblock %}
 
   <!-- jQuery (Necessary for All JavaScript Plugins) -->
   <script src="/static/vendor/jquery/jquery.js"></script>

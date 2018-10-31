@@ -1,0 +1,204 @@
+{% extends 'base_front.html' %}
+{% load Common_extras %}
+{% block title %}STEP 3{% endblock %}
+
+{% block css %}
+<style>
+  .list-group {
+    max-height: 600px;
+    margin-bottom: 10px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  ::-webkit-scrollbar {
+    width: 0px;
+  }
+
+  ::-webkit-scrollbar-track {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    margin: 0px 0 5px 0;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background: rgb(219, 219, 219);
+  }
+
+  .list-group-item{
+    font-size:24px;
+    background-color: beige;
+  }
+  div>.list-group-item:hover{
+    font-size:28px;
+  }
+  div>.list-group-item:focus{
+    font-weight:bold;
+    font-size:28px;
+  }
+</style>
+{% endblock %}
+
+
+{% block container %}
+<div class="row">
+  <div class="col-7 text-center" style="top:80px;margin:auto;">
+    <ul class='list-group' id='FeeItemList'>
+    </ul>
+    <ul class="list-group1">
+      <li class="list-group-item d-flex justify-content-between align-items-center" style="line-height:0;padding: .15rem 1.25rem;">
+        <b>金額總計</b>
+        <span id="totalaccount" class="badge badge-primary badge-pill ">NT$0</span>
+        <button  href="#" id="Checkout" class="btn btn-warning" ><i class="fas fa-coins"></i>確定退款</button >
+      </li>
+    </ul>
+  </div>
+</div>
+
+{% endblock %}
+{% block Process%}
+<!-- Single Slide -->
+<div class='center one col-md-3 col-sm-6 col-xs-12'>
+  <div class="single-slide d-flex ">
+    <div class="post-number">
+      <p>1</p>
+    </div>
+    <div class="post-title">
+      <a href="/KioskUi/index/">點擊繳退費按鈕</a>
+    </div>
+  </div>
+</div>
+<!-- Single Slide -->
+<div class='two col-md-3 col-sm-6 col-xs-12'>
+  <div class="single-slide d-flex">
+    <div class="post-number">
+      <p>2</p>
+    </div>
+    <div class="post-title">
+      <a href="/KioskUi/index/">刷入員工識別卡</a>
+    </div>
+  </div>
+</div>
+<!-- Single Slide -->
+<div class='three col-md-3 col-sm-6 col-xs-12'>
+  <div class="single-slide d-flex">
+    <div class="post-number">
+      <p>3</p>
+    </div>
+    <div class="post-title">
+      <a href="/KioskUi/Refund/{{UserID}}/">輸入單據號碼</a>
+    </div>
+  </div>
+</div>
+<!-- Single Slide -->
+<div class='four col-md-3 col-sm-6 col-xs-12'>
+  <div class="single-slide d-flex">
+    <div class="post-number">
+      <p>4</p>
+    </div>
+    <div class="post-title">
+      <a href="#">確認做費單據並退出金額</a>
+    </div>
+  </div>
+</div>
+{% endblock%}
+{% block model %}
+<!-- Modal -->
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLongTitle" >
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <ul id="InvoiceList" class="list-group">
+          <input type="hidden" id="h_InvoiceID"/>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+
+  $(function() {
+    $(".hero-post-area > .hero-post-slide > .container > .row > div").removeClass("center")
+    $(".hero-post-area > .hero-post-slide > .container > .row >.three").addClass("center")
+    // Set NumPad defaults for jQuery mobile.
+    // These defaults will be applied to all NumPads within this document!
+    $.fn.numpad.defaults.gridTpl = '<table class="table modal-content"></table>';
+    $.fn.numpad.defaults.backgroundTpl = '<div class="modal-backdrop in"></div>';
+    $.fn.numpad.defaults.displayTpl = '<h2 id="numpad_title">請輸入單據號碼</h2><input type="text" class="form-control  input-lg" style="width: 100%;" />';
+    $.fn.numpad.defaults.buttonNumberTpl = '<button type="button" class="btn btn-default btn-lg"></button>';
+    $.fn.numpad.defaults.buttonFunctionTpl = '<button type="button" class="btn btn-lg" style="width: 100%;"></button>';
+    $.fn.numpad.defaults.onKeypadCreate = function() {
+      $(this).find('.done').addClass('btn-primary');
+    };
+    $("#pad").numpad({
+      hidePlusMinusButton: true,
+      hideDecimalButton: true,
+      textDone: '確認',
+      textDelete: '刪除',
+      textClear: '清除',
+      textCancel: '取消'
+    });
+    $("#pad").numpad('open');
+    $('.done').on("click", function() {
+      var InvoiceNo=$('.nmpd-display').val();
+      $.ajax({
+        url: '/KioskUi/GetDealList/'+InvoiceNo+'/',
+        type: 'post',
+        data: {
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        cache: false,
+        async: false,
+        success: function (data) {
+          if(data.length==1){
+            ShowInvoiceData(data[0].MasterID,false);
+          }else if (data.length==0){
+            alert('查無資料請重新輸入!!');
+            location.reload();
+          }else{
+            $.each( data, function( key, value ) {
+              $('#InvoiceList').append("<li class='list-group-item' onclick='ShowInvoiceData("+value.MasterID+",true)' id='"+value.MasterID+"'>"+value.InvoiceNo+"</li>");
+            });
+            $('#exampleModalLong').modal('show');
+          }
+        }
+      });
+    });
+
+  });
+function ShowInvoiceData(MasterID,NeedClose)
+{
+  if(NeedClose){
+    $('#exampleModalLong').modal('toggle');
+  }
+  $.ajax({
+    url: '/KioskUi/GetDealData/'+MasterID+'/',
+    type: 'post',
+    data: {
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+    },
+    cache: false,
+    async: false,
+    success: function (data) {
+      var TotalAmount=0;
+      $.each( data, function( key, value ) {
+        $('#FeeItemList').append(
+          "<li class='list-group-item d-flex justify-content-between align-items-center'>" + value.FeeItem +
+            "<span class='badge badge-primary badge-pill'>NT$" + value.Amount + "</span>"+
+            "<input type='number'  disabled='disabled' value='"+value.Qty+"'/>"+
+          "</li>");
+          TotalAmount=TotalAmount+(value.Amount*value.Qty);
+      });
+      document.getElementById("totalaccount").innerHTML = 'NT$'+TotalAmount;
+    }
+  });
+
+}
+
+
+</script>
+{% endblock %}

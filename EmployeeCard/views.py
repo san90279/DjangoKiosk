@@ -4,6 +4,7 @@ from EmployeeCard.models import M_EmployeeCard
 from django.core import serializers
 import datetime
 from django.contrib import messages
+from django.contrib.auth.models import User
 
 # Create your views here.
 def V_EmployeeCardIndex(request):
@@ -38,6 +39,8 @@ def V_EmployeeCardSave(request):
         EmployeeCardData=M_EmployeeCard.objects.get(pk=pk)
     else:
         EmployeeCardData=M_EmployeeCard()
+        user = User.objects.create_user(EmployeeID, 'XXX@XXX.XXX', '123456789')
+        user.save()
     EmployeeCardData.EmployeeID=EmployeeID
     EmployeeCardData.EmployeeName=EmployeeName
     EmployeeCardData.CardNo=CardNo
