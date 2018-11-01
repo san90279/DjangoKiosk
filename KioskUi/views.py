@@ -8,7 +8,16 @@ from Term.models import M_Term
 from Deal.models import M_DealMaster,M_DealDetail
 from django.core.serializers.json import DjangoJSONEncoder
 import json
+import clr
+import sys
+import System
+import appname
+pth = os.path.dirname(appname.__file__)
+sys.path.append(pth+'\Household')
+clr.AddReference("Household")
+from CYP import Household
 
+KioskDll=Household()
 # Create your views here.
 def V_KioskIndex(request):
     return render(request,'KioskUi/index.html')
@@ -20,7 +29,7 @@ def V_KioskPick(request,id):
     return render(request,'KioskUi/pick.html',{"Feelist":Feelist,"UserID":id,"TermList":TermList,"PenaltyList":PenaltyList})
 
 def V_GetEmployeeData(request):
-    CardNo='9876543210'
+    CardNo=KioskDll.NFC_GETUID(30)
     EmployeeData=M_EmployeeCard.objects.get(CardNo=CardNo)
     UserDate=User.objects.get(username=EmployeeData.EmployeeID)
     return HttpResponse(UserDate.id)
@@ -40,3 +49,16 @@ def V_GetDealData(request,MasterID):
             'Qty':deal.Qty
             } for deal in DealData]
     return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder), content_type='application/json')
+
+def V_ConnectKioskPay(request):
+    #退幣機
+    KioskDll.Hopper_Connect()
+    #紙鈔機
+    KioskDll.NV11_INITS1()
+    #收幣機
+    KioskDll.Slot_Connect()
+    return HttpResponse(true)
+def V_ConnectKioskRefund(request):
+    #退幣機
+    KioskDll.Hopper_Connect()
+    return HttpResponse(true)

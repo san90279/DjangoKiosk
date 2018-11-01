@@ -53,10 +53,10 @@
 
       </div>
       <div class="modal-body">
-        ...
+        請在<span style="color:red;" id='CountSecond'>30</span>秒內刷入識別卡
       </div>
       <div class="modal-footer">
-        <button type="button" onclick="GoPage()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
       </div>
     </div>
   </div>
@@ -65,18 +65,40 @@
 {% block js %}
 <script>
 $(function() {
+  var url="";
   $("#Payment").click(function() {
-    ChangePage('/KioskUi/pick/');
+    url="/KioskUi/ConnectPay/";
+    ChangePage('/KioskUi/pick/',url);
+     GoPage();
   });
   $("#Refund").click(function() {
-    ChangePage('/KioskUi/Refund/');
+    url="/KioskUi/ConnectRefund/";
+    ChangePage('/KioskUi/Refund/',url);
+    GoPage();
   });
+
 });
-function ChangePage(url){
+function myTimer() {
+  var CountSecond=parseInt($('#CountSecond').html())
+  $('#CountSecond').html(CountSecond-1);
+}
+function ChangePage(url,ConnectUrl){
   $('#exampleModalLong').modal('show')
   $( ".hero-post-area > .hero-post-slide > .container > .row > div" ).removeClass( "center" );
   $(".hero-post-area > .hero-post-slide > .container > .row >.two").addClass( "center" );
   $('#NextPageUrl').val(url);
+  var myVar = setInterval(myTimer, 1000);
+  $.ajax({
+    url: ConnectUrl,
+    type: 'post',
+    data: {
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+    },
+    cache: false,
+    success: function (data) {
+      alert(data);
+    }
+  });
 }
 function GoPage(){
   var UserID='';
