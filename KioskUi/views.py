@@ -9,11 +9,6 @@ from Deal.models import M_DealMaster,M_DealDetail
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 import clr
-import sys
-import System
-import appname
-pth = os.path.dirname(appname.__file__)
-sys.path.append(pth+'\Household')
 clr.AddReference("Household")
 from CYP import Household
 
@@ -30,9 +25,13 @@ def V_KioskPick(request,id):
 
 def V_GetEmployeeData(request):
     CardNo=KioskDll.NFC_GETUID(30)
-    EmployeeData=M_EmployeeCard.objects.get(CardNo=CardNo)
-    UserDate=User.objects.get(username=EmployeeData.EmployeeID)
-    return HttpResponse(UserDate.id)
+    try:
+        EmployeeData=M_EmployeeCard.objects.get(CardNo=CardNo)
+        UserDate=User.objects.get(username=EmployeeData.EmployeeID)
+        return HttpResponse(UserDate.id)
+    except Exception as e:
+        return HttpResponse('')
+
 
 def V_Refund(request,id):
     return render(request,'KioskUi/Refund.html',{"UserID":id})
@@ -57,8 +56,21 @@ def V_ConnectKioskPay(request):
     KioskDll.NV11_INITS1()
     #收幣機
     KioskDll.Slot_Connect()
-    return HttpResponse(true)
+    return HttpResponse("true")
 def V_ConnectKioskRefund(request):
     #退幣機
     KioskDll.Hopper_Connect()
-    return HttpResponse(true)
+    return HttpResponse("true")
+
+def V_SendHowMuchPay(request,Amount):
+    KioskDll.SetPrice(Amount)
+    return HttpResponse("true")
+
+def V_CheckHowMuchPay(request):
+    AmountJson=KioskDll.GetMoney()
+    AmountData = json.loads(AmountJson)
+    return HttpResponse(AmountData['TotalMoney'])
+
+def V_PrintInvoiceNo(request,InvoiceNo):
+    KioskDll.EPSON_SERIAL_PRINT(InvoiceNo)
+    return HttpResponse("true")
