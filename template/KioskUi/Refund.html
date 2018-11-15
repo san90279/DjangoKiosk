@@ -106,6 +106,7 @@
 {% endblock%}
 {% block model %}
 <!-- Modal -->
+<input type="hidden" id="h_MasterID" />
 <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLongTitle" >
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -120,7 +121,7 @@
 {% endblock %}
 {% block js %}
 <script>
-
+var myVar;
   $(function() {
     $(".hero-post-area > .hero-post-slide > .container > .row > div").removeClass("center")
     $(".hero-post-area > .hero-post-slide > .container > .row >.three").addClass("center")
@@ -168,6 +169,42 @@
         }
       });
     });
+    $('#Checkout').click(function () {
+      LoadingOn();
+      MasterID=$('#h_MasterID').val();
+      $.ajax({
+        url: '/KioskUi/RefundDealData/'+MasterID+'/{{ UserID }}/',
+        type: 'post',
+        data: {
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        cache: false,
+        //async: false,
+        success: function (data) {
+          LoadingOff();
+          if(data==0){
+            alert('作業完成!!');
+            location.href='/KioskUi/index/';
+          }else{
+            websocket = new WebSocket(wsUri);
+            var message='{"Command":"Payout", "Money":'+data+'}';
+            websocket.onopen = function(evt) {
+              websocket.send(message);
+            };
+            websocket.onmessage = function (evt) {
+              var IsRefund=evt.data;
+              websocket.close();
+              if(IsRefund=='False'){
+                alert('錢箱無零錢可以找出正確金額!!!');
+              }else{
+                alert('作業完成!!');
+                location.href='/KioskUi/index/';
+              }
+            };
+          }
+        }
+      });
+    });
 
   });
 function ShowInvoiceData(MasterID,NeedClose)
@@ -175,6 +212,7 @@ function ShowInvoiceData(MasterID,NeedClose)
   if(NeedClose){
     $('#exampleModalLong').modal('toggle');
   }
+  $('#h_MasterID').val(MasterID);
   $.ajax({
     url: '/KioskUi/GetDealData/'+MasterID+'/',
     type: 'post',
@@ -198,7 +236,22 @@ function ShowInvoiceData(MasterID,NeedClose)
   });
 
 }
-
-
+function LoadingOn(){
+  $('#Checkout').prop('disabled', true);
+  myVar = setInterval(function(){ LoadingText(id); }, 500);
+}
+function LoadingOff(){
+  $('#Checkout').prop('disabled', false);
+  clearInterval(myVar);
+  $('#Checkout').html('<i class="fas fa-coins"></i>確定退款');
+}
+function LoadingText(){
+  var BtText=$('#Checkout').html();
+  if(BtText.indexOf('......')==-1){
+    $('#'+id).html(BtText+'.');
+  }else{
+    $('#'+id).html('請稍後...');
+  }
+}
 </script>
 {% endblock %}

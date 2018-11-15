@@ -39,7 +39,7 @@ def V_GetDealMasterData(request):
 
     data=[{	'StationID': Master.StationID.StationName,
             'DealDate': Master.DealDate.strftime("%Y-%m-%d %H:%M"),
-            'Cashier': Master.Cashier.EmployeeName,
+            'Cashier': Master.Cashier.last_name,
             'InvoiceNo': Master.InvoiceNo.InvoiceNo,
             'Amount': Master.Amount,
             'PayType':  [val for key,val in M_DealMaster.PayTypeList if key==Master.PayType],

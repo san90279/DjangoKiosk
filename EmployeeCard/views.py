@@ -40,6 +40,7 @@ def V_EmployeeCardSave(request):
     else:
         EmployeeCardData=M_EmployeeCard()
         user = User.objects.create_user(EmployeeID, 'XXX@XXX.XXX', '123456789')
+        user.last_name=EmployeeName
         user.save()
     EmployeeCardData.EmployeeID=EmployeeID
     EmployeeCardData.EmployeeName=EmployeeName

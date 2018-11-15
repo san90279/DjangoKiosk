@@ -3,16 +3,14 @@ from FeeItem.models import M_FeeItem
 from EmployeeCard.models import M_EmployeeCard
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from Invoice.models import M_Invoice
 from Penalty.models import M_Penalty
 from Term.models import M_Term
+from Store.models import M_Station
 from Deal.models import M_DealMaster,M_DealDetail
 from django.core.serializers.json import DjangoJSONEncoder
-import json
-import clr
-clr.AddReference("Household")
-from CYP import Household
+import json,datetime
 
-KioskDll=Household()
 # Create your views here.
 def V_KioskIndex(request):
     return render(request,'KioskUi/index.html')
@@ -23,8 +21,7 @@ def V_KioskPick(request,id):
     PenaltyList=M_Penalty.objects.all()
     return render(request,'KioskUi/pick.html',{"Feelist":Feelist,"UserID":id,"TermList":TermList,"PenaltyList":PenaltyList})
 
-def V_GetEmployeeData(request):
-    CardNo=KioskDll.NFC_GETUID(30)
+def V_GetEmployeeData(request,CardNo):
     try:
         EmployeeData=M_EmployeeCard.objects.get(CardNo=CardNo)
         UserDate=User.objects.get(username=EmployeeData.EmployeeID)
@@ -37,7 +34,7 @@ def V_Refund(request,id):
     return render(request,'KioskUi/Refund.html',{"UserID":id})
 
 def V_GetDealList(request,InvoiceNo):
-    DealList=M_DealMaster.objects.filter(InvoiceNo_id__InvoiceNo__icontains=InvoiceNo).order_by('InvoiceNo')
+    DealList=M_DealMaster.objects.filter(InvoiceNo_id__InvoiceNo__icontains=InvoiceNo,Status=1).order_by('InvoiceNo')
     data=[{	'InvoiceNo': deal.InvoiceNo.InvoiceNo,'MasterID':deal.id} for deal in DealList]
     return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder), content_type='application/json')
 
@@ -49,28 +46,86 @@ def V_GetDealData(request,MasterID):
             } for deal in DealData]
     return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder), content_type='application/json')
 
-def V_ConnectKioskPay(request):
-    #退幣機
-    KioskDll.Hopper_Connect()
-    #紙鈔機
-    KioskDll.NV11_INITS1()
-    #收幣機
-    KioskDll.Slot_Connect()
-    return HttpResponse("true")
-def V_ConnectKioskRefund(request):
-    #退幣機
-    KioskDll.Hopper_Connect()
-    return HttpResponse("true")
+def V_SaveDealData(request,PayType):
+    PostJsonStr=request.POST.get('DataJson')
+    DataObject=json.loads(PostJsonStr)
+
+    InvoiceData=M_Invoice.objects.filter(FeeID='31',Status='2',StationID='1').order_by("InvoiceNo")[0]
+    InvoiceData.Status=1
+    InvoiceData.save()
+
+    data_m=M_DealMaster()
+    data_m.StationID=M_Station.objects.get(id=1)
+    data_m.DealDate=datetime.datetime.now()
+    data_m.Status='1'
+    data_m.Cashier=User.objects.get(id=DataObject[0]['Cashier'])
+    data_m.PayType=PayType
+    data_m.LotNo=0
+    data_m.Creator=User.objects.get(id=DataObject[0]['Cashier'])
+    data_m.CreateDate=datetime.datetime.now()
+    data_m.InvoiceNo=InvoiceData
+    data_m.Amount=DataObject[0]['TotalAmount']
+    data_m.IsCheckout=False
+    data_m.IsOutside=False
+    data_m.save()
+
+    for detail in DataObject[1:]:
+        data_d=M_DealDetail()
+        data_d.MasterID=data_m
+        data_d.FeeID=M_FeeItem.objects.get(id=detail['Fee'])
+        data_d.Amount=detail['Price']
+        data_d.Qty=detail['FeeCount']
+        data_d.TotalAmount=int(detail['FeeCount'])*int(detail['Price'])
+        if(detail['Penalty']!=''):
+            data_d.PenaltyID=M_Penalty.objects.get(id=int(detail['Penalty']))
+        if(detail['Term']!=''):
+            data_d.TermID=M_Term.objects.get(id=int(detail['Term']))
+        data_d.Creator=User.objects.get(id=DataObject[0]['Cashier'])
+        data_d.CreateDate=datetime.datetime.now()
+        data_d.save()
+
+    return HttpResponse(json.dumps({'InvoiceNo':InvoiceData.InvoiceNo,'MasterID':data_m.id}, cls=DjangoJSONEncoder), content_type='application/json')
+
+def V_RefundDealData(request,MasterID,UserID):
+    data_m=M_DealMaster.objects.get(id=MasterID)
+    data_m.Status='0'
+    data_m.Editor=User.objects.get(id=UserID)
+    data_m.EditDate=datetime.datetime.now()
+    data_m.save()
+    if(data_m.PayType=='PT01'):
+        return HttpResponse(data_m.Amount)
+    return HttpResponse(0)
+
+def V_RefundMoney(request,Money):
+    return HttpResponse(IsRefund)
 
 def V_SendHowMuchPay(request,Amount):
-    KioskDll.SetPrice(Amount)
     return HttpResponse("true")
 
 def V_CheckHowMuchPay(request):
-    AmountJson=KioskDll.GetMoney()
-    AmountData = json.loads(AmountJson)
     return HttpResponse(AmountData['TotalMoney'])
 
 def V_PrintInvoiceNo(request,InvoiceNo):
-    KioskDll.EPSON_SERIAL_PRINT(InvoiceNo)
     return HttpResponse("true")
+
+def V_PrintInvoice(request,MasterID):
+    data_m=M_DealMaster.objects.get(id=MasterID)
+    data_d=M_DealDetail.objects.filter(MasterID=MasterID)
+    TEL=''
+    FAX=''
+    NumOfReci=''
+    ItemAndMoney=''
+    TotalMoney=''
+    CashOrCard=''
+    OP=''
+    #KioskDll.EPSON_RECEIPT_PRINT(TEL,FAX,NumOfReci,ItemAndMoney,TotalMoney,CashOrCard,OP)
+    return HttpResponse("true")
+
+def V_Test(request):
+    #aa=KioskDll.NV11_DOPOLL_COUNTER()
+    #aa=KioskDll.testCount
+    jsonStr='[{"Cashier":"3","TotalAmount":0},{"Price":"30","Term":"","Penalty":"","Fee":"31","FeeCount":"2"},{"Price":"30","Term":"","Penalty":"","Fee":"31","FeeCount":"2"}]'
+    DataObject=json.loads(jsonStr)
+    for detail in DataObject[1:]:
+        #detail['FeeCount']
+        return HttpResponse(detail['Price']*detail['FeeCount'])

@@ -24,5 +24,6 @@ class M_FeeItem(models.Model):
     Remark=models.CharField(max_length=100,null=True)
     FeeType=models.CharField(max_length=10,choices=FeeTypeList)
     Status=models.CharField(max_length=10,choices=FeeStatusList)
+    OrderBy=models.IntegerField(default=99)
     Editor=models.ForeignKey('auth.user',on_delete=models.PROTECT)
     EditDate=models.DateTimeField(auto_now=True)

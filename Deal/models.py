@@ -17,7 +17,7 @@ class M_DealMaster(models.Model):
     StationID=models.ForeignKey('Store.M_Station',on_delete=models.PROTECT)
     DealDate=models.DateTimeField()
     Status=models.CharField(max_length=10,choices=DealStatusList,null=True)
-    Cashier=models.ForeignKey('EmployeeCard.M_EmployeeCard',on_delete=models.PROTECT)
+    Cashier=models.ForeignKey('auth.user',on_delete=models.PROTECT)
     Amount=models.IntegerField(default=0)
     PayType=models.CharField(max_length=10,choices=PayTypeList)
     InvoiceNo=models.ForeignKey('Invoice.M_Invoice',on_delete=models.PROTECT)
