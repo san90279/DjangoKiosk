@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}發票資訊{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block container %}
+
+  <div class="card bg-light mb-3">
+        <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
+            <div class="card-body">
+              <div class="row">
+                <B class="col-xl-3 col-sm-6 mb-3">罰鍰編號：</B>
+                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="PenaltyID" name="PenaltyID" value="" type="text">
+                <B class="col-xl-3 col-sm-6 mb-3">罰鍰名稱：</B>
+                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="PenaltyName" name="PenaltyName" value="" type="text">
+              </div>
+            </div>
+
+            <div class="card-footer small text-muted">
+                <button onclick="tablerefresh();"  id="search" class="btn btn-primary"> <i class="fas fa-search icon-large"></i>查詢 </button>
+                <button  class="btn btn-warning"  onclick="javascript:location.href='{% url 'PenaltyNew'%}'" ><i class="fas fa-plus"></i>新增</button>
+            </div>
+  </div>
+
+  {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      {{ message }}
+    </div>
+  {% endfor %}
+
+
+<div class="card mb-3">
+  <div class="card-header">
+    <i class="fas fa-table"></i>
+    列印資訊清單</div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped" id="PrintDataTable" width="100%" cellspacing="0">
+        <thead class="thead-light">
+          <tr>
+            <th>啟用日期</th>
+            <th>業務課長</th>
+            <th>主辦會計</th>
+            <th>機關主管</th>
+            <th>電話</th>
+            <th>傳真</th>
+            <th> </th>
+          </tr>
+        </thead>
+        <tfoot class="thead-light">
+          <tr>
+            <th>啟用日期</th>
+            <th>業務課長</th>
+            <th>主辦會計</th>
+            <th>機關主管</th>
+            <th>電話</th>
+            <th>傳真</th>
+            <th> </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer small text-muted">最後更新日期 {% now "SHORT_DATETIME_FORMAT" %}</div>
+</div>
+
+
+{% endblock %}
+
+{% block foot %}Copyright © Cypress 2018{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    function tablerefresh(){
+        var table = $('#PrintDataTable').DataTable();
+        table.ajax.reload();
+    }
+
+
+  $(document).ready(function() {
+    $('#PrintDataTable').DataTable( {
+        "processing": true,
+        "serverSide": true,
+        "searching": false,
+        "ajax": {
+                "type":"POST",
+                "url": "/PrintData/GetPrintData/",
+                "data":function(d){
+                  d.csrfmiddlewaretoken= '{{ csrf_token }}',
+                  d.PenaltyID__icontains =$("#PenaltyID").val(),
+                  d.PenaltyName__icontains =$("#PenaltyName").val()
+                },
+                "dataSrc": "data"
+        },
+
+       "language": {
+                "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
+        },
+        "columns": [
+            { "data": "EnableDate" },
+            { "data": "Salesman" },
+            { "data": "Accounting" },
+            { "data": "Chief" },
+            { "data": "Tel" },
+            { "data": "Fax" },
+            { "data": "pk" ,
+              render: function ( data, type, row ) {
+                  if ( type === 'display' ) {
+                    var retStr='<button class="btn btn-secondary " onclick="location.href=\'/PrintData/Edit/'+data+'/\';" ><i class="far fa-edit icon-large"></i>編輯</button>'
+                    return retStr;
+                  }
+                  return data;
+              },
+            }
+        ],
+      });
+
+  } );
+</script>
+{% endblock %}

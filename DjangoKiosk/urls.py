@@ -13,6 +13,7 @@ from Checkout.views import V_GetCheckoutData,V_CheckoutIndex,V_CheckoutNew
 from Invoice.views import V_InvoiceIndex,V_GetInvoiceData,V_AddInvoiceData
 from ExportExcel.views import V_DayReportIndex,V_MonthReportIndex,V_PenaltyReportIndex,V_FeeItemReportIndex,V_GetPenaltyReport,V_GetFeeItemReport
 from KioskUi.views import V_KioskIndex,V_KioskPick,V_Refund,V_GetEmployeeData,V_GetDealList,V_GetDealData,V_CheckHowMuchPay,V_SendHowMuchPay,V_PrintInvoiceNo,V_PrintInvoice,V_SaveDealData,V_RefundDealData,V_RefundMoney,V_Test
+from PrintData.views import V_PrintDataIndex,V_GetPrintData,V_EditPrintData,V_NewPrintData
 
 Auth_urlpatterns = [
     url(r'^login/$', V_Login),
@@ -107,6 +108,13 @@ KioskUi_urlpatterns=[
     path('Test/', V_Test),
 ]
 
+PrintData_urlpatterns = [
+    path('index/', V_PrintDataIndex),
+    path('GetPrintData/', V_GetPrintData),
+    path('EditPrintData/<int:id>/', V_EditPrintData),
+    path('NewPrintData/', V_NewPrintData),
+]
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^home/$',home),
@@ -123,4 +131,5 @@ urlpatterns = [
     path('Checkout/', include(Checkout_urlpatterns)),
     path('ExportExcel/', include(ExportExcel_urlpatterns)),
     path('KioskUi/', include(KioskUi_urlpatterns)),
+    path('PrintData/', include(PrintData_urlpatterns)),
 ]
