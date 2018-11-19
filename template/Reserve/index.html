@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% block title %}{{sum}}{% endblock %}
+{% block css %}
+
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+{% block body %}
+{% endblock %}
+
+{% block Sidebar %}
+{% endblock %}
+
+{% block container %}
+
+<div id="message">
+</div>
+
+<div class="card bg-light mb-3">
+  <div class="card-footer small text-muted">
+    <label class="btn btn-warning" id="clean" onclick=""><i class="fas fa-donate"></i>清空錢箱</label>
+    <label class="btn btn-warning" id="zero" onclick=""><i class="fab fa-creative-commons-zero"></i>歸零錢箱計數</label>
+    <label class="btn btn-warning" id="setcoin"><i class="fas fa-coins"></i>設定硬幣數量</label>
+  </div>
+
+</div>
+<div class="card mb-3">
+  <div class="card-header">
+    <i class="fas fa-money-check-alt"></i>
+    目前錢箱庫存數量</div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped" id="PenaltyTable" width="100%" cellspacing="0">
+        <thead class="thead-light">
+          <tr>
+            <th>1000元紙鈔</th>
+            <th>500元紙鈔</th>
+            <th>100元紙鈔</th>
+            <th>50元硬幣</th>
+            <th>10元硬幣</th>
+            <th>5元硬幣</th>
+            <th>1元硬幣</th>
+            <th>錢箱總額</th>
+          </tr>
+        </thead>
+        <tfoot class="thead-light">
+          <tr>
+            <th>1000元紙鈔</th>
+            <th>500元紙鈔</th>
+            <th>100元紙鈔</th>
+            <th>50元硬幣</th>
+            <th>10元硬幣</th>
+            <th>5元硬幣</th>
+            <th>1元硬幣</th>
+            <th>錢箱總額</th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer small text-muted">最後更新日期 {% now "SHORT_DATETIME_FORMAT" %}</div>
+</div>
+<div class="modal fade" id="ModalSet" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="ModalSetTitle">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ModalSetTitle">請輸入欲設定的硬幣數量</h5>
+
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered" width="100%" cellspacing="0">
+          <tr>
+            <th><label for="id_FeeID">硬幣50元:</label></th>
+            <td><input type="number" name="TWD50" class="form-control" required="" id="TWD50"></td>
+          </tr>
+          <tr>
+            <th><label>硬幣10元:</label></th>
+            <td><input type="number" name="TWD10" class="form-control" required="" id="TWD10"></td>
+          </tr>
+          <tr>
+            <th><label>硬幣5元:</label></th>
+            <td><input type="number" name="TWD5" value="0" class="form-control" required="" id="TWD5"></td>
+          </tr>
+          <tr>
+            <th><label>硬幣1元:</label></th>
+            <td><input type="number" name="TWD1" class="form-control" required="" id="TWD1"></td>
+          </tr>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="setting" class="btn btn-primary"> <i class="fas fa-wrench"></i>設定 </button>
+        <button type="button" id="exitmodal" class="btn btn-default" data-dismiss="modal"><i class="fas fa-sign-out-alt"></i>退出</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block foot %}Copyright © Cypress 2018{% endblock %}
+{% block js %}
+<script type="text/javascript">
+  var wsUri = 'ws://localhost:8888'
+  $(document).ready(function() {
+        $('#setcoin').click(function() {
+          $('#ModalSet').modal('show')
+        });
+        $('#clean').click(function() {
+          var websocket = new WebSocket(wsUri);
+          var message = '{"Command":"Hopper_SmartEmpty"}';
+          websocket.onopen = function(evt) {
+            websocket.send(message);
+          };
+          websocket.onmessage = function(evt) {
+            if (evt.data == true) {
+              var html_content = '<div class="alert alert-warning alert-dismissible fade show" role="alert">' +
+                '<strong>成功清空硬幣!</strong>' +
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                '<span aria-hidden="true">&times;</span></button></div>'
+              $('#message').html(html_content);
+              websocket.close();
+            }
+          }
+        });
+        $('#zero').click(function() {
+          var websocket = new WebSocket(wsUri);
+          var message = '{"Command":"Hopper_SetCoinLevels", "TWD1":0, "TWD5":0, "TWD10":0, "TWD50":0}';
+          websocket.onopen = function(evt) {
+            websocket.send(message);
+          };
+          websocket.onmessage = function(evt) {
+            if (evt.data == true) {
+              var html_content = '<div class="alert alert-warning alert-dismissible fade show" role="alert">' +
+                '<strong>成功歸零所有幣別計數!</strong>' +
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                '<span aria-hidden="true">&times;</span></button></div>'
+              $('#message').html(html_content);
+              websocket.close();
+            }
+          }
+        });
+        $('#setting').click(function() {
+          var tw1 = $('#TWD1').val();
+          var tw5 = $('#TWD5').val();
+          var tw10 = $('#TWD10').val();
+          var tw50 = $('#TWD50').val();
+
+          var websocket = new WebSocket(wsUri);
+          var message = '{"Command":"Hopper_SetCoinLevels", "TWD1":' + tw1 + ', "TWD5":' + tw5 + ', "TWD10":' + tw10 + ', "TWD50":' + tw50 + '}';
+          websocket.onopen = function(evt) {
+            websocket.send(message);
+          };
+          websocket.onmessage = function(evt) {
+            if (evt.data == true) {
+              var html_content = '<div class="alert alert-warning alert-dismissible fade show" role="alert">' +
+                '<strong>成功設定各硬幣別的數量!</strong>' +
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                '<span aria-hidden="true">&times;</span></button></div>'
+              $('#message').html(html_content);
+              websocket.close();
+            }
+          }
+        });
+        $('#exitmodal').click(function() {
+          $('#ModalSet').modal('toggle')
+        });
+        var websocketinit = new WebSocket(wsUri);
+        var message = '{"Command":"GetMoney_Cashbox"}';
+        websocketinit.onopen = function(evt) {
+          websocketinit.send(message);
+        };
+        websocketinit.onmessage = function(evt) {
+          if (evt.data != NaN) {
+            $('#PenaltyTable').DataTable({
+              "processing": true,
+              "searching": false,
+              "autoWidth": false,
+              "ajax": {
+                "processing": true,
+                "url": evt.data,
+                "dataSrc": ""
+              },
+              "language": {
+                "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
+              },
+              "columns": [{
+                  "data": "TWD1"
+                },
+                {
+                  "data": "TWD5"
+                },
+                {
+                  "data": "TWD10"
+                },
+                {
+                  "data": "TWD50"
+                },
+                {
+                  "data": "TWD100"
+                },
+                {
+                  "data": "TWD200"
+                },
+                {
+                  "data": "TWD500"
+                },
+                {
+                  "data": "TWD1000"
+                },
+                {
+                  "data": "TotalMoney"
+                },
+              ],
+            });
+            websocket.close();
+          }
+        }
+</script>
+{% endblock %}

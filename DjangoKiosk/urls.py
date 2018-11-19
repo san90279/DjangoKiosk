@@ -14,6 +14,8 @@ from Invoice.views import V_InvoiceIndex,V_GetInvoiceData,V_AddInvoiceData
 from ExportExcel.views import V_DayReportIndex,V_MonthReportIndex,V_PenaltyReportIndex,V_FeeItemReportIndex,V_GetPenaltyReport,V_GetFeeItemReport
 from KioskUi.views import V_KioskIndex,V_KioskPick,V_Refund,V_GetEmployeeData,V_GetDealList,V_GetDealData,V_CheckHowMuchPay,V_SendHowMuchPay,V_PrintInvoiceNo,V_PrintInvoice,V_SaveDealData,V_RefundDealData,V_RefundMoney,V_Test
 from PrintData.views import V_PrintDataIndex,V_GetPrintData,V_EditPrintData,V_NewPrintData
+from Backup.views import V_BackupIndex,V_DoBackup
+from Reserve.views import V_ReserveIndex
 
 Auth_urlpatterns = [
     url(r'^login/$', V_Login),
@@ -107,14 +109,22 @@ KioskUi_urlpatterns=[
     path('RefundMoney/<int:Money>/', V_RefundMoney),
     path('Test/', V_Test),
 ]
-
+Backup_urlpatterns=[
+    path('index/',V_BackupIndex),
+    path('DoBackup/',V_DoBackup),
+]
+Reserve_urlpatterns=[
+    path('index/',V_ReserveIndex,name='ReserveIndex'),
+    #path('setzero/',V_ReserveSetzero),
+    #path('return/',V_ReserveReturn),
+    #path('setmoney/',V_ReserveSetmoney),
+]
 PrintData_urlpatterns = [
     path('index/', V_PrintDataIndex),
     path('GetPrintData/', V_GetPrintData),
     path('EditPrintData/<int:id>/', V_EditPrintData),
     path('NewPrintData/', V_NewPrintData),
 ]
-
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^home/$',home),
@@ -131,5 +141,7 @@ urlpatterns = [
     path('Checkout/', include(Checkout_urlpatterns)),
     path('ExportExcel/', include(ExportExcel_urlpatterns)),
     path('KioskUi/', include(KioskUi_urlpatterns)),
+    path('Backup/', include(Backup_urlpatterns)),
+    path('Reserve/', include(Reserve_urlpatterns)),
     path('PrintData/', include(PrintData_urlpatterns)),
 ]
