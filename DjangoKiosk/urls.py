@@ -13,7 +13,8 @@ from Checkout.views import V_GetCheckoutData,V_CheckoutIndex,V_CheckoutNew
 from Invoice.views import V_InvoiceIndex,V_GetInvoiceData,V_AddInvoiceData
 from ExportExcel.views import V_DayReportIndex,V_MonthReportIndex,V_PenaltyReportIndex,V_FeeItemReportIndex,V_GetPenaltyReport,V_GetFeeItemReport
 from KioskUi.views import V_KioskIndex,V_KioskPick,V_Refund,V_GetEmployeeData,V_GetDealList,V_GetDealData,V_ConnectKioskPay,V_ConnectKioskRefund,V_CheckHowMuchPay,V_SendHowMuchPay,V_PrintInvoiceNo
-
+from Backup.views import V_BackupIndex,V_DoBackup
+from Reserve.views import V_ReserveIndex
 Auth_urlpatterns = [
     url(r'^login/$', V_Login),
     url(r'^home/$', V_CheckAuth),
@@ -103,7 +104,16 @@ KioskUi_urlpatterns=[
     path('CheckHowMuchPay/', V_CheckHowMuchPay),
     path('PrintInvoiceNo/<str:InvoiceNo>/', V_PrintInvoiceNo),
 ]
-
+Backup_urlpatterns=[
+    path('index/',V_BackupIndex),
+    path('DoBackup/',V_DoBackup),
+]
+Reserve_urlpatterns=[
+    path('index/',V_ReserveIndex,name='ReserveIndex'),
+    #path('setzero/',V_ReserveSetzero),
+    #path('return/',V_ReserveReturn),
+    #path('setmoney/',V_ReserveSetmoney),
+]
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^home/$',home),
@@ -120,4 +130,6 @@ urlpatterns = [
     path('Checkout/', include(Checkout_urlpatterns)),
     path('ExportExcel/', include(ExportExcel_urlpatterns)),
     path('KioskUi/', include(KioskUi_urlpatterns)),
+    path('Backup/', include(Backup_urlpatterns)),
+    path('Reserve/', include(Reserve_urlpatterns)),
 ]
