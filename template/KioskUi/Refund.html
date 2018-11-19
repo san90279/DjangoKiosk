@@ -146,6 +146,10 @@ var myVar;
     $("#pad").numpad('open');
     $('.done').on("click", function() {
       var InvoiceNo=$('.nmpd-display').val();
+      if(InvoiceNo=='')
+      {
+        alert('請輸入發票號碼!!!');
+      }
       $.ajax({
         url: '/KioskUi/GetDealList/'+InvoiceNo+'/',
         type: 'post',

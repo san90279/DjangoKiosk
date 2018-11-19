@@ -161,7 +161,6 @@
         <h3 id="step3">3.列印收據</h3>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" id="PrintInvoiceNoBT">打印</button>
         <button class="btn btn-secondary" id="PrintInvoiceBT">完成列印發票</button>
         <button type="button" class="btn btn-default" id='CancelDeal'>取消</button>
       </div>
@@ -204,7 +203,6 @@
         return;
       }
       $('#StepModal').modal('show');
-      $('#PrintInvoiceNoBT').hide();
       $('#PrintInvoiceBT').hide();
       $("#step1").css("color", "red");
       $('#CancelDeal').show();
@@ -215,15 +213,16 @@
         websocket.send(message);
       };
       websocket.onmessage = function (evt) {
-        $('#PayAmount').html(data);
-        if(evt.data>=amount){
-          $('#step1').removeAttr('style');
-          $('#step2').css("color", "red");
-          $('#PrintInvoiceNoBT').show();
-          $('#PrintInvoiceBT').show();
-          $('#CancelDeal').hide();
-          PostData('PT01');
-          websocket.close();
+        if(parseInt(evt.data)!=NaN){
+          $('#PayAmount').html(evt.data);
+          if(evt.data>=amount){
+            $('#step1').removeAttr('style');
+            $('#step2').css("color", "red");
+            $('#PrintInvoiceBT').show();
+            $('#CancelDeal').hide();
+            PostData('PT01');
+            websocket.close();
+          }
         }
       };
     });
@@ -235,51 +234,27 @@
       }
       PayByEasyCard();
     });
-    $('#PrintInvoiceNoBT').click(function () {
-      LoadingOn('PrintInvoiceNoBT');
-      var InvoiceNo=$('#h_InvoiceNo').val();
-      $.ajax({
-        url: '/KioskUi/PrintInvoiceNo/'+InvoiceNo+'/',
-        type: 'post',
-        data: {
-          csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        cache: false,
-        //async: false,
-        success: function (data) {
-          if(data){
-            LoadingOff('PrintInvoiceNoBT');
-            alert('列印完成!!');
-          }
-        }
-      });
-    });
+
     $('#PrintInvoiceBT').click(function () {
-      LoadingOn('PrintInvoiceBT');
-      var MasterID=$('#h_MasterID').val();
-      $.ajax({
-        url: '/KioskUi/PrintInvoice/'+MasterID+'/',
-        type: 'post',
-        data: {
-          csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        cache: false,
-        //async: false,
-        success: function (data) {
-          if(data){
-            LoadingOff('PrintInvoiceBT');
-            alert('列印完成!!');
-            var GetTotalMoney=parseInt($('#PayAmount').html());
-            var RefundMoney=GetTotalMoney-convert();
-            if(RefundMoney>0){
-              alert(RefundMoney.toString()+'元退幣中!!!請稍後...');
-              LoadingOn('PrintInvoiceBT');
-              ReturnChange(RefundMoney);
-            }
+      var GetTotalMoney=parseInt($('#PayAmount').html());
+      var RefundMoney=GetTotalMoney-convert();
+      if(RefundMoney>0){
+        alert(RefundMoney.toString()+'元退幣中!!!請稍後...');
+        websocket = new WebSocket(wsUri);
+        var message='{"Command":"Payout", "Money":'+RefundMoney+'}';
+        websocket.onopen = function(evt) {
+          websocket.send(message);
+        };
+        websocket.onmessage = function (evt) {
+          if(evt.data=='True'){
             location.href='/KioskUi/index/';
+          }else{
+            alert('錢箱無零錢可以找出正確金額!!!');
           }
-        }
-      });
+        };
+      }else{
+        location.href='/KioskUi/index/';
+      }
     });
     $('#CancelDeal').click(function () {
       clearInterval(myVar);
@@ -308,11 +283,10 @@
     $('#StepModal').modal('show');
     $('#CancelDeal').hide();
     $('#step2').css("color", "red");
-    $('#PrintInvoiceNoBT').show();
     $('#PrintInvoiceBT').show();
     PostData('PT02');
   }
-  
+
   function PostData(PayType){
     var DealDetail=[];
     DealDetail.push({
@@ -450,17 +424,14 @@
     }
   }
   function LoadingOn(id){
-    $('#PrintInvoiceNoBT').prop('disabled', true);
     $('#PrintInvoiceBT').prop('disabled', true);
     myVarII = setInterval(function(){ LoadingText(id); }, 1000);
   }
   function LoadingOff(id){
-    $('#PrintInvoiceNoBT').prop('disabled', false);
+
     $('#PrintInvoiceBT').prop('disabled', false);
     clearInterval(myVarII);
-    if(id=='PrintInvoiceNoBT'){
-      $('#PrintInvoiceNoBT').html('打印');
-    }else if(id=='PrintInvoiceBT'){
+    if(id=='PrintInvoiceBT'){
       $('#PrintInvoiceBT').html('完成列印發票');
     }
   }
