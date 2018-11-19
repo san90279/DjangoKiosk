@@ -43,11 +43,13 @@
 
 
 {% block container %}
+<input type="hidden" id="h_InvoiceNo" />
+<input type="hidden" id="h_MasterID" />
 <div class="row">
   <div class="col-4 " style="top:100px;padding-left:100px;">
     <div class="list-group">
       {% for fee in Feelist %}
-      <a href="#" id="{{fee.FeeID}}" class="list-group-item list-group-item-action" onclick="ClickFeeItem(this)">{{fee.FeeName}}<input type="hidden" value="{{fee.FeeAmount}}"/></a>
+      <a href="#" id="{{fee.id}}" class="list-group-item list-group-item-action" onclick="ClickFeeItem(this)">{{fee.FeeName}}<input type="hidden" value="{{fee.FeeAmount}}"/></a>
       {% endfor %}
     </div>
   </div>
@@ -58,6 +60,7 @@
       <li class="list-group-item d-flex justify-content-between align-items-center" style="line-height:0;padding: .15rem 1.25rem;">
         <b>金額總計</b>
         <span id="totalaccount" class="badge badge-primary badge-pill ">NT$0</span>
+        <button  href="#" id="EasyCardCheckout" class="btn btn-warning" ><i class="fas fa-coins"></i>悠遊卡結帳</button >
         <button  href="#" id="Checkout" class="btn btn-warning" ><i class="fas fa-coins"></i>投幣結帳</button >
       </li>
     </ul>
@@ -153,21 +156,25 @@
         <h5>請執行以下動作</h5>
       </div>
       <div class="modal-body">
-        <h3 id="step1">1.請投入金額，目前投入<span id="PayAmount"></span>元</h3>
-        <h3 id="step2">2.打印編號</h3><button class="btn btn-secondary" id="PrintInvoiceNoBT">打印</button>
+        <h3 id="step1">1.請投入金額，目前投入<span id="PayAmount">0</span>元</h3>
+        <h3 id="step2">2.打印編號<span id="S_InvoiceNo"></span></h3>
         <h3 id="step3">3.列印收據</h3>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button class="btn btn-secondary" id="PrintInvoiceBT">完成列印發票</button>
+        <button type="button" class="btn btn-default" id='CancelDeal'>取消</button>
       </div>
     </div>
   </div>
 </div>
+
 {% endblock %}
 {% block js %}
 <script>
+  var myVar;
+  var myVarII;
   $(function() {
-    var myVar;
+
 
     $(".hero-post-area > .hero-post-slide > .container > .row > div").removeClass("center");
     $(".hero-post-area > .hero-post-slide > .container > .row >.three").addClass("center");
@@ -191,72 +198,105 @@
       textCancel: '取消'
     });
     $('#Checkout').click(function () {
+      if($(".FeeItem").length==0){
+        alert('請選擇規費項目!!');
+        return;
+      }
       $('#StepModal').modal('show');
-      $('#PrintInvoiceNoBT').hide();
+      $('#PrintInvoiceBT').hide();
       $("#step1").css("color", "red");
+      $('#CancelDeal').show();
       var amount=convert();
-      $.ajax({
-        url: '/KioskUi/SendHowMuchPay/'+amount+'/',
-        type: 'post',
-        data: {
-          csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        cache: false,
-        async: false,
-        success: function (data) {
-
-        }
-      });
-      myVar = setInterval(function(){ CheckPay(amount); }, 1500);
-    });
-    $('#PrintInvoiceNoBT').click(function () {
-      var InvoiceNo='123456789';
-      $.ajax({
-        url: '/KioskUi/SendHowMuchPay/'+InvoiceNo+'/',
-        type: 'post',
-        data: {
-          csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        cache: false,
-        async: false,
-        success: function (data) {
-          if(data){
-            alert('列印完成!!');
+      websocket = new WebSocket(wsUri);
+      var message='{"Command":"SetPrice", "Money":'+amount+'}';
+      websocket.onopen = function(evt) {
+        websocket.send(message);
+      };
+      websocket.onmessage = function (evt) {
+        if(parseInt(evt.data)!=NaN){
+          $('#PayAmount').html(evt.data);
+          if(evt.data>=amount){
+            $('#step1').removeAttr('style');
+            $('#step2').css("color", "red");
+            $('#PrintInvoiceBT').show();
+            $('#CancelDeal').hide();
+            PostData('PT01');
+            websocket.close();
           }
         }
-      });
+      };
+    });
+
+    $('#EasyCardCheckout').click(function () {
+      if($(".FeeItem").length==0){
+        alert('請選擇規費項目!!');
+        return;
+      }
+      PayByEasyCard();
+    });
+
+    $('#PrintInvoiceBT').click(function () {
+      var GetTotalMoney=parseInt($('#PayAmount').html());
+      var RefundMoney=GetTotalMoney-convert();
+      if(RefundMoney>0){
+        alert(RefundMoney.toString()+'元退幣中!!!請稍後...');
+        websocket = new WebSocket(wsUri);
+        var message='{"Command":"Payout", "Money":'+RefundMoney+'}';
+        websocket.onopen = function(evt) {
+          websocket.send(message);
+        };
+        websocket.onmessage = function (evt) {
+          if(evt.data=='True'){
+            location.href='/KioskUi/index/';
+          }else{
+            alert('錢箱無零錢可以找出正確金額!!!');
+          }
+        };
+      }else{
+        location.href='/KioskUi/index/';
+      }
+    });
+    $('#CancelDeal').click(function () {
+      clearInterval(myVar);
+      $('#StepModal').modal('toggle');
     });
   });
-  //
-  function CheckPay(amount)
-  {
+  function ReturnChange(RefundMoney){
     $.ajax({
-      url: '/KioskUi/CheckHowMuchPay/',
+      url: '/KioskUi/RefundMoney/'+RefundMoney+'/',
       type: 'post',
       data: {
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       cache: false,
-      //async: false,
+      async: false,
       success: function (data) {
-        if(data>=amount){
-          $('#step1').removeAttr('style');
-          $('#step2').css("color", "red");
-          $('#PrintInvoiceNoBT').show();
-          clearInterval(myVar);
-          PostData();
-        }else{
-          $('#PayAmount').html(data);
+        if(data=='False'){
+          alert('錢箱無零錢可以找出正確金額!!!');
         }
       }
     });
   }
-  function PostData(){
+
+  function PayByEasyCard()
+  {
+    $('#StepModal').modal('show');
+    $('#CancelDeal').hide();
+    $('#step2').css("color", "red");
+    $('#PrintInvoiceBT').show();
+    PostData('PT02');
+  }
+
+  function PostData(PayType){
     var DealDetail=[];
+    DealDetail.push({
+      'Cashier':'{{ UserID }}',
+      'TotalAmount':convert()
+    });
     $(".FeeItem").each(function() {
-      var Price=$(this).attr('price');
-      var Term=$(this).attr('Term');
-      var Penalty=$(this).attr('Penalty');
+      var Price=$(this).attr('price')=='undefined'?'':$(this).attr('price');
+      var Term=$(this).attr('Term')=='undefined'?'':$(this).attr('Term');
+      var Penalty=$(this).attr('Penalty')=='undefined'?'':$(this).attr('Penalty');
       var Fee=$(this).attr('id');
       var FeeCount=$(this).val();
       DealDetail.push({
@@ -266,6 +306,21 @@
         'Fee':Fee,
         'FeeCount':FeeCount
       });
+    });
+    $.ajax({
+      url: '/KioskUi/SaveDealData/'+PayType+'/',
+      type: 'post',
+      data: {
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        DataJson:JSON.stringify(DealDetail)
+      },
+      cache: false,
+      async: false,
+      success: function (data) {
+        $('#h_InvoiceNo').val(data.InvoiceNo);
+        $('#S_InvoiceNo').html(data.InvoiceNo);
+        $('#h_MasterID').val(data.MasterID);
+      }
     });
 
   }
@@ -289,7 +344,6 @@
       PenaltyName=$('#'+PenaltyID+'').text();
       TermName=$('#'+TermID+'').text();
       name=name+'('+PenaltyName+')('+TermName+')';
-
       SetAppendFee(price,name,id);
     });
   }
@@ -300,7 +354,7 @@
     var name = $(elem).text()
     var id = $(elem).attr("id")
 
-    if(id=='91'){
+    if(id=='62'){
       $('#h_name').val(name);
       $('#h_id').val(id);
       $('#exampleModalLong').modal('show');
@@ -324,7 +378,11 @@
     $(".right > .list-group").append(
       "<li class='list-group-item d-flex justify-content-between align-items-center'>" + name +
         "<span class='badge badge-primary badge-pill'>NT$" + price + "</span>"+
-        "<input type='number' class='FeeItem' onchange='ChangeFeeCount()' id='" + id +"' min='1' max='100' price='"+price+"' Term='"+Term+"' Penalty='"+Penalty+"' value='1'/>"+
+        "<div>"+
+          "<i class='fas fa-plus-square' onclick='PlusValues(\""+id+"\")'></i>&nbsp"+
+          "<input type='input' style='width:50px;' class='FeeItem' onchange='ChangeFeeCount()' id='" + id +"' min='1' max='100' price='"+price+"' Term='"+Term+"' Penalty='"+Penalty+"' value='1'/>"+
+          "&nbsp<i class='fas fa-minus-square' onclick='MinusValues(\""+id+"\")'></i>"+
+        "</div>"+
         "<i onclick='removeitem(this,"+price+")' class='fas fa-times fa-1x'></i>"+
       "</li>");
       var total=convert()
@@ -337,7 +395,7 @@
     $(".FeeItem").each(function() {
       var Price=$(this).attr('price');
       var FeeCount=$(this).val();
-      total=total+parseInt(Price)*parseInt(FeeCount)
+      total=total+parseInt(Price)*parseInt(FeeCount);
     });
     document.getElementById("totalaccount").innerHTML = 'NT$'+total;
   }
@@ -345,14 +403,45 @@
     return parseInt(document.getElementById("totalaccount").innerHTML.substring(3, document.getElementById("totalaccount").innerHTML.length))
   }
   function removeitem(elem,minus) {
-    elem.parentNode.remove()
-    var feeid = $(elem.parentNode.childNodes[2]).attr("id")
-    $("a[id='" + feeid + "']").attr('hidden', false)
-    var total=convert()
-    total=total- parseInt(minus);
+    var feeid = $(elem.parentNode.childNodes[2].childNodes[2]).attr("id");
+    var FeeCount=parseInt($('input[id="'+feeid+'"]').val());
+    elem.parentNode.remove();
+    $("a[id='" + feeid + "']").attr('hidden', false);
+    var total=convert();
+    total=total- (parseInt(minus)*FeeCount);
     document.getElementById("totalaccount").innerHTML = 'NT$'+total;
   }
+  function PlusValues(id){
+    var NowValue=parseInt($('input[id="'+id+'"]').val());
+    $('input[id="'+id+'"]').val(NowValue+1);
+    ChangeFeeCount();
+  }
+  function MinusValues(id){
+    var NowValue=parseInt($('input[id="'+id+'"]').val());
+    if(NowValue>1){
+      $('input[id="'+id+'"]').val(NowValue-1);
+      ChangeFeeCount();
+    }
+  }
+  function LoadingOn(id){
+    $('#PrintInvoiceBT').prop('disabled', true);
+    myVarII = setInterval(function(){ LoadingText(id); }, 1000);
+  }
+  function LoadingOff(id){
 
-
+    $('#PrintInvoiceBT').prop('disabled', false);
+    clearInterval(myVarII);
+    if(id=='PrintInvoiceBT'){
+      $('#PrintInvoiceBT').html('完成列印發票');
+    }
+  }
+  function LoadingText(id){
+    var BtText=$('#'+id).html();
+    if(BtText.indexOf('請稍後......')==-1){
+      $('#'+id).html(BtText+'.');
+    }else{
+      $('#'+id).html('請稍後...');
+    }
+  }
 </script>
 {% endblock %}

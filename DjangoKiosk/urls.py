@@ -12,9 +12,14 @@ from Deal.views import V_DealIndex,V_GetDealMasterData,V_GetDealDetailData,V_Get
 from Checkout.views import V_GetCheckoutData,V_CheckoutIndex,V_CheckoutNew
 from Invoice.views import V_InvoiceIndex,V_GetInvoiceData,V_AddInvoiceData
 from ExportExcel.views import V_DayReportIndex,V_MonthReportIndex,V_PenaltyReportIndex,V_FeeItemReportIndex,V_GetPenaltyReport,V_GetFeeItemReport
+<<<<<<< HEAD
 from KioskUi.views import V_KioskIndex,V_KioskPick,V_Refund,V_GetEmployeeData,V_GetDealList,V_GetDealData,V_ConnectKioskPay,V_ConnectKioskRefund,V_CheckHowMuchPay,V_SendHowMuchPay,V_PrintInvoiceNo
 from Backup.views import V_BackupIndex,V_DoBackup
 from Reserve.views import V_ReserveIndex
+=======
+from KioskUi.views import V_KioskIndex,V_KioskPick,V_Refund,V_GetEmployeeData,V_GetDealList,V_GetDealData,V_CheckHowMuchPay,V_SendHowMuchPay,V_PrintInvoiceNo,V_PrintInvoice,V_SaveDealData,V_RefundDealData,V_RefundMoney,V_Test
+
+>>>>>>> 9aba582fd6ac10f80661f5be18b27a71206cd2c5
 Auth_urlpatterns = [
     url(r'^login/$', V_Login),
     url(r'^home/$', V_CheckAuth),
@@ -95,14 +100,17 @@ KioskUi_urlpatterns=[
     path('index/', V_KioskIndex),
     path('pick/<int:id>/', V_KioskPick),
     path('Refund/<int:id>/', V_Refund),
-    path('GetEmployee/', V_GetEmployeeData),
+    path('GetEmployee/<str:CardNo>/', V_GetEmployeeData),
     path('GetDealList/<str:InvoiceNo>/', V_GetDealList),
     path('GetDealData/<str:MasterID>/', V_GetDealData),
-    path('ConnectPay/', V_ConnectKioskPay),
-    path('ConnectRefund/', V_ConnectKioskRefund),
     path('SendHowMuchPay/<int:Amount>/', V_SendHowMuchPay),
     path('CheckHowMuchPay/', V_CheckHowMuchPay),
     path('PrintInvoiceNo/<str:InvoiceNo>/', V_PrintInvoiceNo),
+    path('PrintInvoice/<str:MasterID>/', V_PrintInvoice),
+    path('SaveDealData/<str:PayType>/', V_SaveDealData),
+    path('RefundDealData/<str:MasterID>/<int:UserID>/', V_RefundDealData),
+    path('RefundMoney/<int:Money>/', V_RefundMoney),
+    path('Test/', V_Test),
 ]
 Backup_urlpatterns=[
     path('index/',V_BackupIndex),
