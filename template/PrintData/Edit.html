@@ -10,16 +10,16 @@
   <div class="card-header">
     {% if form.instance.id %}
       <i class="far fa-edit"></i>
-      罰緩編輯</div>
+      發票資訊編輯</div>
       <div class="card-body">
         <div class="table-responsive">
-          <form method="post" action="{% url 'PenaltyEdit' id=form.instance.id %}">
+          <form method="post" action="{% url 'EditPrintData' id=form.instance.id %}">
     {% else %}
       <i class="fas fa-plus-circle"></i>
-      罰緩新增</div>
+      發票資訊新增</div>
       <div class="card-body">
         <div class="table-responsive">
-          <form method="post" action="{% url 'PenaltyNew'%}">
+          <form method="post" action="{% url 'NewPrintData'%}">
     {% endif %}
             {% csrf_token %}
             <table class="table table-bordered" width="100%" cellspacing="0">

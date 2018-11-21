@@ -11,16 +11,16 @@
         <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
             <div class="card-body">
               <div class="row">
-                <B class="col-xl-3 col-sm-6 mb-3">罰鍰編號：</B>
-                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="PenaltyID" name="PenaltyID" value="" type="text">
-                <B class="col-xl-3 col-sm-6 mb-3">罰鍰名稱：</B>
-                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="PenaltyName" name="PenaltyName" value="" type="text">
+                <B class="col-xl-3 col-sm-6 mb-3">啟用日期開始：</B>
+                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="S_EnableData" name="S_EnableData" value="" type="Date">
+                <B class="col-xl-3 col-sm-6 mb-3">啟用日期結束：</B>
+                <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="E_EnableData" name="E_EnableData" value="" type="Date">
               </div>
             </div>
 
             <div class="card-footer small text-muted">
                 <button onclick="tablerefresh();"  id="search" class="btn btn-primary"> <i class="fas fa-search icon-large"></i>查詢 </button>
-                <button  class="btn btn-warning"  onclick="javascript:location.href='{% url 'PenaltyNew'%}'" ><i class="fas fa-plus"></i>新增</button>
+                <button  class="btn btn-warning"  onclick="javascript:location.href='{% url 'NewPrintData'%}'" ><i class="fas fa-plus"></i>新增</button>
             </div>
   </div>
 
@@ -92,8 +92,8 @@
                 "url": "/PrintData/GetPrintData/",
                 "data":function(d){
                   d.csrfmiddlewaretoken= '{{ csrf_token }}',
-                  d.PenaltyID__icontains =$("#PenaltyID").val(),
-                  d.PenaltyName__icontains =$("#PenaltyName").val()
+                  d.EnableDate__gte =$("#S_EnableData").val(),
+                  d.EnableDate__lte =$("#E_EnableData").val()
                 },
                 "dataSrc": "data"
         },
@@ -111,7 +111,7 @@
             { "data": "pk" ,
               render: function ( data, type, row ) {
                   if ( type === 'display' ) {
-                    var retStr='<button class="btn btn-secondary " onclick="location.href=\'/PrintData/Edit/'+data+'/\';" ><i class="far fa-edit icon-large"></i>編輯</button>'
+                    var retStr='<button class="btn btn-secondary " onclick="location.href=\'/PrintData/EditPrintData/'+data+'/\';" ><i class="far fa-edit icon-large"></i>編輯</button>'
                     return retStr;
                   }
                   return data;

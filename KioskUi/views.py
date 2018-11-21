@@ -19,7 +19,8 @@ def V_KioskPick(request,id):
     Feelist=M_FeeItem.objects.all()
     TermList=M_Term.objects.all()
     PenaltyList=M_Penalty.objects.all()
-    return render(request,'KioskUi/pick.html',{"Feelist":Feelist,"UserID":id,"TermList":TermList,"PenaltyList":PenaltyList})
+    UserName=User.objects.get(id=id).last_name
+    return render(request,'KioskUi/pick.html',{"Feelist":Feelist,"UserID":id,"TermList":TermList,"PenaltyList":PenaltyList,"UserName":UserName})
 
 def V_GetEmployeeData(request,CardNo):
     try:

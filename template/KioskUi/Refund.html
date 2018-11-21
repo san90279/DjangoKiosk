@@ -144,11 +144,15 @@ var myVar;
       textCancel: '取消'
     });
     $("#pad").numpad('open');
+    $('.cancel').on("click", function() {
+      location.href='/KioskUi/index/';
+    });
     $('.done').on("click", function() {
       var InvoiceNo=$('.nmpd-display').val();
       if(InvoiceNo=='')
       {
         alert('請輸入發票號碼!!!');
+        location.reload();
       }
       $.ajax({
         url: '/KioskUi/GetDealList/'+InvoiceNo+'/',

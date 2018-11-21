@@ -45,6 +45,8 @@
 {% block container %}
 <input type="hidden" id="h_InvoiceNo" />
 <input type="hidden" id="h_MasterID" />
+<input type="hidden" id="h_PayTypeName" />
+<input type="hidden" id="h_UserName" value='{{UserName}}' />
 <div class="row">
   <div class="col-4 " style="top:100px;padding-left:100px;">
     <div class="list-group">
@@ -98,7 +100,7 @@
       <p>3</p>
     </div>
     <div class="post-title">
-      <a href="/KioskUi/pick/">選取欲繳之規費、罰緩款項，並且點擊右下角確認按鈕</a>
+      <a href="/KioskUi/pick/{{UserID}}/">選取欲繳之規費、罰緩款項，並且點擊右下角確認按鈕</a>
     </div>
   </div>
 </div>
@@ -207,21 +209,39 @@
       $("#step1").css("color", "red");
       $('#CancelDeal').show();
       var amount=convert();
-      websocket = new WebSocket(wsUri);
+      var websocket = new WebSocket(wsUri);
       var message='{"Command":"SetPrice", "Money":'+amount+'}';
       websocket.onopen = function(evt) {
         websocket.send(message);
       };
       websocket.onmessage = function (evt) {
         if(parseInt(evt.data)!=NaN){
-          $('#PayAmount').html(evt.data);
-          if(evt.data>=amount){
+          if(evt.data=='SetPrice-True'){
+            $('#PayAmount').html('0');
+          }else if(evt.data=='Payout-True'){
+            PostData('PT01');
+            websocket.close();
+          }else if(evt.data=='Payout-False'){
+            message='{"Command":"Payout", "Money":'+$('#PayAmount').html()+'}';
+            websocket.send(message);
+            alert('錢箱無零錢可以找出正確金額!!!');
+            websocket.close();
+          }else if(evt.data>=amount){
             $('#step1').removeAttr('style');
             $('#step2').css("color", "red");
             $('#PrintInvoiceBT').show();
             $('#CancelDeal').hide();
-            PostData('PT01');
-            websocket.close();
+            $('#PayAmount').html(evt.data);
+            var RefundMoney=evt.data-convert();
+            if(RefundMoney>0){
+              message='{"Command":"Payout", "Money":'+RefundMoney+'}';
+              websocket.send(message);
+            }else{
+              PostData('PT01');
+              websocket.close();
+            }
+          }else if(evt.data<amount){
+            $('#PayAmount').html(evt.data);
           }
         }
       };
@@ -236,48 +256,65 @@
     });
 
     $('#PrintInvoiceBT').click(function () {
-      var GetTotalMoney=parseInt($('#PayAmount').html());
-      var RefundMoney=GetTotalMoney-convert();
-      if(RefundMoney>0){
-        alert(RefundMoney.toString()+'元退幣中!!!請稍後...');
-        websocket = new WebSocket(wsUri);
-        var message='{"Command":"Payout", "Money":'+RefundMoney+'}';
-        websocket.onopen = function(evt) {
-          websocket.send(message);
-        };
-        websocket.onmessage = function (evt) {
-          if(evt.data=='True'){
-            location.href='/KioskUi/index/';
-          }else{
-            alert('錢箱無零錢可以找出正確金額!!!');
-          }
-        };
-      }else{
+      var PrintData=GetPrintData();
+      var items="";
+      $(".FeeItem").each(function() {
+        var Name=$(this).attr('itemName');
+        var FeeCount=$(this).val();
+        var Price=$(this).attr('price');
+        if(items!=''){
+          items=items+'\r\n';
+        }
+        items=items+Name+'\r\n'+FeeCount+'x'+Price+'='+(parseInt(FeeCount)*parseInt(Price)).toString()
+      });
+      var op="收費人員:"+$('#h_UserName').val()+"\r\n業務課長:"+PrintData[0]['fields']["Salesman"]+"\r\n主辦會計:"+PrintData[0]['fields']["Accounting"]+"\r\n機管主管:"+PrintData[0]['fields']["Chief"];
+      var printInfo='{"Command":"EPSON_RECEIPT_PRINT", "TEL":"'+PrintData[0]['fields']["Tel"]+'", "FAX":"'+PrintData[0]['fields']["Fax"]+'", "NumOfReci":"'+$('#h_InvoiceNo').val()+'", "ItemAndMoney":"'+items+'", "TotalMoney":"'+convert()+'", "CashORCard":"'+$('#h_PayTypeName').val()+'", "OP":"'+op+'"}';
+      var websocket = new WebSocket(wsUri);
+      websocket.onopen = function(evt) {
+        websocket.send(printInfo);
+      };
+      websocket.onmessage = function (evt) {
+        websocket.close();
         location.href='/KioskUi/index/';
-      }
+      };
     });
     $('#CancelDeal').click(function () {
       clearInterval(myVar);
       $('#StepModal').modal('toggle');
     });
   });
-  function ReturnChange(RefundMoney){
+
+  function ReturnChange(websocket){
+    var GetTotalMoney=parseInt($('#PayAmount').html());
+    var RefundMoney=GetTotalMoney-convert();
+    message='{"Command":"Payout", "Money":'+RefundMoney+'}';
+    websocket.onopen = function(evt) {
+      websocket.send(message);
+    };
+    websocket.onmessage = function (evt) {
+      if(evt.data=='True'){
+        return true;
+      }else{
+        message='{"Command":"Payout", "Money":'+GetTotalMoney+'}';
+        websocket.send(message);
+        alert('錢箱無零錢可以找出正確金額!!!');
+        return false;
+      }
+    };
+  }
+  function GetPrintData(){
+    var printData
     $.ajax({
-      url: '/KioskUi/RefundMoney/'+RefundMoney+'/',
-      type: 'post',
-      data: {
-        csrfmiddlewaretoken: '{{ csrf_token }}'
-      },
+      url: '/PrintData/GetLastPrintData/',
+      type: 'GET',
       cache: false,
       async: false,
       success: function (data) {
-        if(data=='False'){
-          alert('錢箱無零錢可以找出正確金額!!!');
-        }
+        printData=data;
       }
     });
+    return printData;
   }
-
   function PayByEasyCard()
   {
     $('#StepModal').modal('show');
@@ -307,6 +344,11 @@
         'FeeCount':FeeCount
       });
     });
+    if(PayType=='PT01'){
+      $('#h_PayTypeName').val('現金');
+    }else if(PayType=='PT02'){
+      $('#h_PayTypeName').val('悠遊卡');
+    }
     $.ajax({
       url: '/KioskUi/SaveDealData/'+PayType+'/',
       type: 'post',
@@ -367,6 +409,9 @@
           price=$('.nmpd-display').val();
           SetAppendFee(price,name,id);
         });
+        $('.cancel').on("click", function() {
+          $(elem).attr('hidden', false);
+        });
       } else {
         SetAppendFee(price,name,id);
       }
@@ -380,7 +425,7 @@
         "<span class='badge badge-primary badge-pill'>NT$" + price + "</span>"+
         "<div>"+
           "<i class='fas fa-plus-square' onclick='PlusValues(\""+id+"\")'></i>&nbsp"+
-          "<input type='input' style='width:50px;' class='FeeItem' onchange='ChangeFeeCount()' id='" + id +"' min='1' max='100' price='"+price+"' Term='"+Term+"' Penalty='"+Penalty+"' value='1'/>"+
+          "<input type='input' style='width:50px;' class='FeeItem' onchange='ChangeFeeCount()' id='" + id +"' min='1' max='100' itemName='"+name+"' price='"+price+"' Term='"+Term+"' Penalty='"+Penalty+"' value='1'/>"+
           "&nbsp<i class='fas fa-minus-square' onclick='MinusValues(\""+id+"\")'></i>"+
         "</div>"+
         "<i onclick='removeitem(this,"+price+")' class='fas fa-times fa-1x'></i>"+
