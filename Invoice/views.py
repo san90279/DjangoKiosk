@@ -59,6 +59,7 @@ def V_AddInvoiceData(request):
     if form.is_valid():
         i=1
         StartKey=form.cleaned_data['StartInvoiceNo'][:1]
+        AddKeyLength=len(form.cleaned_data['StartInvoiceNo'][1:])
         AddKey=int(form.cleaned_data['StartInvoiceNo'][1:])
         FeeItemObject=M_FeeItem.objects.get(pk=form.cleaned_data['FeeID'])
         StationObject=M_Station.objects.get(pk=form.cleaned_data['StationID'])
@@ -67,7 +68,7 @@ def V_AddInvoiceData(request):
         while i<=form.cleaned_data['AddCount']:
             data=M_Invoice()
             data.FeeID=FeeItemObject
-            data.InvoiceNo=StartKey+str(AddKey)
+            data.InvoiceNo=StartKey+(("%0"+str(AddKeyLength)+"d") % AddKey)
             data.Status='2'
             data.Amount=FeeItemObject.FeeAmount
             data.StationID=StationObject
@@ -79,4 +80,7 @@ def V_AddInvoiceData(request):
             AddKey=AddKey+1
         M_Invoice.objects.bulk_create(BulkCreateList,form.cleaned_data['AddCount'])
         messages.success(request, '新增成功!', extra_tags='alert')
-        return render(request,'Invoice/index.html')
+        Status=M_Invoice.InvoiceStatusList
+        FeeID=M_FeeItem.objects.all().values_list('FeeID', 'FeeName')
+        Station=M_Station.objects.all().values_list('StationID', 'StationName')
+        return render(request,'Invoice/index.html',{'FeeID':FeeID,'Status':Status,'Station':Station})

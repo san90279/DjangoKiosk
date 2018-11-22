@@ -158,9 +158,8 @@
         <h5>請執行以下動作</h5>
       </div>
       <div class="modal-body">
-        <h3 id="step1">1.請投入金額，目前投入<span id="PayAmount">0</span>元</h3>
-        <h3 id="step2">2.打印編號<span id="S_InvoiceNo"></span></h3>
-        <h3 id="step3">3.列印收據</h3>
+        <h3 id="step1">1.總共<span id="ShowTotalMoney"></span>元，目前投入<span id="PayAmount">0</span>元</h3>
+        <h3 id="step2">2.打印收據<span id="S_InvoiceNo"></span></h3>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" id="PrintInvoiceBT">完成列印發票</button>
@@ -209,6 +208,7 @@
       $("#step1").css("color", "red");
       $('#CancelDeal').show();
       var amount=convert();
+      $('#ShowTotalMoney').html(amount);
       var websocket = new WebSocket(wsUri);
       var message='{"Command":"SetPrice", "Money":'+amount+'}';
       websocket.onopen = function(evt) {
@@ -222,9 +222,11 @@
             PostData('PT01');
             websocket.close();
           }else if(evt.data=='Payout-False'){
-            message='{"Command":"Payout", "Money":'+$('#PayAmount').html()+'}';
+            message='{"Command":"ReturnMoney"}';
             websocket.send(message);
             alert('錢箱無零錢可以找出正確金額!!!');
+            $('#PayAmount').html('0');
+            $('#StepModal').modal('toggle');
             websocket.close();
           }else if(evt.data>=amount){
             $('#step1').removeAttr('style');
@@ -256,6 +258,7 @@
     });
 
     $('#PrintInvoiceBT').click(function () {
+      $(this).prop('disabled', true);
       var PrintData=GetPrintData();
       var items="";
       $(".FeeItem").each(function() {
@@ -268,40 +271,35 @@
         items=items+Name+'\r\n'+FeeCount+'x'+Price+'='+(parseInt(FeeCount)*parseInt(Price)).toString()
       });
       var op="收費人員:"+$('#h_UserName').val()+"\r\n業務課長:"+PrintData[0]['fields']["Salesman"]+"\r\n主辦會計:"+PrintData[0]['fields']["Accounting"]+"\r\n機管主管:"+PrintData[0]['fields']["Chief"];
-      var printInfo='{"Command":"EPSON_RECEIPT_PRINT", "TEL":"'+PrintData[0]['fields']["Tel"]+'", "FAX":"'+PrintData[0]['fields']["Fax"]+'", "NumOfReci":"'+$('#h_InvoiceNo').val()+'", "ItemAndMoney":"'+items+'", "TotalMoney":"'+convert()+'", "CashORCard":"'+$('#h_PayTypeName').val()+'", "OP":"'+op+'"}';
+      var printInfo='{"Command":"EPSON_RECEIPT_PRINT", "TEL":"'+PrintData[0]['fields']["Tel"]+'", "FAX":"'+PrintData[0]['fields']["Fax"]+'", "NumOfReci":"'+$('#h_InvoiceNo').val()+'", "ItemAndMoney":"'+items+'", "TotalMoney":"'+convert()+'", "CashORCard":"'+$('#h_PayTypeName').val()+'", "OP":"'+op+'","Count":3}';
       var websocket = new WebSocket(wsUri);
       websocket.onopen = function(evt) {
         websocket.send(printInfo);
       };
       websocket.onmessage = function (evt) {
+        if(evt.data=='Complete'){
+          location.href='/KioskUi/index/';
+        }else{
+          alert(evt.data);
+          //之後要拿掉
+          location.href='/KioskUi/index/';
+        }
         websocket.close();
-        location.href='/KioskUi/index/';
       };
     });
     $('#CancelDeal').click(function () {
       clearInterval(myVar);
       $('#StepModal').modal('toggle');
+      var websocket = new WebSocket(wsUri);
+      websocket.onopen = function(evt) {
+        websocket.send('{"Command":"ReturnMoney"}');
+      };
+      websocket.onmessage = function (evt) {
+        websocket.close();
+      };
     });
   });
 
-  function ReturnChange(websocket){
-    var GetTotalMoney=parseInt($('#PayAmount').html());
-    var RefundMoney=GetTotalMoney-convert();
-    message='{"Command":"Payout", "Money":'+RefundMoney+'}';
-    websocket.onopen = function(evt) {
-      websocket.send(message);
-    };
-    websocket.onmessage = function (evt) {
-      if(evt.data=='True'){
-        return true;
-      }else{
-        message='{"Command":"Payout", "Money":'+GetTotalMoney+'}';
-        websocket.send(message);
-        alert('錢箱無零錢可以找出正確金額!!!');
-        return false;
-      }
-    };
-  }
   function GetPrintData(){
     var printData
     $.ajax({
@@ -317,10 +315,13 @@
   }
   function PayByEasyCard()
   {
+    $('#PayAmount').html('0');
     $('#StepModal').modal('show');
     $('#CancelDeal').hide();
+    $('#step1').css("color", "black");
     $('#step2').css("color", "red");
     $('#PrintInvoiceBT').show();
+    $('#ShowTotalMoney').html(convert());
     PostData('PT02');
   }
 
@@ -379,7 +380,7 @@
     $('#exampleModalLong').modal('toggle');
     $("#pad").numpad('open');
     $('.done').on("click", function() {
-      var price=$('.nmpd-display').val();
+      var price=$('.nmpd-display').val()==''?0:$('.nmpd-display').val();
       var id= $('#h_id').val();
       var name= $('#h_name').val();
       var PenaltyID=$('#h_PenaltyID').val();
@@ -406,7 +407,7 @@
       if (price == 0) {
         $("#pad").numpad('open');
         $('.done').on("click", function() {
-          price=$('.nmpd-display').val();
+          price=$('.nmpd-display').val()==''?0:$('.nmpd-display').val();
           SetAppendFee(price,name,id);
         });
         $('.cancel').on("click", function() {
@@ -468,25 +469,6 @@
       ChangeFeeCount();
     }
   }
-  function LoadingOn(id){
-    $('#PrintInvoiceBT').prop('disabled', true);
-    myVarII = setInterval(function(){ LoadingText(id); }, 1000);
-  }
-  function LoadingOff(id){
 
-    $('#PrintInvoiceBT').prop('disabled', false);
-    clearInterval(myVarII);
-    if(id=='PrintInvoiceBT'){
-      $('#PrintInvoiceBT').html('完成列印發票');
-    }
-  }
-  function LoadingText(id){
-    var BtText=$('#'+id).html();
-    if(BtText.indexOf('請稍後......')==-1){
-      $('#'+id).html(BtText+'.');
-    }else{
-      $('#'+id).html('請稍後...');
-    }
-  }
 </script>
 {% endblock %}

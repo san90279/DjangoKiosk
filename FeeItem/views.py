@@ -35,6 +35,7 @@ def V_GetFeeItemData(request):
             'FeeAmount': FeeItem.FeeAmount,
             'FeeType':  [val for key,val in M_FeeItem.FeeTypeList if key==FeeItem.FeeType],
             'Status':  [val for key,val in M_FeeItem.FeeStatusList if key==FeeItem.Status],
+            'OrderBy':FeeItem.OrderBy,
             'pk': FeeItem.pk} for FeeItem in object_list]
     #JQGRID API
     dic = {

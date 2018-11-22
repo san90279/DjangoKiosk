@@ -80,7 +80,13 @@ $(function() {
 });
 function myTimer() {
   var CountSecond=parseInt($('#CountSecond').html())
-  $('#CountSecond').html(CountSecond-1);
+  if(CountSecond==0){
+    clearInterval(myVar);
+    $('#exampleModalLong').modal('toggle');
+  }else{
+    $('#CountSecond').html(CountSecond-1);
+  }
+
 }
 function ChangePage(url){
   $('#exampleModalLong').modal('show')

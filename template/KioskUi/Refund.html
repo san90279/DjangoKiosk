@@ -107,6 +107,8 @@
 {% block model %}
 <!-- Modal -->
 <input type="hidden" id="h_MasterID" />
+<input type="hidden" id="h_PayType" />
+<input type="hidden" id="h_TotalAmount" />
 <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLongTitle" >
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -164,13 +166,13 @@ var myVar;
         async: false,
         success: function (data) {
           if(data.length==1){
-            ShowInvoiceData(data[0].MasterID,false);
+            ShowInvoiceData(data[0].MasterID,false,data[0].PayType);
           }else if (data.length==0){
             alert('查無資料請重新輸入!!');
             location.reload();
           }else{
             $.each( data, function( key, value ) {
-              $('#InvoiceList').append("<li class='list-group-item' onclick='ShowInvoiceData("+value.MasterID+",true)' id='"+value.MasterID+"'>"+value.InvoiceNo+"</li>");
+              $('#InvoiceList').append("<li class='list-group-item' onclick='ShowInvoiceData("+value.MasterID+",true,\""+value.PayType+"\")' id='"+value.MasterID+"'>"+value.InvoiceNo+"</li>");
             });
             $('#exampleModalLong').modal('show');
           }
@@ -179,47 +181,68 @@ var myVar;
     });
     $('#Checkout').click(function () {
       LoadingOn();
-      MasterID=$('#h_MasterID').val();
-      $.ajax({
-        url: '/KioskUi/RefundDealData/'+MasterID+'/{{ UserID }}/',
-        type: 'post',
-        data: {
-          csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        cache: false,
-        //async: false,
-        success: function (data) {
-          LoadingOff();
-          if(data==0){
-            alert('作業完成!!');
-            location.href='/KioskUi/index/';
+      var PayType=$('#h_PayType').val();
+      var MasterID=$('#h_MasterID').val();
+      var TotalAmount=$('#h_TotalAmount').val();
+      if(PayType=='PT01'){
+        websocket = new WebSocket(wsUri);
+        var message='{"Command":"Payout", "Money":'+TotalAmount+'}';
+        websocket.onopen = function(evt) {
+          websocket.send(message);
+        };
+        websocket.onmessage = function (evt) {
+          var IsRefund=evt.data;
+          websocket.close();
+          if(IsRefund=='Payout-False'){
+            alert('錢箱無零錢可以找出正確金額!!!');
           }else{
-            websocket = new WebSocket(wsUri);
-            var message='{"Command":"Payout", "Money":'+data+'}';
-            websocket.onopen = function(evt) {
-              websocket.send(message);
-            };
-            websocket.onmessage = function (evt) {
-              var IsRefund=evt.data;
-              websocket.close();
-              if(IsRefund=='False'){
-                alert('錢箱無零錢可以找出正確金額!!!');
-              }else{
+            $.ajax({
+              url: '/KioskUi/RefundDealData/'+MasterID+'/{{ UserID }}/',
+              type: 'post',
+              data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+              },
+              cache: false,
+              //async: false,
+              success: function (data) {
+                LoadingOff();
                 alert('作業完成!!');
                 location.href='/KioskUi/index/';
               }
-            };
+            });
           }
-        }
-      });
+        };
+      }else{
+        $.ajax({
+          url: '/KioskUi/RefundDealData/'+MasterID+'/{{ UserID }}/',
+          type: 'post',
+          data: {
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          cache: false,
+          //async: false,
+          success: function (data) {
+            LoadingOff();
+            alert('作業完成!!');
+            location.href='/KioskUi/index/';
+          }
+        });
+      }
+
+
+
+
+
+
     });
 
   });
-function ShowInvoiceData(MasterID,NeedClose)
+function ShowInvoiceData(MasterID,NeedClose,PayType)
 {
   if(NeedClose){
     $('#exampleModalLong').modal('toggle');
   }
+  $('#h_PayType').val(PayType);
   $('#h_MasterID').val(MasterID);
   $.ajax({
     url: '/KioskUi/GetDealData/'+MasterID+'/',
@@ -240,13 +263,14 @@ function ShowInvoiceData(MasterID,NeedClose)
           TotalAmount=TotalAmount+(value.Amount*value.Qty);
       });
       document.getElementById("totalaccount").innerHTML = 'NT$'+TotalAmount;
+      $('#h_TotalAmount').val(TotalAmount);
     }
   });
 
 }
 function LoadingOn(){
   $('#Checkout').prop('disabled', true);
-  myVar = setInterval(function(){ LoadingText(id); }, 500);
+  myVar = setInterval(function(){ LoadingText(); }, 500);
 }
 function LoadingOff(){
   $('#Checkout').prop('disabled', false);

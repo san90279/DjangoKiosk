@@ -54,6 +54,7 @@
             <th>規費金額</th>
             <th>項目描述</th>
             <th>規費群組</th>
+            <th>排序</th>
             <th>狀態</th>
             <th> </th>
           </tr>
@@ -65,6 +66,7 @@
             <th>規費金額</th>
             <th>項目描述</th>
             <th>規費群組</th>
+            <th>排序</th>
             <th>狀態</th>
             <th> </th>
           </tr>
@@ -100,7 +102,6 @@
                     },
                     "dataSrc": "data",
             },
-
            "language": {
                     "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
             },
@@ -110,6 +111,7 @@
                 { "data": "FeeAmount" },
                 { "data": "Remark" },
                 { "data": "FeeType" },
+                { "data": "OrderBy" },
                 { "data": "Status" },
                 { "data": "pk" ,
                   render: function ( data, type, row ) {

@@ -16,7 +16,7 @@ def V_KioskIndex(request):
     return render(request,'KioskUi/index.html')
 
 def V_KioskPick(request,id):
-    Feelist=M_FeeItem.objects.all()
+    Feelist=M_FeeItem.objects.filter(Status='1').order_by('OrderBy')
     TermList=M_Term.objects.all()
     PenaltyList=M_Penalty.objects.all()
     UserName=User.objects.get(id=id).last_name
@@ -36,7 +36,7 @@ def V_Refund(request,id):
 
 def V_GetDealList(request,InvoiceNo):
     DealList=M_DealMaster.objects.filter(InvoiceNo_id__InvoiceNo__icontains=InvoiceNo,Status=1).order_by('InvoiceNo')
-    data=[{	'InvoiceNo': deal.InvoiceNo.InvoiceNo,'MasterID':deal.id} for deal in DealList]
+    data=[{	'InvoiceNo': deal.InvoiceNo.InvoiceNo,'MasterID':deal.id,'PayType':deal.PayType} for deal in DealList]
     return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder), content_type='application/json')
 
 def V_GetDealData(request,MasterID):
@@ -51,7 +51,7 @@ def V_SaveDealData(request,PayType):
     PostJsonStr=request.POST.get('DataJson')
     DataObject=json.loads(PostJsonStr)
 
-    InvoiceData=M_Invoice.objects.filter(FeeID='31',Status='2',StationID='1').order_by("InvoiceNo")[0]
+    InvoiceData=M_Invoice.objects.filter(FeeID='31',Status='2',StationID='1').order_by("id")[0]
     InvoiceData.Status=1
     InvoiceData.save()
 
@@ -93,21 +93,7 @@ def V_RefundDealData(request,MasterID,UserID):
     data_m.Editor=User.objects.get(id=UserID)
     data_m.EditDate=datetime.datetime.now()
     data_m.save()
-    if(data_m.PayType=='PT01'):
-        return HttpResponse(data_m.Amount)
-    return HttpResponse(0)
-
-def V_RefundMoney(request,Money):
-    return HttpResponse(IsRefund)
-
-def V_SendHowMuchPay(request,Amount):
-    return HttpResponse("true")
-
-def V_CheckHowMuchPay(request):
-    return HttpResponse(AmountData['TotalMoney'])
-
-def V_PrintInvoiceNo(request,InvoiceNo):
-    return HttpResponse("true")
+    return HttpResponse(True)
 
 def V_PrintInvoice(request,MasterID):
     data_m=M_DealMaster.objects.get(id=MasterID)
