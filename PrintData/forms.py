@@ -7,7 +7,7 @@ class PrintDataForm(forms.ModelForm):
         fields=['EnableDate','Salesman','Accounting','Chief','Tel','Fax']
     def __init__(self,*args, **kwargs):
         super(PrintDataForm, self).__init__(*args, **kwargs)
-        self.fields['EnableDate'].widget=forms.TextInput(attrs={'class':'form-control','type':'Date'})
+        self.fields['EnableDate'].widget=forms.DateInput(format='%Y-%m-%d',attrs={'class':'form-control','type':'Date'})
         self.fields['Salesman'].widget=forms.TextInput(attrs={'class':'form-control'})
         self.fields['Accounting'].widget=forms.TextInput(attrs={'class':'form-control'})
         self.fields['Chief'].widget=forms.TextInput(attrs={'class':'form-control'})

@@ -13,6 +13,7 @@ from Deal.forms import EntryForm
 from CommonApp.models import GridCS
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib import messages
+from datetime import timedelta
 # Create your views here.
 def V_DealIndex(request):
     Status=M_DealMaster.DealStatusList
@@ -38,7 +39,7 @@ def V_GetDealMasterData(request):
     count=len(MasterData)
 
     data=[{	'StationID': Master.StationID.StationName,
-            'DealDate': Master.DealDate.strftime("%Y-%m-%d %H:%M"),
+            'DealDate': (Master.DealDate+timedelta(hours=8)).strftime("%Y-%m-%d %H:%M"),
             'Cashier': Master.Cashier.last_name,
             'InvoiceNo': Master.InvoiceNo.InvoiceNo,
             'Amount': Master.Amount,
@@ -90,7 +91,7 @@ def V_EntryIndex(request):
     #站別項DropDown使用
     StationList= M_Station.objects.all().values_list('StationID', 'StationName')
     #規費項DropDown使用
-    FeeList= M_FeeItem.objects.all().values_list('FeeID', 'FeeName')
+    FeeList= M_FeeItem.objects.all().order_by('OrderBy').values_list('FeeID', 'FeeName')
     #付款別項DropDown使用
     PayTypeList=M_DealMaster.PayTypeList
     return render(request,'Deal/entry_index.html',{'employee':EmployeeList,'station':StationList,'fee':FeeList,'paytype':PayTypeList})

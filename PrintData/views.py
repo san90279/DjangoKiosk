@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from PrintData.models import M_PrintData
 import datetime,json
@@ -43,7 +43,7 @@ def V_GetPrintData(request):
 
 
 def V_EditPrintData(request, id):
-    PrintData = get_object_or_404(M_PrintData, pk=id)
+    PrintData = M_PrintData.objects.get(id=id)
     template = 'PrintData/Edit.html'
     if request.method == 'GET':
         form = PrintDataForm(instance=PrintData)

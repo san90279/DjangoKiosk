@@ -15,7 +15,7 @@ from django.contrib import messages
 # Create your views here.
 def V_InvoiceIndex(request):
     Status=M_Invoice.InvoiceStatusList
-    FeeID=M_FeeItem.objects.all().values_list('FeeID', 'FeeName')
+    FeeID=M_FeeItem.objects.all().order_by('OrderBy').values_list('FeeID', 'FeeName')
     Station=M_Station.objects.all().values_list('StationID', 'StationName')
     return render(request,'Invoice/index.html',{'FeeID':FeeID,'Status':Status,'Station':Station})
 
