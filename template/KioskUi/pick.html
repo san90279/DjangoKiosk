@@ -63,7 +63,7 @@
         <b>金額總計</b>
         <span id="totalaccount" class="badge badge-primary badge-pill ">NT$0</span>
         <button  href="#" id="EasyCardCheckout" class="btn btn-warning" ><i class="fas fa-coins"></i>悠遊卡結帳</button >
-        <button  href="#" id="Checkout" class="btn btn-warning" ><i class="fas fa-coins"></i>投幣結帳</button >
+        <button  href="#" id="Checkout" class="btn btn-warning" ><i class="fas fa-coins"></i>現金結帳</button >
       </li>
     </ul>
   </div>
@@ -270,7 +270,7 @@
         }
         items=items+Name+'\r\n'+FeeCount+'x'+Price+'='+(parseInt(FeeCount)*parseInt(Price)).toString()
       });
-      var op="收費人員:"+$('#h_UserName').val()+"\r\n業務課長:"+PrintData[0]['fields']["Salesman"]+"\r\n主辦會計:"+PrintData[0]['fields']["Accounting"]+"\r\n機管主管:"+PrintData[0]['fields']["Chief"];
+      var op="收費人員:"+$('#h_UserName').val()+"\r\n業務課長:"+PrintData[0]['fields']["Salesman"]+"\r\n主辦會計:"+PrintData[0]['fields']["Accounting"]+"\r\n機關主管:"+PrintData[0]['fields']["Chief"];
       var printInfo='{"Command":"EPSON_RECEIPT_PRINT", "TEL":"'+PrintData[0]['fields']["Tel"]+'", "FAX":"'+PrintData[0]['fields']["Fax"]+'", "NumOfReci":"'+$('#h_InvoiceNo').val()+'", "ItemAndMoney":"'+items+'", "TotalMoney":"'+convert()+'", "CashORCard":"'+$('#h_PayTypeName').val()+'", "OP":"'+op+'","Count":3}';
       var websocket = new WebSocket(wsUri);
       websocket.onopen = function(evt) {
@@ -387,7 +387,7 @@
       PenaltyName=$('#'+PenaltyID+'').text();
       TermName=$('#'+TermID+'').text();
       name=name+'('+PenaltyName+')('+TermName+')';
-      SetAppendFee(price,name,id);
+      SetAppendFee(price,name,id,TermID,PenaltyID);
     });
   }
   //點擊左邊選項後要做的事>罰鍰:就開啟罰緩視窗>金額為0:開啟小算盤>其他:組出左邊的資料

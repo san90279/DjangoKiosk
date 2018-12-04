@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Deal', '0003_auto_20180910_0110'),
+        ('Deal', '0002_m_dealmaster_lotno'),
     ]
 
     sql = """

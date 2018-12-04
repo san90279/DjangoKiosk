@@ -26,6 +26,7 @@ class Migration(migrations.Migration):
                 ('Status', models.CharField(choices=[('0', '停用'), ('1', '啟用')], max_length=10)),
                 ('EditDate', models.DateTimeField(auto_now=True)),
                 ('Editor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                ('OrderBy', models.IntegerField(default=99)),
             ],
         ),
     ]

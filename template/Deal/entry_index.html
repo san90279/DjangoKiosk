@@ -72,6 +72,7 @@
                   <th>總金額</th>
                   <th>狀態</th>
                   <th>是否過帳</th>
+                  <th>LotNo</th>
                   <th></th>
                 </tr>
               </thead>
@@ -89,6 +90,7 @@
                   <th>總金額</th>
                   <th>狀態</th>
                   <th>是否過帳</th>
+                  <th>LotNo</th>
                   <th></th>
                 </tr>
               </tfoot>
@@ -136,7 +138,7 @@
         },
         "columns": [
             { "data": "DealDate" },
-            { "data": "EmployeeID" },
+            { "data": "CashierName" },
             { "data": "StationID" },
             { "data": "FeeID" },
             { "data": "FeeName" },
@@ -158,6 +160,7 @@
                    }
               },
             },
+            { "data": "LotNo" },
             { "data": "LotNo" ,
              render: function ( data, type, row ) {
                  if ( type === 'display' && row['IsCheckout']==false) {
@@ -169,7 +172,8 @@
                    return '';
                  }
              },
-           }
+           },
+           {"data": "CashierID","visible": false}
         ],
       });
 

@@ -8,7 +8,7 @@
 
 {% block container %}
 <input type="hidden" id="NextPageUrl" value="" />
-<div class="row">
+<div class="row" style="margin-right:auto;">
   <div class="col-12">
     <div class="load-more-btn mt-50 text-center">
       <a href="#" id="Payment" class="btn world-btn mt-15 mr-15" ><i class="fas fa-file-invoice-dollar"></i>繳費</a>
@@ -120,7 +120,7 @@ function GoPage(){
           var url=$('#NextPageUrl').val();
           location.href=url+data+"/";
         }else{
-          alert('無法辨識卡片!請從新刷卡');
+          alert('無法辨識卡片!請重新刷卡');
           $('#CountSecond').html(30);
           clearInterval(myVar);
           $('#exampleModalLong').modal('toggle');

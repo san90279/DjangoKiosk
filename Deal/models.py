@@ -12,8 +12,6 @@ class M_DealMaster(models.Model):
         ('PT01','現金'),
         ('PT02','悠遊卡'),
     )
-
-
     StationID=models.ForeignKey('Store.M_Station',on_delete=models.PROTECT)
     DealDate=models.DateTimeField()
     Status=models.CharField(max_length=10,choices=DealStatusList,null=True)
@@ -47,7 +45,8 @@ class M_DealDetail(models.Model):
 class M_V_entry(models.Model):
     id = models.BigIntegerField(primary_key=True)
     DealDate=models.DateTimeField()
-    EmployeeID=models.CharField(max_length=10,unique=True)
+    username=models.CharField(max_length=10,unique=True)
+    last_name=models.CharField(max_length=50)
     StationID=models.CharField(max_length=10,unique=True)
     FeeID=models.CharField(max_length=10,unique=True)
     FeeName=models.CharField(max_length=50)
@@ -62,25 +61,3 @@ class M_V_entry(models.Model):
     class Meta:
         managed = False
         db_table = "Deal_M_V_entry"
-
-class M_V_DealDetail(models.Model):
-    DealDate=models.DateTimeField()
-    Status=models.CharField(max_length=10,choices=M_DealMaster.DealStatusList,null=True)
-    Amount=models.IntegerField(null=True)
-    PayType=models.CharField(max_length=10,choices=M_DealMaster.PayTypeList,null=True)
-    IsCheckout=models.BooleanField()
-    IsOutside=models.BooleanField()
-    DetailAmount=models.IntegerField(null=True)
-    Qty=models.IntegerField(null=True)
-    DetailTotalAmount=models.IntegerField(null=True)
-    DetailRemark=models.CharField(max_length=100,null=True)
-    MasterID_id=models.IntegerField(null=True)
-    FeeID=models.CharField(max_length=10,null=True)
-    FeeName=models.CharField(max_length=50,null=True)
-    FeeAmount=models.IntegerField(null=True)
-    FeeRemark=models.CharField(max_length=100,null=True)
-    FeeType=models.CharField(max_length=10,choices=M_FeeItem.FeeTypeList,null=True)
-    InvoiceNo=models.CharField(max_length=20,null=True)
-    class Mete:
-        managed = False
-        db_table = "Deal_M_V_DealDetail"

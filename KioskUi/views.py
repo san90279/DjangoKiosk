@@ -35,8 +35,8 @@ def V_Refund(request,id):
     return render(request,'KioskUi/Refund.html',{"UserID":id})
 
 def V_GetDealList(request,InvoiceNo):
-    DealList=M_DealMaster.objects.filter(InvoiceNo_id__InvoiceNo__icontains=InvoiceNo,Status=1).order_by('InvoiceNo')
-    data=[{	'InvoiceNo': deal.InvoiceNo.InvoiceNo,'MasterID':deal.id,'PayType':deal.PayType} for deal in DealList]
+    DealList=M_DealMaster.objects.filter(InvoiceNo_id__InvoiceNo__icontains=InvoiceNo,Status=1,IsCheckout=False).order_by('InvoiceNo')
+    data=[{	'InvoiceNo': deal.InvoiceNo.InvoiceNo,'MasterID':deal.id,'PayType':deal.PayType,'PayTypeName':dict(M_DealMaster.PayTypeList)[deal.PayType]} for deal in DealList]
     return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder), content_type='application/json')
 
 def V_GetDealData(request,MasterID):
@@ -107,12 +107,3 @@ def V_PrintInvoice(request,MasterID):
     OP=''
     #KioskDll.EPSON_RECEIPT_PRINT(TEL,FAX,NumOfReci,ItemAndMoney,TotalMoney,CashOrCard,OP)
     return HttpResponse("true")
-
-def V_Test(request):
-    #aa=KioskDll.NV11_DOPOLL_COUNTER()
-    #aa=KioskDll.testCount
-    jsonStr='[{"Cashier":"3","TotalAmount":0},{"Price":"30","Term":"","Penalty":"","Fee":"31","FeeCount":"2"},{"Price":"30","Term":"","Penalty":"","Fee":"31","FeeCount":"2"}]'
-    DataObject=json.loads(jsonStr)
-    for detail in DataObject[1:]:
-        #detail['FeeCount']
-        return HttpResponse(detail['Price']*detail['FeeCount'])

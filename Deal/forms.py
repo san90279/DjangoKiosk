@@ -19,5 +19,5 @@ class EntryForm(forms.Form):
         super(EntryForm, self).__init__(*args, **kwargs)
         self.fields['StationID'].widget=forms.Select(attrs={'class':'form-control'},choices= M_Station.objects.all().values_list('id', 'StationName'))
         self.fields['FeeID'].widget=forms.Select(attrs={'class':'form-control'},choices= M_FeeItem.objects.all().order_by('OrderBy').values_list('id', 'FeeName'))
-        self.fields['EmployeeCardID'].widget=forms.Select(attrs={'class':'form-control'},choices= M_EmployeeCard.objects.all().values_list('id', 'EmployeeName'))
+        self.fields['EmployeeCardID'].widget=forms.Select(attrs={'class':'form-control'},choices= M_EmployeeCard.objects.all().values_list('EmployeeID', 'EmployeeName'))
         self.fields['PayType'].widget=forms.Select(attrs={'class':'form-control'},choices= M_DealMaster.PayTypeList)

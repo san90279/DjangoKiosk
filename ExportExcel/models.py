@@ -67,10 +67,24 @@ class M_V_FeeItemReport(models.Model):
 
 
 
-
+def SetReportTitle(ws):
+    DefaultCell=ws['P5']
+    ws['A4'].border=copy(DefaultCell.border)
+    ws['B4'].border=copy(DefaultCell.border)
+    ws['E3'].border=copy(DefaultCell.border)
+    ws['F3'].border=copy(DefaultCell.border)
+    ws['G3'].border=copy(DefaultCell.border)
+    ws['I3'].border=copy(DefaultCell.border)
+    ws['J3'].border=copy(DefaultCell.border)
+    ws['K3'].border=copy(DefaultCell.border)
+    ws['M3'].border=copy(DefaultCell.border)
+    ws['N3'].border=copy(DefaultCell.border)
+    return ws
 
 
 def SetDayReportExcel(ReportDate,ws):
+    ws=SetReportTitle(ws)
+
     if(ReportDate==''):
         dt=datetime.datetime.now()
     else:
@@ -143,6 +157,10 @@ def SetDayReportExcel(ReportDate,ws):
 
                 RowNo=RowNo+1
             ws.merge_cells('A{0}:A{1}'.format(str(RowNo-FeeItemDataCount),str(RowNo-1)))
+
+            for num in range(RowNo-FeeItemDataCount,RowNo):
+                ws['A'+str(num)].border=copy(DefaultCell.border)
+
             SubTotal.append(RowNo)
             ws['A'+str(RowNo)]='小計'
             ws['A'+str(RowNo)].border=copy(DefaultCell.border)
@@ -244,6 +262,7 @@ def SetDayReportExcel(ReportDate,ws):
     return ws
 
 def SetMonthReportExcel(ReportYear,ReportMonth,ws):
+    ws=SetReportTitle(ws)
 
     ws['K2'] = '{0}年{1}月填報'.format(ReportYear,ReportMonth)
 
@@ -302,7 +321,7 @@ def SetMonthReportExcel(ReportYear,ReportMonth,ws):
                 ws['M'+str(RowNo)]=RowDate.filter(PayType='PT02', Status=1).aggregate(Sum('Amount'))['Amount__sum'] or 0
                 ws['M'+str(RowNo)].border=copy(DefaultCell.border)
                 ws['M'+str(RowNo)].font=copy(DefaultCell.font)
-                
+
                 ws['F'+str(RowNo)]="=SUM(D{0}:E{0})".format(str(RowNo))
                 ws['F'+str(RowNo)].border=copy(DefaultCell.border)
                 ws['F'+str(RowNo)].font=copy(DefaultCell.font)
@@ -315,6 +334,9 @@ def SetMonthReportExcel(ReportYear,ReportMonth,ws):
 
                 RowNo=RowNo+1
             ws.merge_cells('A{0}:A{1}'.format(str(RowNo-FeeItemDataCount),str(RowNo-1)))
+            for num in range(RowNo-FeeItemDataCount,RowNo):
+                ws['A'+str(num)].border=copy(DefaultCell.border)
+
             SubTotal.append(RowNo)
             ws['A'+str(RowNo)]='小計'
             ws['A'+str(RowNo)].border=copy(DefaultCell.border)

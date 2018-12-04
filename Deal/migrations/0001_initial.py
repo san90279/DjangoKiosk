@@ -60,6 +60,8 @@ class Migration(migrations.Migration):
                 ('Creator', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='CreatorDetail', to=settings.AUTH_USER_MODEL)),
                 ('Editor', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='EditorDetail', to=settings.AUTH_USER_MODEL)),
                 ('FeeID', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='FeeItem.M_FeeItem')),
+                ('PenaltyID', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='Penalty.M_Penalty')),
+                ('TermID', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='Term.M_Term')),
             ],
         ),
         migrations.CreateModel(
@@ -67,7 +69,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('DealDate', models.DateTimeField()),
-                ('Status', models.CharField(choices=[('0', '作廢')], max_length=10, null=True)),
+                ('Status', models.CharField(choices=[('0', '作廢'), ('1', '正常')], max_length=10, null=True)),
                 ('Amount', models.IntegerField(default=0)),
                 ('PayType', models.CharField(choices=[('PT01', '現金'), ('PT02', '悠遊卡')], max_length=10)),
                 ('IsCheckout', models.BooleanField()),
@@ -79,6 +81,7 @@ class Migration(migrations.Migration):
                 ('Editor', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='EditorMaster', to=settings.AUTH_USER_MODEL)),
                 ('InvoiceNo', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='Invoice.M_Invoice')),
                 ('StationID', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='Store.M_Station')),
+                ('LotNo', models.IntegerField(default=1)),
             ],
         ),
         migrations.AddField(
@@ -101,8 +104,7 @@ class Migration(migrations.Migration):
                 ('Amount', models.IntegerField(default=0)),
                 ('Qty', models.IntegerField(default=0)),
                 ('TotalAmount', models.IntegerField(default=0)),
-                ('Status', models.CharField(choices=[('0', '作廢')], max_length=10, null=True)),
-                ('IsCheckout', models.BooleanField()),
+                ('Status', models.CharField(choices=[('0', '作廢'), ('1', '正常')], max_length=10, null=True)),
             ],
             options={
                 'db_table': 'Deal_M_V_entry',

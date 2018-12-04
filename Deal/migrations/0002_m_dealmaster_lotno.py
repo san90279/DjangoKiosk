@@ -12,15 +12,16 @@ class Migration(migrations.Migration):
         CREATE VIEW "Deal_M_V_entry" AS
          SELECT row_number() OVER (ORDER BY dm."DealDate") AS id,
             dm."DealDate",
-            e."EmployeeID",
+            e."username",
+            e."last_name",
             s1."StationID",
             f."FeeID",
             f."FeeName",
             min(i."InvoiceNo"::text) AS beginno,
             dm."PayType",
             dd."Amount",
-            dd."Qty",
-            dd."TotalAmount",
+            COUNT(*) AS "Qty",
+            SUM(dd."TotalAmount") AS "TotalAmount",
             dm."Status",
             dm."IsCheckout",
             dm."LotNo"
@@ -28,18 +29,13 @@ class Migration(migrations.Migration):
              JOIN "Deal_m_dealdetail" dd ON dm.id = dd."MasterID_id"
              JOIN "Invoice_m_invoice" i ON dm."InvoiceNo_id" = i.id
              JOIN "FeeItem_m_feeitem" f ON dd."FeeID_id" = f.id
-             JOIN "EmployeeCard_m_employeecard" e ON dm."Cashier_id" = e.id
+             JOIN "auth_user" e ON dm."Cashier_id" = e.id
              JOIN "Store_m_station" s1 ON dm."StationID_id" = s1.id
           WHERE dm."IsOutside" = true
-          GROUP BY dm."Status", dm."IsCheckout", dm."DealDate", e."EmployeeID", s1."StationID", f."FeeID", f."FeeName", dm."PayType", dd."TotalAmount", dd."Qty", dd."Amount",dm."LotNo";
+          GROUP BY dm."Status", dm."IsCheckout", dm."DealDate", e."username",e."last_name", s1."StationID", f."FeeID", f."FeeName", dm."PayType", dd."TotalAmount",  dd."Amount",dm."LotNo";
 
     """
     operations = [
-        migrations.AddField(
-            model_name='m_dealmaster',
-            name='LotNo',
-            field=models.IntegerField(default=1),
-        ),
         migrations.RunSQL("""drop view if exists "Deal_M_V_entry";"""),
         migrations.RunSQL(sql),
     ]

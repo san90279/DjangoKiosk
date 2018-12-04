@@ -7,13 +7,14 @@ from EmployeeCard.models import M_EmployeeCard
 from Store.models import M_Station
 from FeeItem.models import M_FeeItem
 from Invoice.models import M_Invoice
-from Deal.models import M_DealMaster,M_DealDetail,M_V_entry,M_V_DealDetail
+from Deal.models import M_DealMaster,M_DealDetail,M_V_entry
 import datetime,json
 from Deal.forms import EntryForm
 from CommonApp.models import GridCS
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib import messages
 from datetime import timedelta
+from django.contrib.auth.models import User
 # Create your views here.
 def V_DealIndex(request):
     Status=M_DealMaster.DealStatusList
@@ -118,21 +119,22 @@ def V_EntryNew(request):
         #判斷必填欄位
         if form.is_valid():
             StationObject=M_Station.objects.get(pk=form.cleaned_data['StationID'])
-            MatchObject=M_Invoice.objects.filter(StationID=StationObject)
             Qty=int(form.cleaned_data['Qty'])
             StartKey=form.cleaned_data['beginno'][:1]
             AddKey=int(form.cleaned_data['beginno'][1:])
+            AddKeyLength=len(form.cleaned_data['beginno'][1:])
             InvoiceList=[] #存累加的票據號
             for i in range(0,Qty,1):
-                InvoiceList.append(StartKey+str(AddKey+i))
-            CheckInvoice=M_Invoice.objects.filter(Q(InvoiceNo__in=InvoiceList,Status=2)).count()
-            if MatchObject and CheckInvoice==Qty:
+                InvoiceList.append(StartKey+(("%0"+str(AddKeyLength)+"d") % (AddKey+i)))
+            CheckInvoice=M_Invoice.objects.filter(Q(InvoiceNo__in=InvoiceList,Status=2,StationID=StationObject))
+            CheckInvoiceCount=CheckInvoice.count()
+            if CheckInvoiceCount==Qty:
                 DealDate=form.cleaned_data['DealDate']
                 PayType=form.cleaned_data['PayType']
-                EmployeeObject=M_EmployeeCard.objects.get(pk=form.cleaned_data['EmployeeCardID'])
+                UserData=User.objects.get(username=form.cleaned_data['EmployeeCardID'])
                 FeeItemObject=M_FeeItem.objects.get(pk=form.cleaned_data['FeeID'])
                 #群組篩選LotNo欄位
-                LastLotNo=M_DealMaster.objects.filter(Q(DealDate=DealDate)).aggregate(Max('LotNo'))
+                LastLotNo=M_DealMaster.objects.all().aggregate(Max('LotNo'))
                 BulkCreateList_m=[] #Bulk insert 交易主檔array
                 BulkCreateList_d=[] #Bulk insert 交易子檔array
                 if LastLotNo['LotNo__max'] is None:
@@ -143,7 +145,7 @@ def V_EntryNew(request):
                     data_m=M_DealMaster()
                     data_m.StationID=StationObject
                     data_m.DealDate=DealDate
-                    data_m.Cashier=EmployeeObject
+                    data_m.Cashier=UserData
                     data_m.Amount=FeeItemObject.FeeAmount
                     data_m.PayType=PayType
                     data_m.Status='1'
@@ -172,7 +174,7 @@ def V_EntryNew(request):
                     BulkCreateList_d.append(data_d)
                 M_DealDetail.objects.bulk_create(BulkCreateList_d,form.cleaned_data['Qty'])
                 #更新發票狀態為[1:使用]
-                MatchObject.update(Status=1)
+                CheckInvoice.update(Status=1)
                 messages.success(request, '交易補登成功!', extra_tags='alert')
                 return redirect('EntryIndex')
             else :
@@ -196,7 +198,8 @@ def V_GetEntryData(request):
     count=len(EntryData)
     #拼出teplate JQGRID 欄位JSON資料流
     data=[{	'DealDate': Enrty.DealDate.strftime('%Y-%m-%d'),
-            'EmployeeID': Enrty.EmployeeID,
+            'CashierName': Enrty.last_name,
+            'CashierID': Enrty.username,
             'StationID': Enrty.StationID,
             'FeeID': Enrty.FeeID,
             'FeeName': Enrty.FeeName,

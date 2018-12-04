@@ -60,7 +60,8 @@ INSTALLED_APPS = [
     'ExportExcel',
     'KioskUi',
     'Backup',
-    'Reserve',
+    'PrintData',
+    'reserve',
 ]
 
 MIDDLEWARE = [
@@ -105,9 +106,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
-        'USER':'pi',
+        'USER':'postgres',
         'PASSWORD':'cyp0517',
-        'HOST':'192.168.7.83',
+        'HOST':'192.168.8.60',
         'PORT':'5432',
     }
 }

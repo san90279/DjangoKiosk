@@ -166,13 +166,13 @@ var myVar;
         async: false,
         success: function (data) {
           if(data.length==1){
-            ShowInvoiceData(data[0].MasterID,false,data[0].PayType);
+            ShowInvoiceData(data[0].MasterID,false,data[0].PayType,data[0].PayTypeName);
           }else if (data.length==0){
             alert('查無資料請重新輸入!!');
             location.reload();
           }else{
             $.each( data, function( key, value ) {
-              $('#InvoiceList').append("<li class='list-group-item' onclick='ShowInvoiceData("+value.MasterID+",true,\""+value.PayType+"\")' id='"+value.MasterID+"'>"+value.InvoiceNo+"</li>");
+              $('#InvoiceList').append("<li class='list-group-item' onclick='ShowInvoiceData("+value.MasterID+",true,\""+value.PayType+"\",\""+value.PayTypeName+"\")' id='"+value.MasterID+"'>"+value.InvoiceNo+"</li>");
             });
             $('#exampleModalLong').modal('show');
           }
@@ -237,7 +237,7 @@ var myVar;
     });
 
   });
-function ShowInvoiceData(MasterID,NeedClose,PayType)
+function ShowInvoiceData(MasterID,NeedClose,PayType,PayTypeName)
 {
   if(NeedClose){
     $('#exampleModalLong').modal('toggle');
@@ -262,7 +262,7 @@ function ShowInvoiceData(MasterID,NeedClose,PayType)
           "</li>");
           TotalAmount=TotalAmount+(value.Amount*value.Qty);
       });
-      document.getElementById("totalaccount").innerHTML = 'NT$'+TotalAmount;
+      document.getElementById("totalaccount").innerHTML = 'NT$'+TotalAmount+'('+PayTypeName+')';
       $('#h_TotalAmount').val(TotalAmount);
     }
   });
