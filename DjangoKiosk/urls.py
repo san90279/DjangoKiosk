@@ -11,7 +11,7 @@ from Store.views import V_StationIndex,V_GetStationData,V_StationEdit,V_StationN
 from Deal.views import V_DealIndex,V_GetDealMasterData,V_GetDealDetailData,V_GetEntryData,V_EntryIndex,V_EntryNew,V_EntryDelete
 from Checkout.views import V_GetCheckoutData,V_CheckoutIndex,V_CheckoutNew
 from Invoice.views import V_InvoiceIndex,V_GetInvoiceData,V_AddInvoiceData
-from ExportExcel.views import V_DayReportIndex,V_MonthReportIndex,V_PenaltyReportIndex,V_FeeItemReportIndex,V_GetPenaltyReport,V_GetFeeItemReport
+from ExportExcel.views import V_DayReportIndex,V_MonthReportIndex,V_PenaltyReportIndex,V_FeeItemReportIndex,V_GetPenaltyReport,V_GetFeeItemReport,V_IntervalReportIndex
 from KioskUi.views import V_KioskIndex,V_KioskPick,V_Refund,V_GetEmployeeData,V_GetDealList,V_GetDealData,V_PrintInvoice,V_SaveDealData,V_RefundDealData
 from PrintData.views import V_PrintDataIndex,V_GetPrintData,V_EditPrintData,V_NewPrintData,V_GetLastPrintData
 from Backup.views import V_BackupIndex,V_DoBackup
@@ -87,6 +87,7 @@ Checkout_urlpatterns = [
 ExportExcel_urlpatterns = [
     path('DayReportIndex/', V_DayReportIndex),
     path('MonthReportIndex/', V_MonthReportIndex),
+    path('IntervalReportIndex/', V_IntervalReportIndex),
     path('PenaltyReportIndex/', V_PenaltyReportIndex),
     path('FeeItemReportIndex/', V_FeeItemReportIndex),
     path('GetPenaltyReport/', V_GetPenaltyReport,name='GetPenaltyReport'),

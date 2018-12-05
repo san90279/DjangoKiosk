@@ -51,6 +51,7 @@
       <li class="list-group-item d-flex justify-content-between align-items-center" style="line-height:0;padding: .15rem 1.25rem;">
         <b>金額總計</b>
         <span id="totalaccount" class="badge badge-primary badge-pill ">NT$0</span>
+        <span id="ShowInvoiceNo" class="badge badge-primary badge-pill "></span>
         <button  href="#" id="Checkout" class="btn btn-warning" ><i class="fas fa-coins"></i>確定退款</button >
       </li>
     </ul>
@@ -166,13 +167,13 @@ var myVar;
         async: false,
         success: function (data) {
           if(data.length==1){
-            ShowInvoiceData(data[0].MasterID,false,data[0].PayType,data[0].PayTypeName);
+            ShowInvoiceData(data[0].MasterID,false,data[0].PayType,data[0].PayTypeName,data[0].InvoiceNo);
           }else if (data.length==0){
             alert('查無資料請重新輸入!!');
             location.reload();
           }else{
             $.each( data, function( key, value ) {
-              $('#InvoiceList').append("<li class='list-group-item' onclick='ShowInvoiceData("+value.MasterID+",true,\""+value.PayType+"\",\""+value.PayTypeName+"\")' id='"+value.MasterID+"'>"+value.InvoiceNo+"</li>");
+              $('#InvoiceList').append("<li class='list-group-item' onclick='ShowInvoiceData("+value.MasterID+",true,\""+value.PayType+"\",\""+value.PayTypeName+"\",\""+value.InvoiceNo+"\")' id='"+value.MasterID+"'>"+value.InvoiceNo+"</li>");
             });
             $('#exampleModalLong').modal('show');
           }
@@ -237,7 +238,7 @@ var myVar;
     });
 
   });
-function ShowInvoiceData(MasterID,NeedClose,PayType,PayTypeName)
+function ShowInvoiceData(MasterID,NeedClose,PayType,PayTypeName,InvoiceNo)
 {
   if(NeedClose){
     $('#exampleModalLong').modal('toggle');
@@ -263,6 +264,7 @@ function ShowInvoiceData(MasterID,NeedClose,PayType,PayTypeName)
           TotalAmount=TotalAmount+(value.Amount*value.Qty);
       });
       document.getElementById("totalaccount").innerHTML = 'NT$'+TotalAmount+'('+PayTypeName+')';
+      document.getElementById("ShowInvoiceNo").innerHTML = '收據編號 : '+InvoiceNo;
       $('#h_TotalAmount').val(TotalAmount);
     }
   });

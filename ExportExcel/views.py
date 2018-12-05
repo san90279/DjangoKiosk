@@ -61,6 +61,11 @@ def V_MonthReportIndex(request):
         messages.success(request, '查無資料!', extra_tags='alert')
         return render(request,'ExportExcel/MonthReportIndex.html',{"MonthList":MonthList,"YearList":YearList});
 
+def V_IntervalReportIndex(request):
+    if(request.method=='GET'):
+        return render(request,'ExportExcel/IntervalReportIndex.html');
+
+
 
 #罰緩報表主頁
 def V_PenaltyReportIndex(request):

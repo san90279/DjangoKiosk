@@ -19,8 +19,8 @@
 
 <div class="card bg-light mb-3">
   <div class="card-footer small text-muted">
-    <label class="btn btn-danger" id="clean" onclick=""><i class="fas fa-donate"></i>清空錢箱</label>
-    <label class="btn btn-warning" id="zero" onclick=""><i class="fas fa-broom"></i>歸零錢箱計數</label>
+    <label class="btn btn-danger" id="clean"><i class="fas fa-donate"></i>清空錢箱</label>
+    <label class="btn btn-warning" id="zero"><i class="fas fa-broom"></i>歸零錢箱計數</label>
     <label class="btn btn-primary" id="setcoin"><i class="fas fa-coins"></i>設定硬幣數量</label>
   </div>
 
@@ -105,6 +105,7 @@
 {% block js %}
 <script type="text/javascript">
   var wsUri = 'ws://192.168.8.60:8888'
+  var myVar;
   function inittable(){
     var websocketinit = new WebSocket(wsUri);
     var message = '{"Command":"GetMoney_Cashbox"}';
@@ -116,6 +117,7 @@
       if (evt.data != NaN) {
         var js = JSON.parse('[' + evt.data + ']')
         var tb = $('#PenaltyTable').DataTable({
+          destroy:true,
           "processing": true,
           "searching": false,
           "autoWidth": false,
@@ -124,60 +126,59 @@
           "language": {
             "url": "/static/vendor/datatables/i18n/Chinese-traditional.lang"
           },
-          "columns": [{
-              "data": "TotalMoney"
-            },
-            {
-              "data": "TWD1000"
-            },
-            {
-              "data": "TWD500"
-            },
-            {
-              "data": "TWD200"
-            },
-            {
-              "data": "TWD100"
-            },
-            {
-              "data": "TWD50"
-            },
-            {
-              "data": "TWD10"
-            },
-            {
-              "data": "TWD5"
-            },
-            {
-              "data": "TWD1"
-            },
-
+          "columns": [
+            {"data": "TotalMoney"},
+            {"data": "TWD1000"},
+            {"data": "TWD500"},
+            {"data": "TWD200"},
+            {"data": "TWD100"},
+            {"data": "TWD50"},
+            {"data": "TWD10"},
+            {"data": "TWD5"},
+            {"data": "TWD1"},
           ],
         });
         websocketinit.close();
       }
     }
   }
+  function myTimer(){
+    var OText=$('#MsgShow').html();
+    if(OText.indexOf('.....')==-1){
+      $('#MsgShow').html(OText+'.');
+    }else{
+      $('#MsgShow').html(OText.replace('.....'));
+    }
+  }
   $(document).ready(function() {
+
     $('#setcoin').click(function() {
       $('#ModalSet').modal('show')
     });
     $('#clean').click(function() {
       var websocket = new WebSocket(wsUri);
-      var message = '{"Command":"Hopper_EmptyCashbox"}';
+      var message = '{"Command":"Hopper_SmartEmpty"}';
       websocket.onopen = function(evt) {
         websocket.send(message);
+        $('#clean').attr('disabled', true);
+        $('#zero').attr('disabled', true);
+        $('#setcoin').attr('disabled', true);
+        var html_content = '<div class="alert alert-warning alert-dismissible fade show" role="alert">' +
+          '<strong id="MsgShow">退幣中!請稍後</strong>' +
+          '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+          '<span aria-hidden="true">&times;</span></button></div>'
+        $('#message').html(html_content);
+        myVar = setInterval(myTimer, 500);
       };
       websocket.onmessage = function(evt) {
-        if (evt.data == "True") {
-          inittable()
-          var html_content = '<div class="alert alert-warning alert-dismissible fade show" role="alert">' +
-            '<strong>成功清空硬幣!</strong>' +
-            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-            '<span aria-hidden="true">&times;</span></button></div>'
-          $('#message').html(html_content);
-          websocket.close();
-        }
+        clearInterval(myVar);
+        var RetData=JSON.parse(evt.data);
+        $('#MsgShow').html('已退出50元'+RetData.TWD50+'個、已退出10元'+RetData.TWD10+'個、已退出5元'+RetData.TWD5+'個、已退出1元'+RetData.TWD1+'個');
+        $('#clean').attr('disabled', false);
+        $('#zero').attr('disabled', false);
+        $('#setcoin').attr('disabled', false);
+        websocket.close();
+        inittable()
       }
     });
     $('#zero').click(function() {
@@ -188,14 +189,14 @@
       };
       websocket.onmessage = function(evt) {
         if (evt.data == "True") {
-          inittable()
           var html_content = '<div class="alert alert-warning alert-dismissible fade show" role="alert">' +
             '<strong>成功歸零所有幣別計數!</strong>' +
             '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
             '<span aria-hidden="true">&times;</span></button></div>'
           $('#message').html(html_content);
-          websocket.close();
         }
+        websocket.close();
+        inittable()
       }
     });
     $('#sett').click(function() {
@@ -212,14 +213,14 @@
       websocket.onmessage = function(evt) {
         if (evt.data == "True") {
           $('#ModalSet').modal('toggle')
-          inittable()
           var html_content = '<div class="alert alert-warning alert-dismissible fade show" role="alert">' +
             '<strong>成功設定各硬幣別的數量!</strong>' +
             '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
             '<span aria-hidden="true">&times;</span></button></div>'
           $('#message').html(html_content);
-          websocket.close();
         }
+        websocket.close();
+        inittable()
       }
     });
     $('#exitmodal').click(function() {

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}區間報表{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block container %}
+{% for message in messages %}
+  <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    {{ message }}
+  </div>
+{% endfor %}
+<div class="card mb-3">
+  <div class="card-header">
+    <i class="fas fa-plus-circle"></i>
+    區間報表</div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <form method="post" id="SubmitForm" action="/ExportExcel/IntervalReportIndex/">
+          {% csrf_token %}
+          <table class="table table-bordered" width="100%" cellspacing="0">
+            <tr>
+              <th>
+                <label>報表區間</label>
+              </th>
+              <td>
+                <div class="form-group row" style="padding-left: 10px;">
+                  <div class="col-xs-3">
+                    <input type="date" id="ExportDateS" name="ExportDateS" class="form-control" />
+                  </div>
+                  <span>&nbsp;~&nbsp;</span>
+                  <div class="col-xs-3">
+                    <input type="date" id="ExportDateE" name="ExportDateE" class="form-control" />
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2"><button type="submit" id="ExportBT" class="btn btn-primary"> <i class="fas fa-file-excel"></i> 匯出</button></td>
+            </tr>
+          </table>
+        </form>
+      </div>
+    </div>
+    <div class="card-footer small text-muted">Updated {% now "SHORT_DATETIME_FORMAT" %}</div>
+
+</div>
+{% endblock %}
+
+{% block foot %}Copyright © Cypress 2018{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#ExportBT').click(function(){
+      if($('#ExportDateS').val()=='')      {
+        alert("請選擇日期!!!");
+        $('#ExportDateS').focus();
+        return false;
+      }else if($('#ExportDateE').val()=='')      {
+        alert("請選擇日期!!!");
+        $('#ExportDateE').focus();
+        return false;
+      }else{
+        $( ".alert-dismissible" ).remove();
+        $( "#SubmitForm" ).submit();
+      }
+    });
+  });
+</script>
+{% endblock %}
