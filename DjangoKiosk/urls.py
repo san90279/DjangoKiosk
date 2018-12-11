@@ -98,6 +98,7 @@ KioskUi_urlpatterns=[
     path('index/', V_KioskIndex),
     path('pick/<int:id>/', V_KioskPick),
     path('Refund/<int:id>/', V_Refund),
+    path('PayEntry/<int:id>/', V_PayEntry),
     path('GetEmployee/<str:CardNo>/', V_GetEmployeeData),
     path('GetDealList/<str:InvoiceNo>/', V_GetDealList),
     path('GetDealData/<str:MasterID>/', V_GetDealData),

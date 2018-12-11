@@ -47,7 +47,7 @@
 <input type="hidden" id="h_MasterID" />
 <input type="hidden" id="h_PayTypeName" />
 <input type="hidden" id="h_UserName" value='{{UserName}}' />
-<div class="row">
+<div class="row" style="margin-right:auto;">
   <div class="col-4 " style="top:100px;padding-left:100px;">
     <div class="list-group">
       {% for fee in Feelist %}
@@ -159,7 +159,7 @@
       </div>
       <div class="modal-body">
         <h3 id="step1">1.總共<span id="ShowTotalMoney"></span>元，目前投入<span id="PayAmount">0</span>元</h3>
-        <h3 id="step2">2.打印收據<span id="S_InvoiceNo"></span></h3>
+        <h3 id="step2">2.列印收據<span id="S_InvoiceNo"></span></h3>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" id="PrintInvoiceBT">完成列印發票</button>

@@ -21,6 +21,7 @@ class M_DealMaster(models.Model):
     InvoiceNo=models.ForeignKey('Invoice.M_Invoice',on_delete=models.PROTECT)
     IsCheckout=models.BooleanField()
     IsOutside=models.BooleanField()
+    IsOutside=models.BooleanField(default=False)
     LotNo=models.IntegerField(default=1)
     Creator=models.ForeignKey('auth.user',on_delete=models.PROTECT,related_name='CreatorMaster')
     CreateDate=models.DateTimeField(auto_now=True)

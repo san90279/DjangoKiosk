@@ -13,6 +13,7 @@
     <div class="load-more-btn mt-50 text-center">
       <a href="#" id="Payment" class="btn world-btn mt-15 mr-15" ><i class="fas fa-file-invoice-dollar"></i>繳費</a>
       <a href="#" id="Refund" class="btn world-btn mt-15"><i class="fas fa-hand-holding-usd"></i>退費</a>
+      <a href="#" id="PayEntry" class="btn world-btn mt-15"><i class="fas fa-hand-holding-usd"></i>補登繳費</a>
     </div>
   </div>
 </div>
@@ -76,7 +77,36 @@ $(function() {
     ChangePage('/KioskUi/Refund/');
     GoPage();
   });
+  $("#PayEntry").click(function() {
 
+  });
+
+  websocket = new WebSocket(wsUri);
+  var message='{"Command":"GetMoney_Cashbox"}';
+  websocket.onopen = function(evt) {
+    websocket.send(message);
+  };
+  websocket.onmessage = function (evt) {
+    var data=JSON.parse(evt.data);
+    var msg='元硬幣數量小於20個';
+    if(data.TWD50<20)
+    {
+      alert('50'+msg);
+    }
+    if(data.TWD10<20)
+    {
+      alert('10'+msg);
+    }
+    if(data.TWD5<20)
+    {
+      alert('5'+msg);
+    }
+    if(data.TWD1<20)
+    {
+      alert('1'+msg);
+    }
+    websocket.close();
+  };
 });
 function myTimer() {
   var CountSecond=parseInt($('#CountSecond').html())

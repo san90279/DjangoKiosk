@@ -107,3 +107,6 @@ def V_PrintInvoice(request,MasterID):
     OP=''
     #KioskDll.EPSON_RECEIPT_PRINT(TEL,FAX,NumOfReci,ItemAndMoney,TotalMoney,CashOrCard,OP)
     return HttpResponse("true")
+
+def V_PayEntry(request,id):
+    return render(request,'KioskUi/PayEntry.html',{"UserID":id})
