@@ -82,18 +82,23 @@ def SetReportTitle(ws):
     return ws
 
 
-def SetDayReportExcel(ReportDate,ws):
+def SetDayReportExcel(ReportDateS,ReportDateE,ws):
     ws=SetReportTitle(ws)
 
-    if(ReportDate==''):
+    if(ReportDateS==''):
         dt=datetime.datetime.now()
     else:
-        dt=datetime.datetime.strptime(ReportDate,'%Y-%m-%d')
-    ws['K2'] = '{0}年{1}月{2}日填報'.format(dt.year-1911,dt.month,dt.day)
+        dt=datetime.datetime.strptime(ReportDateS,'%Y-%m-%d')
 
     FeeTypeList=M_FeeItem.FeeTypeList
     FeeItemList=M_FeeItem.objects.filter(Status=1).values()
-    DealData=M_V_DayReport.objects.filter(DealDate=ReportDate).values()
+    if(ReportDateE==''):
+        ReportDateE=ReportDateS
+        ws['K2'] = '{0}年{1}月{2}日填報'.format(dt.year-1911,dt.month,dt.day)
+    else:
+        dtE=datetime.datetime.strptime(ReportDateE,'%Y-%m-%d')
+        ws['K2'] = '{0}年{1}月{2}日-{3}年{4}月{5}日填報'.format(dt.year-1911,dt.month,dt.day,dtE.year-1911,dtE.month,dtE.day)
+    DealData=M_V_DayReport.objects.filter(DealDate__range=(datetime.datetime.strptime(ReportDateS,'%Y-%m-%d'),datetime.datetime.strptime(ReportDateE,'%Y-%m-%d'))).values()
 
     if(len(DealData)==0):
         return None

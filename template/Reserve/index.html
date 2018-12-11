@@ -1,5 +1,5 @@
 ﻿{% extends 'base.html' %}
-{% block title %}{{sum}}{% endblock %}
+{% block title %}錢幣管理{% endblock %}
 {% block css %}
 
 {% endblock %}
@@ -19,9 +19,9 @@
 
 <div class="card bg-light mb-3">
   <div class="card-footer small text-muted">
-    <label class="btn btn-danger" id="clean"><i class="fas fa-donate"></i>清空錢箱</label>
-    <label class="btn btn-warning" id="zero"><i class="fas fa-broom"></i>歸零錢箱計數</label>
-    <label class="btn btn-primary" id="setcoin"><i class="fas fa-coins"></i>設定硬幣數量</label>
+    <button class="btn btn-danger" id="clean"><i class="fas fa-donate"></i>清空錢箱</button>
+    <button class="btn btn-warning" id="zero"><i class="fas fa-broom"></i>歸零錢箱計數</button>
+    <button class="btn btn-primary" id="setcoin"><i class="fas fa-coins"></i>設定硬幣數量</button>
   </div>
 
 </div>
@@ -147,11 +147,10 @@
     if(OText.indexOf('.....')==-1){
       $('#MsgShow').html(OText+'.');
     }else{
-      $('#MsgShow').html(OText.replace('.....'));
+      $('#MsgShow').html(OText.replace('.....',''));
     }
   }
   $(document).ready(function() {
-
     $('#setcoin').click(function() {
       $('#ModalSet').modal('show')
     });

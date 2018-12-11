@@ -22,14 +22,31 @@ def V_DayReportIndex(request):
     wb = load_workbook(filename = path)
     ws = wb.active
 
-    ws=SetDayReportExcel(request.POST.get('ExportDate', ''),ws)
+    ws=SetDayReportExcel(request.POST.get('ExportDate', ''),'',ws)
     if(ws):
         response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
-        response['Content-Disposition'] = 'attachment;filename={0}.xlsx'.format('Export')
+        response['Content-Disposition'] = 'attachment;filename={0}.xlsx'.format(request.POST.get('ExportDate', ''))
         return response
     else:
         messages.success(request, '查無資料!', extra_tags='alert')
         return render(request,'ExportExcel/DayReportIndex.html');
+
+def V_IntervalReportIndex(request):
+    if(request.method=='GET'):
+        return render(request,'ExportExcel/IntervalReportIndex.html');
+    module_dir = os.path.dirname(__file__)
+    path=open(os.path.join(module_dir+'/ExcelTemplate/', '日報表.xlsx'),'rb')
+    wb = load_workbook(filename = path)
+    ws = wb.active
+
+    ws=SetDayReportExcel(request.POST.get('ExportDateS', ''),request.POST.get('ExportDateE', ''),ws)
+    if(ws):
+        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment;filename={0}_{1}.xlsx'.format(request.POST.get('ExportDateS', ''),request.POST.get('ExportDateE', ''))
+        return response
+    else:
+        messages.success(request, '查無資料!', extra_tags='alert')
+        return render(request,'ExportExcel/IntervalReportIndex.html');
 
 
 def V_MonthReportIndex(request):
@@ -60,11 +77,6 @@ def V_MonthReportIndex(request):
     else:
         messages.success(request, '查無資料!', extra_tags='alert')
         return render(request,'ExportExcel/MonthReportIndex.html',{"MonthList":MonthList,"YearList":YearList});
-
-def V_IntervalReportIndex(request):
-    if(request.method=='GET'):
-        return render(request,'ExportExcel/IntervalReportIndex.html');
-
 
 
 #罰緩報表主頁
