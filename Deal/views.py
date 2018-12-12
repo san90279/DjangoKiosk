@@ -197,7 +197,7 @@ def V_GetEntryData(request):
     #資料總筆數
     count=len(EntryData)
     #拼出teplate JQGRID 欄位JSON資料流
-    data=[{	'DealDate': Enrty.DealDate.strftime('%Y-%m-%d'),
+    data=[{	'DealDate': (Enrty.DealDate+timedelta(hours=8)).strftime('%Y-%m-%d'),
             'CashierName': Enrty.last_name,
             'CashierID': Enrty.username,
             'StationID': Enrty.StationID,
@@ -210,6 +210,7 @@ def V_GetEntryData(request):
             'TotalAmount': Enrty.TotalAmount,
             'Status': [val for key,val in M_DealMaster.DealStatusList if key==Enrty.Status],
             'IsCheckout': Enrty.IsCheckout,
+            'IsOutsidePay': Enrty.IsOutsidePay,
             'LotNo': Enrty.LotNo} for Enrty in object_list]
     #JQGRID API
     dic = {

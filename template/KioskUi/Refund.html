@@ -282,9 +282,9 @@ function LoadingOff(){
 function LoadingText(){
   var BtText=$('#Checkout').html();
   if(BtText.indexOf('......')==-1){
-    $('#'+id).html(BtText+'.');
+    $('#Checkout').html(BtText+'.');
   }else{
-    $('#'+id).html('請稍後...');
+    $('#Checkout').html(BtText.replace('......',''));
   }
 }
 </script>

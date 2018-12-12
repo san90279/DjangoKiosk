@@ -78,7 +78,8 @@ $(function() {
     GoPage();
   });
   $("#PayEntry").click(function() {
-
+    ChangePage('/KioskUi/PayEntry/');
+    GoPage();
   });
 
   websocket = new WebSocket(wsUri);
@@ -89,21 +90,26 @@ $(function() {
   websocket.onmessage = function (evt) {
     var data=JSON.parse(evt.data);
     var msg='元硬幣數量小於20個';
+    var AlertMsg="";
     if(data.TWD50<20)
     {
-      alert('50'+msg);
+      AlertMsg=AlertMsg+'50'+msg+'\n';
     }
     if(data.TWD10<20)
     {
-      alert('10'+msg);
+      AlertMsg=AlertMsg+'10'+msg+'\n';
     }
     if(data.TWD5<20)
     {
-      alert('5'+msg);
+      AlertMsg=AlertMsg+'5'+msg+'\n';
     }
     if(data.TWD1<20)
     {
-      alert('1'+msg);
+      AlertMsg=AlertMsg+'1'+msg+'\n';
+    }
+    if(AlertMsg!='')
+    {
+      alert(AlertMsg);
     }
     websocket.close();
   };

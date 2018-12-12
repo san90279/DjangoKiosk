@@ -24,7 +24,8 @@ class Migration(migrations.Migration):
             SUM(dd."TotalAmount") AS "TotalAmount",
             dm."Status",
             dm."IsCheckout",
-            dm."LotNo"
+            dm."LotNo",
+            dm."IsOutsidePay"
            FROM "Deal_m_dealmaster" dm
              JOIN "Deal_m_dealdetail" dd ON dm.id = dd."MasterID_id"
              JOIN "Invoice_m_invoice" i ON dm."InvoiceNo_id" = i.id
@@ -32,7 +33,7 @@ class Migration(migrations.Migration):
              JOIN "auth_user" e ON dm."Cashier_id" = e.id
              JOIN "Store_m_station" s1 ON dm."StationID_id" = s1.id
           WHERE dm."IsOutside" = true
-          GROUP BY dm."Status", dm."IsCheckout", dm."DealDate", e."username",e."last_name", s1."StationID", f."FeeID", f."FeeName", dm."PayType", dd."TotalAmount",  dd."Amount",dm."LotNo";
+          GROUP BY dm."Status", dm."IsCheckout", dm."DealDate", e."username",e."last_name", s1."StationID", f."FeeID", f."FeeName", dm."PayType", dd."TotalAmount",  dd."Amount",dm."LotNo",dm."IsOutsidePay";
 
     """
     operations = [

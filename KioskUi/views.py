@@ -7,9 +7,10 @@ from Invoice.models import M_Invoice
 from Penalty.models import M_Penalty
 from Term.models import M_Term
 from Store.models import M_Station
-from Deal.models import M_DealMaster,M_DealDetail
+from Deal.models import M_DealMaster,M_DealDetail,M_V_entry
 from django.core.serializers.json import DjangoJSONEncoder
 import json,datetime
+from datetime import timedelta
 
 # Create your views here.
 def V_KioskIndex(request):
@@ -35,7 +36,7 @@ def V_Refund(request,id):
     return render(request,'KioskUi/Refund.html',{"UserID":id})
 
 def V_GetDealList(request,InvoiceNo):
-    DealList=M_DealMaster.objects.filter(InvoiceNo_id__InvoiceNo__icontains=InvoiceNo,Status=1,IsCheckout=False).order_by('InvoiceNo')
+    DealList=M_DealMaster.objects.filter(InvoiceNo_id__InvoiceNo__icontains=InvoiceNo,Status=1,IsCheckout=False,IsOutside=False).order_by('InvoiceNo')
     data=[{	'InvoiceNo': deal.InvoiceNo.InvoiceNo,'MasterID':deal.id,'PayType':deal.PayType,'PayTypeName':dict(M_DealMaster.PayTypeList)[deal.PayType]} for deal in DealList]
     return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder), content_type='application/json')
 
@@ -95,18 +96,16 @@ def V_RefundDealData(request,MasterID,UserID):
     data_m.save()
     return HttpResponse(True)
 
-def V_PrintInvoice(request,MasterID):
-    data_m=M_DealMaster.objects.get(id=MasterID)
-    data_d=M_DealDetail.objects.filter(MasterID=MasterID)
-    TEL=''
-    FAX=''
-    NumOfReci=''
-    ItemAndMoney=''
-    TotalMoney=''
-    CashOrCard=''
-    OP=''
-    #KioskDll.EPSON_RECEIPT_PRINT(TEL,FAX,NumOfReci,ItemAndMoney,TotalMoney,CashOrCard,OP)
-    return HttpResponse("true")
-
 def V_PayEntry(request,id):
     return render(request,'KioskUi/PayEntry.html',{"UserID":id})
+
+def V_GetDealLotList(request,LotNo):
+    DealLotList=M_V_entry.objects.filter(LotNo__icontains=LotNo,Status=1,IsCheckout=False,IsOutsidePay=False).order_by('id')
+    data=[{	'LotNo': LotList.LotNo,'DealDate':(LotList.DealDate+timedelta(hours=8)).strftime("%Y-%m-%d"),'FeeName':LotList.FeeName,'TotalAmount':LotList.TotalAmount} for LotList in DealLotList]
+    return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder), content_type='application/json')
+
+def V_PayEntryFinish(request,LotNo,UserID):
+    LotDealList=M_DealMaster.objects.filter(LotNo=LotNo)
+    UserData=User.objects.get(id=UserID)
+    LotDealList.update(IsOutsidePay=True,Editor=UserData,EditDate=datetime.datetime.now())
+    return HttpResponse("true")

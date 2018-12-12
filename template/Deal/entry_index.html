@@ -72,7 +72,7 @@
                   <th>總金額</th>
                   <th>狀態</th>
                   <th>是否過帳</th>
-                  <th>LotNo</th>
+                  <th>Lot No</th>
                   <th></th>
                 </tr>
               </thead>
@@ -90,7 +90,7 @@
                   <th>總金額</th>
                   <th>狀態</th>
                   <th>是否過帳</th>
-                  <th>LotNo</th>
+                  <th>Lot No</th>
                   <th></th>
                 </tr>
               </tfoot>
@@ -163,7 +163,7 @@
             { "data": "LotNo" },
             { "data": "LotNo" ,
              render: function ( data, type, row ) {
-                 if ( type === 'display' && row['IsCheckout']==false) {
+                 if ( type === 'display' && row['IsCheckout']==false && row['IsOutsidePay']==false) {
                    var retStr='<button  class="btn btn-danger " onclick="location.href=\'/Deal/entrydelete/'+row['DealDate']+'/'+data+'/\';" ><i class="fas fa-minus-circle"></i>刪除</button>'
                    return retStr;
                    return data;

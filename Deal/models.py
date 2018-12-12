@@ -21,7 +21,7 @@ class M_DealMaster(models.Model):
     InvoiceNo=models.ForeignKey('Invoice.M_Invoice',on_delete=models.PROTECT)
     IsCheckout=models.BooleanField()
     IsOutside=models.BooleanField()
-    IsOutside=models.BooleanField(default=False)
+    IsOutsidePay=models.BooleanField(default=False)
     LotNo=models.IntegerField(default=1)
     Creator=models.ForeignKey('auth.user',on_delete=models.PROTECT,related_name='CreatorMaster')
     CreateDate=models.DateTimeField(auto_now=True)
@@ -59,6 +59,7 @@ class M_V_entry(models.Model):
     Status=models.CharField(max_length=10,choices=M_DealMaster.DealStatusList,null=True)
     IsCheckout=models.BooleanField()
     LotNo=models.IntegerField(default=1)
+    IsOutsidePay=models.BooleanField(default=False)
     class Meta:
         managed = False
         db_table = "Deal_M_V_entry"
