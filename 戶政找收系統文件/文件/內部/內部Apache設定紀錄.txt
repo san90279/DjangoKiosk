@@ -1,0 +1,40 @@
+C:\Apache24\conf
+httpd.conf
+多新增以下設定
+===========================================================================================
+LoadFile "c:/users/kiouser!/appdata/local/programs/python/python35-32/python35.dll"
+LoadModule wsgi_module "c:/users/kiouser!/envs/kiosk/lib/site-packages/mod_wsgi/server/mod_wsgi.cp35-win32.pyd"
+WSGIScriptAlias / C:/Apache24/htdocs/DjangoKiosk/DjangoKiosk/wsgi.py
+WSGIPythonHome "c:/users/kiouser!/envs/kiosk"
+WSGIPythonPath C:/Apache24/htdocs/DjangoKiosk
+WSGIApplicationGroup %{GLOBAL}
+
+DocumentRoot "${SRVROOT}/htdocs/DjangoKiosk/DjangoKiosk"
+<Directory "${SRVROOT}/htdocs/DjangoKiosk/DjangoKiosk">
+	Options Indexes FollowSymLinks
+    	<Files wsgi.py>
+    	Require all granted
+    	</Files>
+
+</Directory>
+    Alias /static/ C:/Apache24/htdocs/DjangoKiosk/static/
+    <Directory C:/Apache24/htdocs/DjangoKiosk/static/>
+         Options Indexes  FollowSymLinks
+         AllowOverride None
+         Require all granted
+    </Directory>
+===========================================================================================
+
+
+
+C:\Apache24\bin
+丟入DLL檔
+=====================
+C:\Apache24
+丟入
+Resources資料夾
+
+===========================================================================================
+
+專案放置的路徑
+C:\Apache24\htdocs\DjangoKiosk
