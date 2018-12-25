@@ -441,3 +441,84 @@ def SetMonthReportExcel(ReportYear,ReportMonth,ws):
     ws['L'+str(RowNo)]='機關首長'
 
     return ws
+
+
+
+def SetFeeItemReportExcel(StartDate,EndDate,ws):
+
+    DealData=M_V_FeeItemReport.objects.filter(DealDate__range=(datetime.datetime.strptime(StartDate,'%Y-%m-%d'),datetime.datetime.strptime(EndDate,'%Y-%m-%d'))).values()
+    if(len(DealData)==0):
+        return None
+    dt=datetime.datetime.now()
+    ws['J4'] = '列印日期:{0}年{1}月{2}日'.format(dt.year-1911,dt.month,dt.day)
+    ws['B5'] = datetime.datetime.strptime(StartDate,'%Y-%m-%d')
+    ws['D5'] =datetime.datetime.strptime(EndDate,'%Y-%m-%d')
+    i=9
+
+    for value in DealData:
+        ws['A'+str(i)] = value['StationID']
+        ws['B'+str(i)] = value['DealDate'].date()
+        ws['C'+str(i)] = value['DealDate'].time()
+        ws['D'+str(i)] = '作廢' if value['Status']=='0' else '正常'
+        ws['E'+str(i)] = value['FeeID']
+        ws['F'+str(i)] = value['FeeName']
+        ws['G'+str(i)] = value['Qty']
+        ws['H'+str(i)] = value['Amount']
+        ws['I'+str(i)] = value['Amount'] if value['PayType']=='PT01' else 0
+        ws['J'+str(i)] = value['Amount'] if value['PayType']=='PT02' else 0
+        ws['K'+str(i)] = value['InvoiceNo']
+        ws['L'+str(i)] = value['Remark']
+        i=i+1
+    ws['A'+str(i)] = '筆數'
+    ws['B'+str(i)] = len(DealData)
+    ws['C'+str(i)] = '數量總計'
+    ws['D'+str(i)] = DealData.aggregate(Sum('Qty'))['Qty__sum']
+    ws['E'+str(i)] = '金額合計(不含作廢):'
+    ws['F'+str(i)] = DealData.filter(Status='1').aggregate(Sum('Amount'))['Amount__sum']
+    ws['G'+str(i)] = '金額合計(作廢):'
+    ws['H'+str(i)] = DealData.filter(Status='0').aggregate(Sum('Amount'))['Amount__sum']
+    i=i+2
+    ws['A'+str(i)] = '機關主管：'
+    ws['D'+str(i)] = '主辦會計：'
+    ws['H'+str(i)] = '出　　納：'
+    ws['K'+str(i)] = '業務主管：'
+    ws['N'+str(i)] = '製　　表：'
+
+
+    return ws
+
+
+
+def SetPenaltyReportExcel(StartDate,EndDate,ws):
+    DealData=M_V_PenaltyReport.objects.filter(DealDate__range=(datetime.datetime.strptime(StartDate,'%Y-%m-%d'),datetime.datetime.strptime(EndDate,'%Y-%m-%d'))).values()
+    if(len(DealData)==0):
+        return None
+    dt=datetime.datetime.now()
+    ws['F4'] = '列印日期:{0}年{1}月{2}日'.format(dt.year-1911,dt.month,dt.day)
+    ws['C6'] = datetime.datetime.strptime(StartDate,'%Y-%m-%d')
+    ws['F6'] =datetime.datetime.strptime(EndDate,'%Y-%m-%d')
+    i=10
+
+    for value in DealData:
+        ws['A'+str(i)] = value['DealDate'].date()
+        ws['B'+str(i)] = value['PenaltyID']
+        ws['C'+str(i)] = value['PenaltyName']
+        ws['D'+str(i)] = value['TermID']
+        ws['E'+str(i)] = value['TermName']
+        ws['G'+str(i)] = value['qty']
+        ws['H'+str(i)] = value['totalamount']
+        ws['I'+str(i)] = value['Remark']
+        i=i+1
+    ws['A'+str(i)] = '筆數'
+    ws['B'+str(i)] = len(DealData)
+    ws['C'+str(i)] = '數量總計'
+    ws['D'+str(i)] = DealData.aggregate(Sum('qty'))['qty__sum']
+    ws['E'+str(i)] = '金額合計:'
+    ws['F'+str(i)] = DealData.aggregate(Sum('totalamount'))['totalamount__sum']
+    i=i+2
+    ws['A'+str(i)] = '機關主管：'
+    ws['C'+str(i)] = '主辦會計：'
+    ws['E'+str(i)] = '出　　納：'
+    ws['G'+str(i)] = '業務主管：'
+    ws['I'+str(i)] = '製　　表：'
+    return ws

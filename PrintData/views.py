@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.core.serializers.json import DjangoJSONEncoder
 from PrintData.forms import PrintDataForm
 from django.core import serializers
+from datetime import timedelta
 # Create your views here.
 
 def V_PrintDataIndex(request):
@@ -25,7 +26,7 @@ def V_GetPrintData(request):
     #資料總筆數
     count=len(PrintData)
     #拼出teplate JQGRID 欄位JSON資料流
-    data=[{	'EnableDate': Print.EnableDate.strftime("%Y-%m-%d"),
+    data=[{	'EnableDate': (Print.EnableDate+timedelta(hours=8)).strftime("%Y-%m-%d"),
 			'Salesman': Print.Salesman,
             'Accounting': Print.Accounting,
             'Chief': Print.Chief,
@@ -68,7 +69,7 @@ def V_NewPrintData(request):
         form = PrintDataForm(request.POST)
         if form.is_valid():
             PrintData = form.save(commit=False)
-            PrintData.EnableDate = form.EnableDate
+            PrintData.EnableDate = form.EnableDate+timedelta(hours=8)
             PrintData.Salesman = form.Salesman
             PrintData.Accounting = form.Accounting
             PrintData.Chief = form.Chief

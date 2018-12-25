@@ -6,15 +6,16 @@
 {% endblock %}
 
 {% block container %}
-
+<form method="post" id="SubmitForm" action="/ExportExcel/FeeItemReportIndex/">
+  {% csrf_token %}
   <div class="card bg-light mb-3">
         <div class="card-header"><i class="fas fa-search"></i>條件搜尋</div>
             <div class="card-body">
               <div class="row">
                     <B class="col-xl-3 col-sm-6 mb-3">起始日期：</B>
-                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Startdate" name="Startdate" value="" type="date">
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Startdate" name="Startdate" type="date"/>
                     <B class="col-xl-3 col-sm-6 mb-3">結束日期：</B>
-                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Enddate" name="Enddate" value="" type="date">
+                    <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="Enddate" name="Enddate" type="date"/>
                     <B class="col-xl-3 col-sm-6 mb-3">規費：</B>
                     {% ParameterListFor  list=Fee html_id="FeeID" pleaseselect="---請選擇---" %}
                     <B class="col-xl-3 col-sm-6 mb-3">顯示類別：</B>
@@ -29,13 +30,13 @@
             </div>
 
             <div class="card-footer small text-muted">
-                <button onclick="tablerefresh();"  id="search" class="btn btn-primary"> <i class="fas fa-search icon-large"></i>查詢 </button>
-                <button  class="btn btn-warning"  onclick="javascript:location.href='{% url 'FeeItemNew'%}'" ><i class="fas fa-file-excel"></i>報表</button>
+                <button onclick="tablerefresh();return false;"  id="search" class="btn btn-primary"> <i class="fas fa-search icon-large"></i>查詢 </button>
+                <button  class="btn btn-warning" onclick="doSubmit()" ><i class="fas fa-file-excel"></i>報表</button>
             </div>
 
   </div>
 
-
+</form>
 
 
 <div class="card mb-3">
@@ -126,7 +127,9 @@
             ],
           });
   }
-
+  function doSubmit(){
+    $( "#SubmitForm" ).submit();
+  }
   $(document).ready(function() {
      tablerefresh();
     } );

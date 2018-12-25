@@ -272,7 +272,7 @@
         items=items+Name+'\r\n'+FeeCount+'x'+Price+'='+(parseInt(FeeCount)*parseInt(Price)).toString()
       });
       var op="收費人員:"+$('#h_UserName').val()+"\r\n業務課長:"+PrintData[0]['fields']["Salesman"]+"\r\n主辦會計:"+PrintData[0]['fields']["Accounting"]+"\r\n機關主管:"+PrintData[0]['fields']["Chief"];
-      var printInfo='{"Command":"EPSON_RECEIPT_PRINT","Title":"台北市信義戶政收款收據", "TEL":"", "FAX":"", "NumOfReci":"'+$('#h_InvoiceNo').val()+'", "ItemAndMoney":"'+items+'", "TotalMoney":"'+convert()+'", "CashORCard":"'+$('#h_PayTypeName').val()+'", "OP":"'+op+'","Count":3}';
+      var printInfo='{"Command":"EPSON_RECEIPT_PRINT","Title":"台北市信義戶政收款收據", "TEL":"", "FAX":"", "NumOfReci":"'+$('#h_InvoiceNo').val()+'", "ItemAndMoney":"'+items+'", "TotalMoney":"'+convert()+'", "CashORCard":"'+$('#h_PayTypeName').val()+'", "OP":"'+op+'","Count":1}';
       var websocket = new WebSocket(wsUri);
       websocket.onopen = function(evt) {
         websocket.send(printInfo);
@@ -283,7 +283,7 @@
         }else{
           alert(evt.data);
           //之後要拿掉
-          location.href='/KioskUi/index/';
+          //location.href='/KioskUi/index/';
         }
         websocket.close();
       };
@@ -426,9 +426,9 @@
       "<li class='list-group-item d-flex justify-content-between align-items-center'>" + name +
         "<span class='badge badge-primary badge-pill'>NT$" + price + "</span>"+
         "<div>"+
-          "<i class='fas fa-plus-square' onclick='PlusValues(\""+id+"\")' onmousedown='PlusMousedown(\""+id+"\")' onmouseup='PlusMouseup(\""+id+"\")' onmouseout='PlusMouseout(\""+id+"\")'></i>&nbsp"+
+          "<i class='fas fa-minus-square' onclick='MinusValues(\""+id+"\")' onmousedown='MinusMousedown(\""+id+"\")' onmouseup='MinusMouseup(\""+id+"\")' onmouseout='MinusMouseout(\""+id+"\")'  ontouchstart='MinusTouchStart(\""+id+"\")' ontouchend='MinusTuchEnd(\""+id+"\")'></i>&nbsp&nbsp&nbsp&nbsp"+
           "<input type='input' style='width:50px;' class='FeeItem' onchange='ChangeFeeCount()' id='" + id +"' min='1' max='100' itemName='"+name+"' price='"+price+"' Term='"+Term+"' Penalty='"+Penalty+"' value='1'/>"+
-          "&nbsp<i class='fas fa-minus-square' onclick='MinusValues(\""+id+"\")' onmousedown='MinusMousedown(\""+id+"\")' onmouseup='MinusMouseup(\""+id+"\")' onmouseout='MinusMouseout(\""+id+"\")'></i>"+
+          "&nbsp&nbsp&nbsp&nbsp<i class='fas fa-plus-square' onclick='PlusValues(\""+id+"\")' onmousedown='PlusMousedown(\""+id+"\")' onmouseup='PlusMouseup(\""+id+"\")' onmouseout='PlusMouseout(\""+id+"\")' ontouchstart='PlusTouchStart(\""+id+"\")' ontouchend='PlusTuchEnd(\""+id+"\")'></i>"+
         "</div>"+
         "<i onclick='removeitem(this,"+price+")' class='fas fa-times fa-1x'></i>"+
       "</li>");
@@ -496,6 +496,23 @@
     clearInterval(myVarII);
     clearTimeout(timeout);
   }
-
+  function PlusTouchStart(id){
+    timeout = setTimeout(function() {
+      myVarII = setInterval(function(){PlusValues(id);}, 80);
+    }, 800);
+  }
+  function MinusTouchStart(id){
+    timeout = setTimeout(function() {
+      myVarII = setInterval(function(){MinusValues(id);}, 80);
+    }, 800);
+  }
+  function PlusTuchEnd(id){
+    clearInterval(myVarII);
+    clearTimeout(timeout);
+  }
+  function MinusTuchEnd(id){
+    clearInterval(myVarII);
+    clearTimeout(timeout);
+  }
 </script>
 {% endblock %}

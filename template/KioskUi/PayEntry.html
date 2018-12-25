@@ -52,7 +52,7 @@
         <b>金額總計</b>
         <span id="totalaccount" class="badge badge-primary badge-pill ">NT$0</span>
         <span id="ShowFeeName" class="badge badge-primary badge-pill "></span>
-        <button  href="#" id="Checkout" class="btn btn-warning" ><i class="fas fa-coins"></i>確定退款</button >
+        <button  href="#" id="Checkout" class="btn btn-warning" ><i class="fas fa-coins"></i>繳款</button >
       </li>
     </ul>
   </div>
@@ -195,7 +195,7 @@ var myVar;
     });
     $('#Checkout').click(function () {
       LoadingOn();
-      var TotalAmount=$('#h_TotalAmount').val();
+      var TotalAmount=parseInt($('#h_TotalAmount').val());
       websocket = new WebSocket(wsUri);
       var message='{"Command":"SetPrice", "Money":'+TotalAmount+'}';
       websocket.onopen = function(evt) {
@@ -205,6 +205,7 @@ var myVar;
         if(evt.data=='SetPrice-True'){
           $('#PayAmount').html('0');
         }else if(evt.data>=TotalAmount){
+          $('#PayAmount').html(evt.data);
           var LotNo=$('#h_LotNo').val();
           $.ajax({
             url: '/KioskUi/PayEntryFinish/'+LotNo+'/{{ UserID }}/',
@@ -237,12 +238,9 @@ function ShowLotData(LotNo,NeedClose,DealDate,FeeName,TotalAmount)
     "<li class='list-group-item d-flex justify-content-between align-items-center'>" + FeeName +'(Lot No : '+LotNo+')'+
       "<span class='badge badge-primary badge-pill'>NT$" + TotalAmount + "</span>"+
     "</li>");
-
+  document.getElementById("ShowTotalMoney").innerHTML=TotalAmount;
   document.getElementById("totalaccount").innerHTML = 'NT$'+TotalAmount;
-  document.getElementById("ShowFeeName").innerHTML = FeeName+'('+DealDate+')'
-  $('#h_TotalAmount').val(TotalAmount);
-
-
+  document.getElementById("ShowFeeName").innerHTML = FeeName+'('+DealDate+')';
 }
 function LoadingOn(){
   $('#Checkout').prop('disabled', true);
@@ -253,7 +251,7 @@ function LoadingOff(){
   $('#Checkout').prop('disabled', false);
   $('#StepModal').modal('toggle');
   clearInterval(myVar);
-  $('#Checkout').html('<i class="fas fa-coins"></i>確定退款');
+  $('#Checkout').html('<i class="fas fa-coins"></i>繳款');
 }
 function LoadingText(){
   var BtText=$('#Checkout').html();

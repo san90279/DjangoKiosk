@@ -18,15 +18,8 @@
               <div class="row">
                     <B class="col-xl-3 col-sm-6 mb-3">指定日期：</B>
                     <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" id="searchDate" name="searchDate" value="" type="date">
-                    <B class="col-xl-3 col-sm-6 mb-3">收銀人員：</B>
-                    {% ParameterListFor  list=employee html_id="searchUserName" pleaseselect="----請選擇----" %}
-                    <B class="col-xl-3 col-sm-6 mb-3">指定機台：</B>
-                    {% ParameterListFor  list=station html_id="searchStation" pleaseselect="----請選擇----" %}
                     <B class="col-xl-3 col-sm-6 mb-3">規費代碼：</B>
                     {% ParameterListFor  list=fee html_id="searchFeeID" pleaseselect="----請選擇----" %}
-                    <B class="col-xl-3 col-sm-6 mb-3">收款類別：</B>
-                    {% ParameterListFor  list=paytype html_id="searchPayType" pleaseselect="全部" %}
-
                     <B class="col-xl-3 col-sm-6 mb-3"></B>
                     <input class="form-control rounded-0 col-xl-3 col-sm-6 mb-3" value="" type="hidden">
               </div>
@@ -125,10 +118,7 @@
                 "data":function(d){
                   d.csrfmiddlewaretoken= '{{ csrf_token }}',
                   d.DealDate__icontains =$("#searchDate").val(),
-                  d.EmployeeID__icontains =$("#searchUserName").val(),
-                  d.StationID__icontains =$("#searchStation").val(),
-                  d.FeeID__icontains =$("#searchFeeID").val(),
-                  d.PayType__icontains =$("#searchPayType").val()
+                  d.FeeID__icontains =$("#searchFeeID").val()
                 },
                 "dataSrc": "data",
         },

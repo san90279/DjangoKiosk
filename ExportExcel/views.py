@@ -6,12 +6,13 @@ from django.views.decorators.csrf import csrf_protect
 import os
 import datetime,json
 from django.http import HttpResponse
-from ExportExcel.models import M_V_PenaltyReport,M_V_FeeItemReport,SetDayReportExcel,SetMonthReportExcel
+from ExportExcel.models import M_V_PenaltyReport,M_V_FeeItemReport,SetDayReportExcel,SetMonthReportExcel,SetFeeItemReportExcel,SetPenaltyReportExcel
 from Deal.models import M_DealMaster
 from FeeItem.models import M_FeeItem
 from CommonApp.models import GridCS
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib import messages
+from datetime import timedelta
 
 # Create your views here.
 def V_DayReportIndex(request):
@@ -81,14 +82,44 @@ def V_MonthReportIndex(request):
 
 #罰緩報表主頁
 def V_PenaltyReportIndex(request):
-    return render(request,'ExportExcel/PenaltyReportIndex.html');
+    if(request.method=='GET'):
+        return render(request,'ExportExcel/PenaltyReportIndex.html');
+
+    module_dir = os.path.dirname(__file__)
+    path=open(os.path.join(module_dir+'/ExcelTemplate/', '罰鍰交易明細表.xlsx'),'rb')
+    wb = load_workbook(filename = path)
+    ws = wb.active
+
+    ws=SetPenaltyReportExcel(request.POST.get('Begindate', ''),request.POST.get('Enddate', ''),ws)
+    if(ws):
+        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment;filename={0}.xlsx'.format('Export')
+        return response
+    else:
+        messages.success(request, '查無資料!', extra_tags='alert')
+        return render(request,'ExportExcel/PenaltyReportIndex.html',{"MonthList":MonthList,"YearList":YearList});
 
 #規費報表主頁
 def V_FeeItemReportIndex(request):
     Status=M_DealMaster.DealStatusList
     PayType=M_DealMaster.PayTypeList
     Fee=M_FeeItem.objects.all().values_list('FeeID', 'FeeName')
-    return render(request,'ExportExcel/FeeItemReportIndex.html',{'Status':Status,'PayType':PayType,'Fee':Fee});
+    if(request.method=='GET'):
+        return render(request,'ExportExcel/FeeItemReportIndex.html',{'Status':Status,'PayType':PayType,'Fee':Fee});
+
+    module_dir = os.path.dirname(__file__)
+    path=open(os.path.join(module_dir+'/ExcelTemplate/', '規費交易明細表.xlsx'),'rb')
+    wb = load_workbook(filename = path)
+    ws = wb.active
+
+    ws=SetFeeItemReportExcel(request.POST.get('Startdate', ''),request.POST.get('Enddate', ''),ws)
+    if(ws):
+        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment;filename={0}.xlsx'.format('Export')
+        return response
+    else:
+        messages.success(request, '查無資料!', extra_tags='alert')
+        return render(request,'ExportExcel/FeeItemReportIndex.html',{'Status':Status,'PayType':PayType,'Fee':Fee});
 
 #JQGRID取得罰緩報表資料
 @csrf_protect
@@ -103,7 +134,7 @@ def V_GetPenaltyReport(request):
     #資料總筆數
     count=len(PenaltyData)
     #拼出teplate JQGRID 欄位JSON資料流
-    data=[{	'DealDate': Penalty.DealDate.strftime('%Y-%m-%d'),
+    data=[{	'DealDate': (Penalty.DealDate+timedelta(hours=8)).strftime('%Y-%m-%d'),
             'PenaltyID':Penalty.PenaltyID  ,
             'PenaltyName': Penalty.PenaltyName,
             'TermID': Penalty.TermID ,
@@ -134,8 +165,8 @@ def V_GetFeeItemReport(request):
     count=len(FeeItemData)
     #拼出teplate JQGRID 欄位JSON資料流
     data=[{	'StationID': FeeItem.StationID,
-            'DealDate': FeeItem.DealDate.strftime('%Y-%m-%d'),
-            'DealTime': FeeItem.DealDate.strftime('%H:%M'),
+            'DealDate': (FeeItem.DealDate+timedelta(hours=8)).strftime('%Y-%m-%d'),
+            'DealTime': (FeeItem.DealDate+timedelta(hours=8)).strftime('%H:%M'),
             'InvoiceNo':FeeItem.InvoiceNo ,
             'Status': [val for key,val in M_DealMaster.DealStatusList if key==FeeItem.Status],
             'PayType':[val for key,val in M_DealMaster.PayTypeList if key==FeeItem.PayType],
