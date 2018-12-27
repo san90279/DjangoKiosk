@@ -29,7 +29,7 @@ def V_GetCheckoutData(request):
     #拼出teplate JQGRID 欄位JSON資料流
     data=[{	'CloseDate': Checkout.CloseDate,
             'Editor':Checkout.Editor.username,
-            'RecordTime':Checkout.RecordTime.strftime('%Y-%m-%d %H:%M:%S'),
+            'RecordTime':(Checkout.RecordTime+timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S'),
             'pk': Checkout.pk} for Checkout in object_list]
     #JQGRID API
     dic = {

@@ -102,9 +102,9 @@
                       d.csrfmiddlewaretoken= '{{ csrf_token }}',
                       d.DealDate__gte=$("#Startdate").val(),
                       d.DealDate__lte=$("#Enddate").val(),
-                      d.FeeID__icontains=$("#FeeID").val(),
-                      d.Status__icontains=$("#DealType").val(),
-                      d.PayType__icontains=$("#PayType").val()
+                      d.FeeID__exact=$("#FeeID").val(),
+                      d.Status__exact=$("#DealType").val(),
+                      d.PayType__exact=$("#PayType").val()
                     },
                     "dataSrc": "data",
             },

@@ -284,6 +284,7 @@
           alert(evt.data);
           //之後要拿掉
           //location.href='/KioskUi/index/';
+          $(this).prop('disabled', false);
         }
         websocket.close();
       };
