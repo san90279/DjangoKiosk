@@ -2,13 +2,18 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.core.serializers.json import DjangoJSONEncoder
 import json
+import socket
+
 #import clr
 #clr.AddReference("Household")
 #from CYP import Household
 #KioskDll=Household()
 # Create your views here.
 def V_ReserveIndex(request):
-    return render(request,'Reserve/index.html')
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(('8.8.8.8', 80))
+    ip = s.getsockname()[0]
+    return render(request,'Reserve/index.html',{"ip":ip})
 
 #def V_ReserveData(request):
     #feedback=KioskDll.GetMoney_Cashbox()
