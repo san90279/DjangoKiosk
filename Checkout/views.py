@@ -6,6 +6,7 @@ from Checkout.models import M_Checkout
 from Deal.models import M_DealMaster
 from django.db.models import Q
 import datetime,json
+from datetime import timedelta
 from CommonApp.models import GridCS
 from Checkout.forms import CheckoutForm
 from django.core.serializers.json import DjangoJSONEncoder
